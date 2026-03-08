@@ -1,0 +1,243 @@
+/* G&M Autospares – Travely-inspired (BootstrapMade style) */
+
+:root {
+  --font: 'Poppins', system-ui, sans-serif;
+  --travely-primary: #0d6efd;
+  --travely-hero-overlay: rgba(0, 0, 0, 0.45);
+}
+
+body.travely-body {
+  font-family: var(--font);
+  padding-top: 56px; /* fixed navbar height */
+}
+
+/* Home: transparent navbar over hero */
+body.page-home .navbar {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+body.page-home .navbar .nav-link,
+body.page-home .navbar .navbar-brand {
+  color: #fff !important;
+}
+body.page-home .navbar .nav-link:hover {
+  color: rgba(255,255,255,0.85) !important;
+}
+body.page-home .navbar-toggler-icon {
+  filter: invert(1);
+}
+body.page-home {
+  padding-top: 0;
+}
+body.page-home main {
+  padding-top: 0 !important;
+}
+
+/* Travely hero – full-width, overlay, centered text */
+.travely-hero {
+  position: relative;
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+}
+.travely-hero.has-bg-image {
+  background-color: #1a1a2e;
+}
+.travely-hero .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--travely-hero-overlay);
+  z-index: 0;
+}
+.travely-hero .hero-inner {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1rem 6rem;
+}
+.travely-hero .hero-inner h1 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.travely-hero .hero-inner .lead {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Flight-style search card – overlaps hero bottom */
+.travely-search-card {
+  position: relative;
+  z-index: 2;
+  margin-top: -4rem;
+  margin-bottom: 3rem;
+}
+.travely-search-card .card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+.travely-search-card .card-body {
+  padding: 1.5rem;
+}
+.travely-search-card .form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #6c757d;
+  margin-bottom: 0.35rem;
+}
+.travely-search-card .btn-search {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  align-self: flex-end;
+}
+@media (min-width: 992px) {
+  .travely-search-card .card-body {
+    padding: 1.5rem 1.75rem;
+  }
+  .travely-search-card .form-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Section headings – Travely style */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: #212529;
+}
+
+/* Hero slider (when using slider instead of static hero) */
+.hero-slider {
+  position: relative;
+  min-height: 75vh;
+  overflow: hidden;
+}
+.hero-slider .hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.hero-slider .hero-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+.hero-slider .hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-slider .hero-slide-content {
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+
+/* Parts filter layout (Livewire) – horizontal bar option on parts page */
+.parts-filter {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 992px) {
+  .parts-filter {
+    grid-template-columns: 280px 1fr;
+  }
+}
+.parts-filter.filter-bar-layout {
+  grid-template-columns: 1fr;
+}
+.parts-filter.filter-bar-layout .filter-panel {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.parts-filter.filter-bar-layout .filter-panel .card-body {
+  padding: 1rem 1.25rem;
+}
+@media (min-width: 768px) {
+  .parts-filter.filter-bar-layout .filter-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+  .parts-filter.filter-bar-layout .filter-form-row .mb-3 {
+    margin-bottom: 0 !important;
+    flex: 1;
+    min-width: 120px;
+  }
+  .parts-filter.filter-bar-layout .filter-form-row .btn {
+    flex-shrink: 0;
+  }
+}
+
+.filter-panel .card-body {
+  padding: 1.25rem;
+}
+
+/* Part & vehicle cards */
+.part-card,
+a.part-card,
+.vehicle-card,
+a.vehicle-card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.part-card:hover,
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+.part-card-image,
+.vehicle-card-image {
+  aspect-ratio: 4/3;
+  background: #f8f9fa;
+  overflow: hidden;
+}
+.vehicle-card-image {
+  aspect-ratio: 16/10;
+}
+.part-card-image img,
+.vehicle-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.part-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 0.9rem;
+}
+.part-card-price {
+  color: var(--travely-primary);
+  font-weight: 600;
+}
+
+/* Part detail */
+.part-detail-gallery {
+  position: sticky;
+  top: 5.5rem;
+}
