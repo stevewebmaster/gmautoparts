@@ -4,6 +4,18 @@ Use this after you’ve pushed the latest code to GitHub (`git push origin main`
 
 ---
 
+## SiteHost Cloud Containers – folder structure
+
+On **SiteHost Cloud Containers**:
+
+- Put your **application files** in **`/application`**.
+- The **web root** (what the browser hits) must be **`/application/public`** — i.e. Laravel’s `public` folder inside the app.
+
+So: **project root = `/application`**, **web root = `/application/public`**.  
+If the site is wrong (e.g. 404, or no CSS), the web root is usually set to the project root instead of `public`. Fix by setting Nginx `root` or Apache `DocumentRoot` (under `/config`) to **`/application/public`**.
+
+---
+
 ## 1. On your Mac – push latest to GitHub
 
 ```bash
@@ -16,38 +28,40 @@ git push origin main
 
 ---
 
-## 2. On SiteHost – first-time setup (or if you’re cloning fresh)
+## 2. On SiteHost container – first-time setup (or fresh clone)
 
-**SSH into your SiteHost container/server**, then:
+**SSH into your SiteHost container**, then:
 
 ```bash
-# Go to your web root (e.g. where you want the app). Example:
-cd /home/youruser  # or wherever SiteHost puts your sites
+# On Cloud Containers the app must live in /application
+cd /
 
-# Clone from GitHub (use your repo URL)
-git clone git@github.com:stevewebmaster/gmautoparts.git gmautoparts
-cd gmautoparts
+# If /application is empty (new container): clone so repo root becomes /application
+# (Back up existing /application first if it has content you want to keep.)
+mv application application.bak 2>/dev/null || true
+git clone git@github.com:stevewebmaster/gmautoparts.git application
+cd /application
 ```
 
-**If the repo is already there** (you’ve done this before), just pull:
+**If the repo is already in `/application`** (you’ve done this before), just pull:
 
 ```bash
-cd /path/to/gmautoparts   # wherever you cloned it
+cd /application
 git pull origin main
 ```
 
 ---
 
-## 3. On SiteHost – install/update and configure
+## 3. On SiteHost container – install/update and configure
 
-Run these in the project folder (e.g. `gmautoparts`):
+Run these in the project folder (**`/application`** on the container):
 
 ```bash
 # Install PHP dependencies (first time or after composer.json change)
 composer install --no-dev --optimize-autoloader
 
-# First time only: copy env and generate key
-cp .env.example .env
+# First time only: copy env and generate key (use SiteHost template if you have it)
+cp .env.sitehost.example .env   # or: cp .env.example .env
 php artisan key:generate
 
 # Edit .env with your SiteHost values (use nano, vim, or panel file editor)
@@ -75,12 +89,15 @@ chown -R www-data:www storage bootstrap/cache   # adjust www-data if different
 
 ---
 
-## 4. Point the site at `public/`
+## 4. Set web root to `/application/public`
 
-- **Nginx:** Set `root` to `/path/to/gmautoparts/public;`
-- **Apache:** Document root should be `.../gmautoparts/public`, or use a `.htaccess` in the parent that routes to `public/` (Laravel’s `public/.htaccess` handles this if the vhost points to `public`).
+On **SiteHost Cloud Containers** the web root must be Laravel’s `public` folder:
 
-SiteHost may have a “Document root” or “Web root” setting in the panel – set it to the `public` folder inside your project.
+- **Nginx** (config under `/config`): set `root` to **`/application/public;`**
+- **Apache** (config under `/config`): set **DocumentRoot** to **`/application/public`**
+
+SiteHost may also expose a “Document root” or “Web root” in the panel – set it to **`/application/public`**.  
+Do **not** point the web root at `/application` (project root); the site will break or expose config files.
 
 ---
 
@@ -89,7 +106,7 @@ SiteHost may have a “Document root” or “Web root” setting in the panel �
 When you’ve already set up the app and only need to deploy new code:
 
 ```bash
-cd /path/to/gmautoparts
+cd /application
 git pull origin main
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
