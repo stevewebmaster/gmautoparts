@@ -11,6 +11,9 @@ Laravel 10 website for G&M Autospares (automotive wrecker, New Zealand) with par
 
 ## Installation (e.g. on SiteHost)
 
+For **SiteHost Cloud Containers**, use the full guide: **[docs/DEPLOY-SITEHOST.md](docs/DEPLOY-SITEHOST.md)** (paths, Nginx config, HTTPS, troubleshooting).
+
+Generic steps:
 1. **Clone or upload** the project to your server (e.g. `public_html` or your site root). Ensure the web root points to the `public` folder (e.g. Nginx `root /path/to/GM/public;`).
 
 2. **Install dependencies**
@@ -30,6 +33,7 @@ Laravel 10 website for G&M Autospares (automotive wrecker, New Zealand) with par
    - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` – your MySQL credentials
    - `MAIL_*` – SMTP settings for contact form and part enquiries
    - `ADMIN_EMAIL` – address to receive contact/enquiry emails (optional; can use `MAIL_FROM_ADDRESS`)
+   - `MINIAPP_PIN` – (optional) PIN for the mini-app at `/app` so the client can add parts/vehicles from their phone; leave empty to disable
 
 4. **Database**
    ```bash
@@ -82,6 +86,7 @@ server {
 ## After deployment
 
 - **Admin panel:** `https://yoursite.co.nz/admin`
+- **Mini-app (add parts/vehicles from phone):** `https://yoursite.co.nz/app/login` – PIN-protected; see [docs/MINIAPP.md](docs/MINIAPP.md).
 - **Client guide:** See [docs/CLIENT-GUIDE.md](docs/CLIENT-GUIDE.md) for adding parts, vehicles, slider slides, and editing pages.
 
 ## Tech stack

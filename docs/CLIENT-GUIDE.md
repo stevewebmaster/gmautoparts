@@ -56,9 +56,11 @@ To add **parts** to this vehicle: open the vehicle in Admin, go to the **Parts**
 
 ## Managing part categories and subcategories
 
-- **Categories** (e.g. ENGINE, BRAKES) are under **Admin** → **Catalogue** → **Part categories**.
-- To add a **subcategory** to a category: open that category, go to the **Subcategories** tab, click **New**, enter Name and Slug, then save.
-- You can reorder categories and subcategories using the **Sort order** field (lower numbers appear first).
+- The site comes pre-loaded with part categories and subcategories from the old website (e.g. ENGINE, GEARBOX, DOOR, LIGHTS). You can add new categories and subcategories anytime.
+- **Categories** are under **Admin** → **Catalogue** → **Part categories**. Click **New** to add a category, or open an existing one to edit.
+- To add a **subcategory** to a category: open that category, go to the **Subcategories** tab, click **New**, enter Name and Slug (slug is auto-filled from the name), then save.
+- You can also manage all subcategories in one place: **Admin** → **Catalogue** → **Part subcategories**.
+- Use the **Sort order** field (lower numbers appear first) to control the order categories and subcategories appear on the site.
 
 ---
 
@@ -97,6 +99,20 @@ Slides rotate automatically on the homepage. Reorder by changing **Sort order** 
 
 - **Contact form** (Contact page) and **Enquire now** (on each part) send emails to the address configured on the server (e.g. in `.env` as `MAIL_FROM_ADDRESS` or `ADMIN_EMAIL`).
 - Ensure your host has mail (SMTP) set up so these emails are delivered. Your developer can configure the exact address and mail settings.
+
+---
+
+## Mini-app (add parts & vehicles from your phone)
+
+If your developer has set up the **mini-app**, you can add parts and vehicles from your phone:
+
+1. Open the mini-app URL (e.g. `https://yoursite.co.nz/app/login`) in your phone’s browser.
+2. Enter the **PIN** you were given and tap **Continue**.
+3. Choose **Add a part** or **Add a vehicle**.
+4. Fill in the details and add at least one photo (you can use the camera). Tap **Save**.
+5. The part or vehicle will appear on the main website.
+
+You can **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: menu → Add to Home screen) so the mini-app opens like an app. The PIN is set by your developer; ask them to change it if needed.
 
 ---
 

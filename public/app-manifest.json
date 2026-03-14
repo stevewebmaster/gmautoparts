@@ -1,0 +1,10 @@
+{
+  "name": "G&M Autospares – Add parts & vehicles",
+  "short_name": "G&M Mini-app",
+  "description": "Add parts and vehicles to the G&M Autospares website from your phone.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#0f3460",
+  "orientation": "portrait"
+}

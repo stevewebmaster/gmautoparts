@@ -4,15 +4,20 @@ Use this after you’ve pushed the latest code to GitHub (`git push origin main`
 
 ---
 
-## SiteHost Cloud Containers – folder structure
+## SiteHost Cloud Containers – paths (important)
 
-On **SiteHost Cloud Containers**:
+**Two different views of the filesystem:**
 
-- Put your **application files** in **`/application`**.
-- The **web root** (what the browser hits) must be **`/application/public`** — i.e. Laravel’s `public` folder inside the app.
+| View | Path to Laravel app | Path to public (web root) |
+|------|----------------------|----------------------------|
+| **SSH / FileZilla** (your login) | `~/container/application` or `/home/USER/container/application` | `~/container/application/public` |
+| **Inside the container** (Nginx, PHP) | `/container/application` | `/container/application/public` |
 
-So: **project root = `/application`**, **web root = `/application/public`**.  
-If the site is wrong (e.g. 404, or no CSS), the web root is usually set to the project root instead of `public`. Fix by setting Nginx `root` or Apache `DocumentRoot` (under `/config`) to **`/application/public`**.
+- Paths under **`/home/`** are only visible to SSH users. **Nginx and PHP run inside the container** and do **not** see `/home/...`. Never use `/home/...` in Nginx config.
+- The **document root** Nginx must use is **`/container/application/public`** (the path as seen inside the container).
+- Put the Laravel app so it lives at **`~/container/application`** (clone or copy there). The container then exposes it as `/container/application`.
+
+**Stack used:** Nginx + PHP 8.4 (e.g. 1.0.4-noble). Database host: **mariadb1011** (not localhost) – set in `.env` as `DB_HOST=mariadb1011`.
 
 ---
 
@@ -28,85 +33,88 @@ git push origin main
 
 ---
 
-## 2. On SiteHost container – first-time setup (or fresh clone)
+## 2. On SiteHost – first-time setup (app in container)
 
-**SSH into your SiteHost container.** The container often has no sudo and no SSH key for GitHub, so clone via **HTTPS** into your home directory:
+**SSH in** with the user that has access to the container (e.g. webmnzgmauto3).
+
+**Put the app in the container’s application folder:**
 
 ```bash
-cd ~
-git clone https://github.com/stevewebmaster/gmautoparts.git gmautoparts
-cd gmautoparts
+cd ~/container
+# If application already exists and you want a fresh deploy:
+rm -rf application
+git clone https://github.com/stevewebmaster/gmautoparts.git application
+cd ~/container/application
 ```
 
-Then set the site’s **web root** (in the panel or under `/config`) to **`/home/YOUR_USERNAME/gmautoparts/public`** (replace `YOUR_USERNAME` with your SSH user, e.g. `webmnzgmauto2`).
-
-**If the repo is already in `~/gmautoparts`** (you’ve done this before), just pull:
+**Install and configure:**
 
 ```bash
-cd ~/gmautoparts
-git pull origin main
-```
-
-**Alternative:** If you have write access to `/application` (or can use sudo), you can put the app there and use web root **`/application/public`** instead.
-
----
-
-## 3. On SiteHost container – install/update and configure
-
-Run these in the project folder (e.g. **`~/gmautoparts`** or **`/application`** if you put the app there):
-
-```bash
-# Install PHP dependencies (first time or after composer.json change)
 composer install --no-dev --optimize-autoloader
-
-# First time only: copy env and generate key (use SiteHost template if you have it)
-cp .env.sitehost.example .env   # or: cp .env.example .env
+cp .env.sitehost.example .env
 php artisan key:generate
-
-# Edit .env with your SiteHost values (use nano, vim, or panel file editor)
-# Set: APP_URL, APP_DEBUG=false, DB_*, MAIL_*, etc.
 nano .env
 ```
+
+In `.env` set at least:
+
+- `APP_URL=https://gm.websitemaster.co.nz` (or your domain; **https**, no trailing slash)
+- `APP_DEBUG=false`
+- `DB_HOST=mariadb1011`
+- `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (SiteHost MySQL)
+- `MAIL_*` if you use contact form
 
 Then:
 
 ```bash
-# Database (first time: migrate + seed; updates: migrate only)
 php artisan migrate --force
-php artisan db:seed   # first time only
-
-# Storage link for uploads (first time only)
+php artisan db:seed
 php artisan storage:link
-
-# Create admin user (first time only)
-php artisan make:filament-user
-
-# Permissions (use the user SiteHost runs PHP as, often www-data or your username)
+php artisan gm:create-admin
 chmod -R 775 storage bootstrap/cache
-chown -R www-data:www storage bootstrap/cache   # adjust www-data if different
 ```
+
+**Note:** Use **`php artisan gm:create-admin`** to create the admin user, not `php artisan make:filament-user` (Filament’s install check can block that command).
 
 ---
 
-## 4. Set web root to the Laravel `public` folder
+## 3. Nginx config (document root and Laravel)
 
-The web root must be Laravel’s **`public`** folder (never the project root):
+The file that matters is **`~/container/config/nginx/sites-available/default`** (linked from `sites-enabled`).
 
-- If the app is in **`~/gmautoparts`**: set web root to **`/home/YOUR_USERNAME/gmautoparts/public`**
-- If the app is in **`/application`**: set web root to **`/application/public`**
+- **Do not** add a second default server in `conf.d/default.conf` – that causes “duplicate default server” and Nginx will not start.
+- **root** must be **`/container/application/public`** (path as seen inside the container).
 
-**Nginx** (under `/config`): `root /home/webmnzgmauto2/gmautoparts/public;`  
-**Apache** (under `/config`): `DocumentRoot /home/webmnzgmauto2/gmautoparts/public`  
-Or use the panel “Document root” / “Web root” and enter that path.
+**Edit:**
+
+```bash
+nano ~/container/config/nginx/sites-available/default
+```
+
+Use a single `server { }` block with at least:
+
+- `root /container/application/public;`
+- `server_name localhost gm.websitemaster.co.nz;` (or your domain)
+- `location / { try_files $uri $uri/ /index.php?$query_string; }`
+- `location ~ \.php$` with `fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;` and `fastcgi_pass unix:/var/run/php5-fpm.sock;`
+
+After saving, **restart the container** in the SiteHost panel so Nginx reloads the config.
+
+---
+
+## 4. HTTPS and mixed content
+
+- Set **`APP_URL=https://yourdomain.co.nz`** in `.env` (no trailing slash).
+- The app’s **AppServiceProvider** forces `URL::forceScheme('https')` when `APP_URL` starts with `https://`, so asset and form URLs are generated over HTTPS behind the proxy. That avoids “Mixed Content” when the site is opened via HTTPS.
+- After changing `.env` or deploying code:  
+  `php artisan config:clear` then `php artisan config:cache`.
 
 ---
 
 ## 5. Quick “update only” (after first deploy)
 
-When you’ve already set up the app and only need to deploy new code:
-
 ```bash
-cd ~/gmautoparts   # or cd /application if you use /application
+cd ~/container/application
 git pull origin main
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
@@ -118,28 +126,37 @@ php artisan view:cache
 
 ## When PHP/Composer aren’t in SSH (build on Mac, upload)
 
-On some SiteHost containers, `php` and `composer` are not available in the SSH session. In that case:
+On some SiteHost SSH users, `php` and `composer` are not in PATH. Then:
 
-1. **On your Mac** – build the app (install dependencies so `vendor/` exists):
-   ```bash
-   cd /Users/stevepeters/Files/GM
-   composer install --no-dev --optimize-autoloader
-   ```
-2. **Zip the project** (excluding `.git`, `node_modules`, `.env`) and upload the zip via FileZilla to your home or `~/application` on the server. On the server (SSH): `cd ~/application && unzip -o ../gmautoparts.zip` (or unzip into a temp folder then copy into `~/application`). Do **not** overwrite the server’s `.env` – keep the one on the server with your DB settings.
-3. **APP_KEY** – On the server’s `.env` you need an `APP_KEY=base64:...`. On your Mac run `php artisan key:generate --show` and paste that value into the server `.env`.
-4. **Storage link (on server, no PHP needed):**
-   ```bash
-   cd ~/application/public
-   ln -sf ../storage/app/public storage
-   ```
-5. **Migrations and admin user** – From your Mac, using the **remote** database: temporarily set `.env` (or a copy) with the SiteHost DB host (e.g. the hostname SiteHost gives for external DB access, if any), then run `php artisan migrate --force`, `php artisan db:seed`, `php artisan make:filament-user`. If the DB is only reachable from the container, ask SiteHost how to run these commands.
-6. **Web root** – In the SiteHost panel, set document root to **`/home/webmnzgmauto2/application/public`** (or `~/application/public`).
+1. On your Mac: `composer install --no-dev --optimize-autoloader`, then zip the project (excluding `.git`, `node_modules`, `.env`).
+2. Upload the zip and extract into **`~/container/application`** (so the container sees it at `/container/application`).
+3. On the server: keep your existing `.env`; ensure `APP_KEY` is set (e.g. generate on Mac with `php artisan key:generate --show` and paste into server `.env`).
+4. Storage link: `cd ~/container/application/public && ln -sf ../storage/app/public storage` (or `php artisan storage:link` if PHP is available).
+5. Nginx root must still be **`/container/application/public`**.
 
 ---
 
 ## Troubleshooting
 
-- **500 error:** Check `storage/logs/laravel.log`. Ensure `storage` and `bootstrap/cache` are writable (775 and owned by the web server user).
-- **DB connection:** Confirm `.env` has the correct SiteHost database host, name, user, and password.
-- **Admin not loading:** Ensure the web root is `public` and that `php artisan route:clear` / `php artisan config:clear` don’t need to be run after changing `.env`.
-- **Empty or missing `public`:** In SSH run `ls -la ~/application/public` – you should see `index.php`. If not, re-copy the app into `~/application` or upload a built zip from your Mac.
+- **500 “No application encryption key”:** Run `php artisan key:generate` in `~/container/application` and ensure `.env` has `APP_KEY=base64:...`.
+- **“File not found” / Nginx realpath() failed:** Nginx is using the wrong root. It must be **`/container/application/public`** (not `/application/public`, not `/container/public`, not any `/home/...` path). Edit `~/container/config/nginx/sites-available/default` and restart the container.
+- **Duplicate default server / Nginx won’t start:** Remove or empty `~/container/config/nginx/conf.d/default.conf` so only `sites-available/default` defines the default server.
+- **Mixed content on HTTPS (CSS/JS blocked):** Set `APP_URL=https://yourdomain.co.nz` and ensure the AppServiceProvider change that forces HTTPS when APP_URL is https is deployed; then `php artisan config:cache`.
+- **DB connection:** Use `DB_HOST=mariadb1011` (or the host SiteHost gives), not localhost.
+- **Admin user:** Use `php artisan gm:create-admin`, not `make:filament-user`.
+- **Laravel errors:** Check `~/container/application/storage/logs/laravel.log`. Ensure `storage` and `bootstrap/cache` are writable (e.g. `chmod -R 775 storage bootstrap/cache`).
+
+---
+
+## Reference – where everything is on the server
+
+| What | Location (SSH / FileZilla) | Location (inside container) |
+|------|---------------------------|-----------------------------|
+| Laravel app root | `~/container/application` | `/container/application` |
+| Web root (document root) | `~/container/application/public` | `/container/application/public` |
+| Nginx config | `~/container/config/nginx/sites-available/default` | — |
+| Nginx error log | `~/container/logs/nginx/error.log` | — |
+| Laravel log | `~/container/application/storage/logs/laravel.log` | — |
+| .env | `~/container/application/.env` | — |
+
+**Do not** use `/home/...` in Nginx config; the container cannot see those paths.

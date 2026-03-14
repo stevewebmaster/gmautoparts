@@ -40,9 +40,14 @@ class PartResource extends Resource
                         ->required()
                         ->searchable()
                         ->preload()
-                        ->reactive(),
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('part_subcategory_id', null)),
                     Forms\Components\Select::make('part_subcategory_id')
-                        ->relationship('subcategory', 'name')
+                        ->relationship(
+                            'subcategory',
+                            'name',
+                            modifyQueryUsing: fn ($query, $get) => $query->where('part_category_id', $get('part_category_id') ?: 0)
+                        )
                         ->searchable()
                         ->preload(),
                     Forms\Components\Textarea::make('description')->rows(4),
