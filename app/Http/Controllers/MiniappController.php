@@ -6,8 +6,8 @@ use App\Models\Part;
 use App\Models\PartCategory;
 use App\Models\PartSubcategory;
 use App\Models\Vehicle;
+use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -25,7 +25,16 @@ class MiniappController extends Controller
     {
         $request->validate(['pin' => 'required|string']);
 
-        if ($request->pin !== config('miniapp.pin')) {
+        $pin = trim((string) $request->pin);
+        $expected = trim((string) preg_replace('/[\r\n]+/', '', config('miniapp.pin') ?? ''));
+
+        if ($expected === '') {
+            return back()->withErrors([
+                'pin' => 'Mini-app PIN is not set on the server. Add MINIAPP_PIN to the .env file in the app directory (the same folder as artisan), then run: php artisan config:clear && php artisan config:cache',
+            ])->withInput();
+        }
+
+        if ($pin !== $expected) {
             return back()->withErrors(['pin' => 'Invalid PIN.'])->withInput();
         }
 
@@ -95,7 +104,13 @@ class MiniappController extends Controller
 
         $paths = [];
         foreach ($request->file('images') as $file) {
-            $paths[] = $file->store('parts', 'public');
+            $stored = ImageOptimizer::optimizeAndStore($file, 'parts');
+            if ($stored) {
+                $paths[] = $stored;
+            }
+        }
+        if (empty($paths)) {
+            return back()->withErrors(['images' => 'Could not save images. Please try again.'])->withInput();
         }
         $validated['images'] = $paths;
         $validated['is_visible'] = true;
@@ -127,7 +142,13 @@ class MiniappController extends Controller
 
         $paths = [];
         foreach ($request->file('images') as $file) {
-            $paths[] = $file->store('vehicles', 'public');
+            $stored = ImageOptimizer::optimizeAndStore($file, 'vehicles');
+            if ($stored) {
+                $paths[] = $stored;
+            }
+        }
+        if (empty($paths)) {
+            return back()->withErrors(['images' => 'Could not save images. Please try again.'])->withInput();
         }
         $validated['images'] = $paths;
         $validated['is_visible'] = true;

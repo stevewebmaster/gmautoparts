@@ -38,6 +38,37 @@ On Android (Chrome): **Menu → Add to Home screen** or **Install app**.
 
 The manifest is at `/app-manifest.json` so the mini-app can open like an app.
 
+## Image optimization
+
+Uploads from the mini-app are automatically optimized before saving:
+
+- **Max width:** 1200px (height scales to keep aspect ratio).
+- **Format:** JPEG at 82% quality.
+
+This keeps file sizes down and avoids filling the server. If optimization fails (e.g. corrupt image), the original file is stored instead.
+
+---
+
+## Troubleshooting: "Invalid PIN" when PIN is in .env
+
+1. **Use the app directory that the site actually runs from.** The web server (Nginx) only uses one directory. On SiteHost that is **`~/container/application`**. All `php artisan` and `.env` must be in that directory. If you have another folder (e.g. `~/gmautoparts`), the PIN there is ignored. See [DEPLOY-SITEHOST.md](DEPLOY-SITEHOST.md) (“One app directory only”).
+
+2. **Check that Laravel sees the PIN** (run this **in the app directory**, e.g. `cd ~/container/application`):
+   ```bash
+   php artisan tinker --execute="echo config('miniapp.pin') ? 'PIN is set (' . strlen(config('miniapp.pin')) . ' chars)' : 'PIN is EMPTY';"
+   ```
+   If it says **PIN is EMPTY**, then either `.env` has no `MINIAPP_PIN` or config is cached from before you added it. Fix: add `MINIAPP_PIN=1234` to **`~/container/application/.env`**, then run:
+   ```bash
+   php artisan config:clear
+   php artisan config:cache
+   ```
+
+3. **No spaces in `.env`:** Use `MINIAPP_PIN=1234` not `MINIAPP_PIN = 1234` (spaces can cause issues).
+
+4. If you see **"Mini-app PIN is not set on the server"** after submitting, the config value is empty at runtime—follow step 2.
+
+---
+
 ## Security
 
 - Access is protected by the PIN only (no user accounts).
