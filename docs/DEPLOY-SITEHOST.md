@@ -137,8 +137,37 @@ Use a single `server { }` block with at least:
 
 - `root /container/application/public;`
 - `server_name localhost gm.websitemaster.co.nz;` (or your domain)
-- `location / { try_files $uri $uri/ /index.php?$query_string; }`
+- **`location /` must use Laravel’s `try_files`**, not `=404` (see warning below).
 - `location ~ \.php$` with `fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;` and `fastcgi_pass unix:/var/run/php5-fpm.sock;`
+
+**⚠️ Default SiteHost template is wrong for Laravel:** it often has  
+`try_files $uri $uri/ =404;`  
+That serves `/` via `index.php` sometimes, but **`/admin`, `/parts`, etc. return nginx 404** because the request never reaches `index.php`. Replace with:
+
+`try_files $uri $uri/ /index.php?$query_string;`
+
+**Example `server { }` block (adjust `server_name` and socket if needed):**
+
+```nginx
+server {
+	listen 80 default_server;
+	root /container/application/public;
+	index index.php index.html;
+	server_name localhost gm.websitemaster.co.nz;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location ~ \.php$ {
+		fastcgi_param HTTP_PROXY "";
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+	}
+}
+```
 
 After saving, **restart the container** in the SiteHost panel so Nginx reloads the config.
 
@@ -148,8 +177,16 @@ After saving, **restart the container** in the SiteHost panel so Nginx reloads t
 
 - Set **`APP_URL=https://yourdomain.co.nz`** in `.env` (no trailing slash).
 - The app’s **AppServiceProvider** forces `URL::forceScheme('https')` when `APP_URL` starts with `https://`, so asset and form URLs are generated over HTTPS behind the proxy. That avoids “Mixed Content” when the site is opened via HTTPS.
+- The app includes **`TrustProxies`** middleware so Laravel respects `X-Forwarded-Proto` / `X-Forwarded-For` from SiteHost’s reverse proxy. Without that, redirects and cookies can behave as if the request were HTTP.
 - After changing `.env` or deploying code:  
   `php artisan config:clear` then `php artisan config:cache`.
+
+**If HTTPS still fails after enabling SSL in the SiteHost panel:**
+
+1. In SiteHost, confirm the certificate is **issued/active** for the **exact hostname** you use (e.g. `www` vs non-`www` may need both or a redirect rule).
+2. Wait a few minutes after enabling SSL; retry in a private/incognito window.
+3. From your Mac: `curl -sI https://yourdomain.co.nz` — check for `HTTP/2 200` or `301` to HTTPS, not connection errors.
+4. **Restart the Cloud Container** in the panel after SSL or domain changes.
 
 ---
 
@@ -182,6 +219,7 @@ On some SiteHost SSH users, `php` and `composer` are not in PATH. Then:
 
 - **500 “No application encryption key”:** Run `php artisan key:generate` in `~/container/application` and ensure `.env` has `APP_KEY=base64:...`.
 - **“File not found” / Nginx realpath() failed:** Nginx is using the wrong root. It must be **`/container/application/public`** (the path as seen inside the container). Do **not** use any path under `/home/` (e.g. `/home/webmnzgmauto3/container/application/public`) – the container cannot access `/home/`. Edit `~/container/config/nginx/sites-available/default` (and `sites-enabled/default` if you edit that), set `root /container/application/public;`, then restart the container.
+- **`/admin` or other routes 404 with small nginx page, but `/` works:** Your `location /` likely has **`try_files $uri $uri/ =404;`**. Change it to **`try_files $uri $uri/ /index.php?$query_string;`** and add **`fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;`** inside the `\.php$` block, then restart the container.
 - **Duplicate default server / Nginx won’t start:** Remove or empty `~/container/config/nginx/conf.d/default.conf` so only `sites-available/default` defines the default server.
 - **Mixed content on HTTPS (CSS/JS blocked):** Set `APP_URL=https://yourdomain.co.nz` and ensure the AppServiceProvider change that forces HTTPS when APP_URL is https is deployed; then `php artisan config:cache`.
 - **DB connection:** Use `DB_HOST=mariadb1011` (or the host SiteHost gives), not localhost.
