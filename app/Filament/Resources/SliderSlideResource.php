@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\SliderSlideResource\Pages;
 use App\Models\SliderSlide;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -62,5 +63,14 @@ class SliderSlideResource extends Resource
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
             ])]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListSliderSlides::route('/'),
+            'create' => Pages\CreateSliderSlide::route('/create'),
+            'edit' => Pages\EditSliderSlide::route('/{record}/edit'),
+        ];
     }
 }

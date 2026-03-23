@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PartSubcategoryResource\Pages;
 use App\Models\PartSubcategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -61,5 +62,14 @@ class PartSubcategoryResource extends Resource
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
             ])]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListPartSubcategories::route('/'),
+            'create' => Pages\CreatePartSubcategory::route('/create'),
+            'edit' => Pages\EditPartSubcategory::route('/{record}/edit'),
+        ];
     }
 }

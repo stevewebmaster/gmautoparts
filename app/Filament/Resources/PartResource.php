@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PartResource\Pages;
 use App\Models\Part;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -111,5 +112,14 @@ class PartResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['title', 'stock_number', 'description'];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListParts::route('/'),
+            'create' => Pages\CreatePart::route('/create'),
+            'edit' => Pages\EditPart::route('/{record}/edit'),
+        ];
     }
 }

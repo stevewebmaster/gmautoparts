@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PartCategoryResource\Pages;
 use App\Filament\Resources\PartCategoryResource\RelationManagers\SubcategoriesRelationManager;
 use App\Models\PartCategory;
 use Filament\Forms;
@@ -63,6 +64,15 @@ class PartCategoryResource extends Resource
     {
         return [
             SubcategoriesRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListPartCategories::route('/'),
+            'create' => Pages\CreatePartCategory::route('/create'),
+            'edit' => Pages\EditPartCategory::route('/{record}/edit'),
         ];
     }
 }

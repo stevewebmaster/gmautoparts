@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\VehicleResource\Pages;
 use App\Filament\Resources\VehicleResource\RelationManagers\PartsRelationManager;
 use App\Models\Vehicle;
 use Filament\Forms;
@@ -85,6 +86,15 @@ class VehicleResource extends Resource
     {
         return [
             PartsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListVehicles::route('/'),
+            'create' => Pages\CreateVehicle::route('/create'),
+            'edit' => Pages\EditVehicle::route('/{record}/edit'),
         ];
     }
 }
