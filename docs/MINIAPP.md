@@ -2,6 +2,20 @@
 
 The mini-app lets the client add **parts** and **vehicles** (Now Dismantling) from their phone: take photos, enter details, and the items appear on the main website.
 
+## Test on your phone today
+
+1. **Use HTTPS** — Open the site with `https://` (required for camera/file access and a smooth install on most phones).
+2. **Set the PIN on the server** — In `~/container/application/.env` on SiteHost: `MINIAPP_PIN=yourpin`, then run `php artisan config:clear` and `php artisan config:cache`.
+3. **Open the login URL** in Safari (iPhone) or Chrome (Android):  
+   `https://yourdomain.co.nz/app/login`
+4. Enter the PIN → you should see **Add a part** / **Add a vehicle**.
+5. **Add to Home Screen** (optional but recommended):
+   - **iPhone (Safari):** Share → **Add to Home Screen**
+   - **Android (Chrome):** Menu → **Add to Home screen** / **Install app**
+6. **After saving**, confirm on the main site: **Parts** catalogue and **Now Dismantling** should show the new items (they are created visible by default).
+
+If anything fails, see **Troubleshooting** below and [DEPLOY-SITEHOST.md](DEPLOY-SITEHOST.md) (one app directory only: `~/container/application`).
+
 ## Setup
 
 1. **Set a PIN** in `.env`:
@@ -38,9 +52,24 @@ On Android (Chrome): **Menu → Add to Home screen** or **Install app**.
 
 The manifest is at `/app-manifest.json` so the mini-app can open like an app.
 
+## Server 500 when saving a part or vehicle
+
+1. **Check the log** on the server: `tail -n 60 ~/container/application/storage/logs/laravel.log`
+2. **Storage link & permissions:**  
+   `php artisan storage:link`  
+   `chmod -R 775 storage bootstrap/cache`
+3. **Skip image resizing** (common fix if PHP has no GD/Imagick or Intervention fails): in `.env` add  
+   `MINIAPP_OPTIMIZE_UPLOADS=false`  
+   then `php artisan config:clear` and `php artisan config:cache`.
+4. **Database:** run `php artisan migrate --force` so `parts.images` and `vehicles.images` exist.
+
+## Custom home-screen icon (later)
+
+You can replace `public/icons/miniapp-icon.svg` or add PNGs (e.g. 192×192 and 512×512) and list them in `public/app-manifest.json` under `icons` for best results on iOS and Android.
+
 ## Image optimization
 
-Uploads from the mini-app are automatically optimized before saving:
+Uploads from the mini-app are automatically optimized before saving (unless `MINIAPP_OPTIMIZE_UPLOADS=false`):
 
 - **Max width:** 1200px (height scales to keep aspect ratio).
 - **Format:** JPEG at 82% quality.

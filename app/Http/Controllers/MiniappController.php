@@ -8,6 +8,7 @@ use App\Models\PartSubcategory;
 use App\Models\Vehicle;
 use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -116,7 +117,18 @@ class MiniappController extends Controller
         $validated['is_visible'] = true;
         $validated['is_featured'] = false;
 
-        Part::create($validated);
+        try {
+            Part::create($validated);
+        } catch (\Throwable $e) {
+            Log::error('Mini-app storePart failed', [
+                'message' => $e->getMessage(),
+                'exception' => $e,
+            ]);
+
+            return back()->withErrors([
+                'images' => 'Could not save the part. Try setting MINIAPP_OPTIMIZE_UPLOADS=false in server .env, then php artisan config:cache. Also confirm php artisan storage:link and writable storage/. See storage/logs/laravel.log.',
+            ])->withInput();
+        }
 
         return redirect()->route('app.dashboard')->with('success', 'Part added. It will appear on the website.');
     }
@@ -153,7 +165,18 @@ class MiniappController extends Controller
         $validated['images'] = $paths;
         $validated['is_visible'] = true;
 
-        Vehicle::create($validated);
+        try {
+            Vehicle::create($validated);
+        } catch (\Throwable $e) {
+            Log::error('Mini-app storeVehicle failed', [
+                'message' => $e->getMessage(),
+                'exception' => $e,
+            ]);
+
+            return back()->withErrors([
+                'images' => 'Could not save the vehicle. Try setting MINIAPP_OPTIMIZE_UPLOADS=false in server .env, then php artisan config:cache. Also confirm php artisan storage:link and writable storage/. See storage/logs/laravel.log.',
+            ])->withInput();
+        }
 
         return redirect()->route('app.dashboard')->with('success', 'Vehicle added. It will appear in Now Dismantling.');
     }

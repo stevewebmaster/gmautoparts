@@ -21,28 +21,30 @@ class ImageOptimizer
      */
     public static function optimizeAndStore(UploadedFile $file, string $directory): ?string
     {
-        $filename = Str::random(20) . '.jpg';
-        $path = $directory . '/' . $filename;
-        $fullPath = Storage::disk('public')->path($path);
-
-        if (!Storage::disk('public')->exists($directory)) {
-            Storage::disk('public')->makeDirectory($directory);
-        }
-
         try {
-            $image = Image::read($file);
-            $image->scaleDown(width: self::MAX_WIDTH);
-            $image->save($fullPath, quality: self::JPEG_QUALITY);
-
-            return $path;
-        } catch (\Throwable $e) {
-            // Fallback: store original file if optimization fails
-            try {
-                $stored = $file->store($directory, 'public');
-                return $stored;
-            } catch (\Throwable) {
-                return null;
+            if (! config('miniapp.optimize_uploads', true)) {
+                return $file->store($directory, 'public');
             }
+
+            $filename = Str::random(20) . '.jpg';
+            $path = $directory . '/' . $filename;
+            $fullPath = Storage::disk('public')->path($path);
+
+            if (! Storage::disk('public')->exists($directory)) {
+                Storage::disk('public')->makeDirectory($directory);
+            }
+
+            try {
+                $image = Image::read($file);
+                $image->scaleDown(width: self::MAX_WIDTH);
+                $image->save($fullPath, quality: self::JPEG_QUALITY);
+
+                return $path;
+            } catch (\Throwable) {
+                return $file->store($directory, 'public');
+            }
+        } catch (\Throwable) {
+            return null;
         }
     }
 }
