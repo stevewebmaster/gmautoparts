@@ -35,6 +35,9 @@ class ImageOptimizer
             }
 
             try {
+                // Large phone photos can exceed default PHP memory (e.g. 128M) while GD decodes the image.
+                @ini_set('memory_limit', config('miniapp.image_memory_limit', '256M'));
+
                 $image = Image::read($file);
                 $image->scaleDown(width: self::MAX_WIDTH);
                 $image->save($fullPath, quality: self::JPEG_QUALITY);

@@ -58,10 +58,11 @@ The manifest is at `/app-manifest.json` so the mini-app can open like an app.
 2. **Storage link & permissions:**  
    `php artisan storage:link`  
    `chmod -R 775 storage bootstrap/cache`
-3. **Skip image resizing** (common fix if PHP has no GD/Imagick or Intervention fails): in `.env` add  
+3. **Skip image resizing** (common fix if PHP has no GD/Imagick, **memory errors**, or Intervention fails): in `.env` add  
    `MINIAPP_OPTIMIZE_UPLOADS=false`  
    then `php artisan config:clear` and `php artisan config:cache`.
-4. **Database:** run `php artisan migrate --force` so `parts.images` and `vehicles.images` exist.
+4. **“Allowed memory size … exhausted” in `intervention/image` / GD:** PHP’s limit (often **128M**) is too low for big camera photos. Either use **`MINIAPP_OPTIMIZE_UPLOADS=false`** (simplest), or ask SiteHost to raise **`memory_limit`** for PHP (e.g. **256M**), and/or set **`MINIAPP_IMAGE_MEMORY_LIMIT=512M`** in `.env` (only works if the host allows `ini_set` for memory).
+5. **Database:** run `php artisan migrate --force` so `parts.images` and `vehicles.images` exist.
 
 ## Custom home-screen icon (later)
 
