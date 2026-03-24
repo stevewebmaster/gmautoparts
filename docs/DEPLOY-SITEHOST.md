@@ -201,6 +201,16 @@ php artisan config:cache
 php artisan view:cache
 ```
 
+**If `git pull` fails with** `Your local changes ... storage/logs/laravel.log would be overwritten`:
+
+```bash
+cd ~/container/application
+git restore storage/logs/laravel.log
+git pull origin main
+```
+
+`storage/logs/laravel.log` is a runtime log file on the server and should not block deploys.
+
 ---
 
 ## When PHP/Composer aren’t in SSH (build on Mac, upload)
@@ -220,6 +230,9 @@ On some SiteHost SSH users, `php` and `composer` are not in PATH. Then:
 - **500 “No application encryption key”:** Run `php artisan key:generate` in `~/container/application` and ensure `.env` has `APP_KEY=base64:...`.
 - **“File not found” / Nginx realpath() failed:** Nginx is using the wrong root. It must be **`/container/application/public`** (the path as seen inside the container). Do **not** use any path under `/home/` (e.g. `/home/webmnzgmauto3/container/application/public`) – the container cannot access `/home/`. Edit `~/container/config/nginx/sites-available/default` (and `sites-enabled/default` if you edit that), set `root /container/application/public;`, then restart the container.
 - **`/admin` or other routes 404 with small nginx page, but `/` works:** Your `location /` likely has **`try_files $uri $uri/ =404;`**. Change it to **`try_files $uri $uri/ /index.php?$query_string;`** and add **`fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;`** inside the `\.php$` block, then restart the container.
+- **Admin login works but dashboard gives 500 (`Route [filament.admin.resources...index] not defined`):** Server is on old code or missing Filament resource page classes. Verify server commit (`git rev-parse --short HEAD`) matches GitHub `main`, run `composer dump-autoload -o`, `php artisan optimize:clear`, and check `php artisan route:list --path=admin` includes resource routes (e.g. `admin/pages`, `admin/parts`, `admin/vehicles`), not just login/logout.
+- **Admin login returns 403 after password accepted:** Ensure `app/Models/User.php` implements `FilamentUser` and has `canAccessPanel(Panel $panel): bool { return true; }`, then deploy that commit, clear caches, and restart the container to flush opcache.
+- **Password reset in Tinker still fails login:** Save a hashed password, e.g. `$user->password = bcrypt('NewPassword123!'); $user->save();` (plain text in DB will not authenticate).
 - **Duplicate default server / Nginx won’t start:** Remove or empty `~/container/config/nginx/conf.d/default.conf` so only `sites-available/default` defines the default server.
 - **Mixed content on HTTPS (CSS/JS blocked):** Set `APP_URL=https://yourdomain.co.nz` and ensure the AppServiceProvider change that forces HTTPS when APP_URL is https is deployed; then `php artisan config:cache`.
 - **DB connection:** Use `DB_HOST=mariadb1011` (or the host SiteHost gives), not localhost.

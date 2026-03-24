@@ -79,6 +79,7 @@ document.getElementById('part_category_id').addEventListener('change', function(
     sub.innerHTML = '<option value="">Loading...</option>';
     if (!id) { sub.innerHTML = '<option value="">Select subcategory (optional)</option>'; return; }
     fetch('{{ route("app.subcategories", ["category" => "__ID__"]) }}'.replace('__ID__', id), {
+        credentials: 'same-origin',
         headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
     }).then(function(r) { return r.json(); }).then(function(data) {
         sub.innerHTML = '<option value="">Select subcategory (optional)</option>';

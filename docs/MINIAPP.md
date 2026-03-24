@@ -68,6 +68,43 @@ The manifest is at `/app-manifest.json` so the mini-app can open like an app.
 
 You can replace `public/icons/miniapp-icon.svg` or add PNGs (e.g. 192×192 and 512×512) and list them in `public/app-manifest.json` under `icons` for best results on iOS and Android.
 
+## Re-enabling optimization (after using `MINIAPP_OPTIMIZE_UPLOADS=false`)
+
+Optimization failed before because PHP ran out of memory (**128M**) while decoding large phone photos with **GD**. To turn resizing/JPEG compression back on:
+
+1. **Raise PHP memory** (best first step)  
+   Ask SiteHost to increase **`memory_limit`** for your site’s PHP (e.g. **256M** or **512M**). That fixes most GD/Intervention crashes on big images.
+
+2. **Turn optimization back on** in `.env`:
+   ```env
+   MINIAPP_OPTIMIZE_UPLOADS=true
+   ```
+   Optionally bump the temporary limit the app tries to set during resize (if the host allows `ini_set`):
+   ```env
+   MINIAPP_IMAGE_MEMORY_LIMIT=512M
+   ```
+
+3. **Try Imagick instead of GD** (if the host supports it)  
+   On the server, check:
+   ```bash
+   php -m | grep -i imagick
+   ```
+   If you see `imagick`, add to `.env`:
+   ```env
+   IMAGE_DRIVER=imagick
+   ```
+   The project ships `config/image.php` so Intervention uses that driver. Then `php artisan config:clear` and `php artisan config:cache`.
+
+4. **Deploy / clear config** after any `.env` change:
+   ```bash
+   php artisan config:clear
+   php artisan config:cache
+   ```
+
+5. **Test** with one photo from the phone. If it still fails, check `storage/logs/laravel.log` and either keep a higher `memory_limit` from the host or leave `MINIAPP_OPTIMIZE_UPLOADS=false` (uploads still work; files are just larger).
+
+**Optional later:** client-side resize in the browser before upload can reduce server memory use; we can add that in a future change if you want.
+
 ## Image optimization
 
 Uploads from the mini-app are automatically optimized before saving (unless `MINIAPP_OPTIMIZE_UPLOADS=false`):
