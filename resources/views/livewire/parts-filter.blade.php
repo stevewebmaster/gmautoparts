@@ -1,102 +1,71 @@
-<div class="row gy-4">
-{{-- Left Sidebar --}}
-<div class="col-xxl-3 col-xl-3 col-lg-4" wire:key="parts-filter-sidebar">
-
-    <aside class="sidebar-area">
-
-        <div class="widget widget-style-smoke search-top">
-            <div class="h5 box-title">Search Options</div>
-        </div>
-
-        <div class="widget widget-style-smoke search">
-
-            {{-- Make --}}
-            <div class="inventory-search-item">
-                <div class="form-group">
-                    <select wire:model.live="make" class="form-select">
-                        <option value="">All Makes</option>
-                        @foreach($makes as $m)
-                            <option value="{{ $m }}">{{ $m }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Model --}}
-            <div class="inventory-search-item">
-                <div class="form-group">
-                    <select wire:model.live="model" class="form-select">
-                        <option value="">All Models</option>
-                        @foreach($models as $m)
-                            <option value="{{ $m }}">{{ $m }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Year --}}
-            <div class="inventory-search-item">
-                <div class="form-group">
-                    <select wire:model.live="year" class="form-select">
-                        <option value="">All Years</option>
-                        @foreach($years as $y)
-                            <option value="{{ $y }}">{{ $y }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Category --}}
-            <div class="inventory-search-item">
-                <div class="form-group">
-                    <select wire:model.live="category" class="form-select">
-                        <option value="">All Categories</option>
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            {{-- Subcategory (shown when category selected) --}}
-            @if($subcategories->isNotEmpty())
-                <div class="inventory-search-item">
-                    <div class="form-group">
-                        <select wire:model.live="subcategory" class="form-select">
-                            <option value="">All Subcategories</option>
-                            @foreach($subcategories as $sub)
-                                <option value="{{ $sub->id }}">{{ $sub->name }}</option>
-                            @endforeach
-                        </select>
+<div>
+    <div class="reservation-area style-2 home-4-style mb-40">
+        <div class="container th-container p-0">
+            <div class="reservation-wrapper">
+                <div class="reservation-form">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="select-group-wrapper">
+                                <div class="form-group">
+                                    <select wire:model.live="make" class="form-select nice-select">
+                                        <option value="">All Makes</option>
+                                        @foreach($makes as $m)
+                                            <option value="{{ $m }}">{{ $m }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select wire:model.live="model" class="form-select nice-select">
+                                        <option value="">All Models</option>
+                                        @foreach($models as $m)
+                                            <option value="{{ $m }}">{{ $m }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select wire:model.live="year" class="form-select nice-select">
+                                        <option value="">All Years</option>
+                                        @foreach($years as $y)
+                                            <option value="{{ $y }}">{{ $y }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select wire:model.live="category" class="form-select nice-select">
+                                        <option value="">All Categories</option>
+                                        @foreach($categories as $cat)
+                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="advance-btn-wrapper">
+                                    <button wire:click="clearFilters" type="button" class="th-btn w-100">
+                                        Reset <i class="fas fa-arrow-up-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advance-search-wrapper stye-2 home-4-style">
+                        <div class="form-group">
+                            <select wire:model.live="subcategory" class="form-select nice-select">
+                                <option value="">All Subcategories</option>
+                                @foreach($subcategories as $sub)
+                                    <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text"
+                                   wire:model.live.debounce.300ms="keyword"
+                                   class="form-control"
+                                   placeholder="Search parts, stock number, description...">
+                        </div>
                     </div>
                 </div>
-            @endif
-
-            {{-- Keyword --}}
-            <div class="inventory-search-item">
-                <div class="form-group" style="position:relative;">
-                    <input type="text"
-                           wire:model.live.debounce.300ms="keyword"
-                           class="form-control"
-                           placeholder="Search parts...">
-                    <i class="fa-solid fa-magnifying-glass" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#aaa;pointer-events:none;"></i>
-                </div>
             </div>
-
-            {{-- Buttons --}}
-            <div class="inventory-search-item">
-                <button wire:click="clearFilters" type="button"
-                        class="th-btn left-icon style3 w-100">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Filters
-                </button>
-            </div>
-
         </div>
-    </aside>
-</div>
-
-{{-- Results Column --}}
-<div class="col-xxl-9 col-xl-9 col-lg-8" wire:key="parts-filter-results">
+    </div>
 
     {{-- Top filter bar --}}
     <div class="row">
@@ -109,11 +78,11 @@
                     </p>
                 </div>
                 <div class="filter-search">
-                    <div class="icon-item">
-                        <i class="fa-solid fa-list"></i>
+                    <div class="icon-item active">
+                        <i class="fa-regular fa-grid"></i>
                     </div>
                     <div class="icon-item">
-                        <i class="fa-regular fa-grid"></i>
+                        <i class="fa-solid fa-list"></i>
                     </div>
                 </div>
             </div>
@@ -133,6 +102,10 @@
                         @else
                             <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
                         @endif
+                        <div class="actions">
+                            <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="fa-regular fa-tag"></i></a>
+                            <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="far fa-heart"></i></a>
+                        </div>
                     </div>
                     <div class="car-content">
                         <div class="media-body">
@@ -147,6 +120,22 @@
                                 @endif
                             </p>
                         </div>
+                        <ul class="car-feature">
+                            <li>
+                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-1.svg" alt="icon"></div>
+                                {{ $part->year ?: 'N/A' }}
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-2.svg" alt="icon"></div>
+                                {{ $part->make ?: 'Unknown Make' }}
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-3.svg" alt="icon"></div>
+                                {{ $part->model ?: 'Unknown Model' }}
+                            </li>
+                        </ul>
                         <div class="car-bottom">
                             @if($part->price)
                                 <h6 class="box-title">${{ number_format($part->price, 2) }}</h6>
@@ -178,5 +167,4 @@
         </div>
     @endif
 
-</div>
 </div>

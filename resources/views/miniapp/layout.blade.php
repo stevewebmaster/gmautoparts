@@ -13,10 +13,11 @@
     <title>@yield('title', 'G&M Mini-app')</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: linear-gradient(180deg, #eef4ff 0%, #f6f8fb 140px, #f8fafc 100%); min-height: 100vh; color: #1f2937; }
-        .app-header { background: linear-gradient(135deg, #0a1a36 0%, #0f3460 100%); color: #fff; padding: 1rem 1.25rem; box-shadow: 0 8px 24px rgba(15, 52, 96, 0.25); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: #000; min-height: 100vh; color: #1f2937; }
+        .app-header { background: #000; color: #fff; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
         .app-brand { color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.75rem; }
         .app-brand img { width: 34px; height: 34px; border-radius: 8px; background: rgba(255, 255, 255, 0.14); padding: 3px; }
+        .app-header-logo { display: block; width: clamp(160px, 48vw, 240px); height: auto; margin: 0.4rem 0 0.15rem; }
         .app-brand-title { font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
         .app-brand-subtitle { font-size: 0.75rem; opacity: 0.85; }
         .app-body { padding: 1rem; padding-bottom: 2rem; max-width: 560px; margin: 0 auto; }
@@ -47,6 +48,7 @@
 <body>
     @if(!request()->routeIs('app.login'))
     <header class="app-header">
+        <img class="app-header-logo" src="/gm-parts-logo.svg" alt="G&M Auto Parts">
         <a class="app-brand" href="{{ route('app.dashboard') }}">
             <img src="/icons/miniapp-icon.svg" alt="G&M">
             <span>
