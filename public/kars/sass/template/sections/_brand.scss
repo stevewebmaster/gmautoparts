@@ -1,0 +1,224 @@
+/* Brand 1 ---------------------------------- */
+.process-play-btn-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.brand-box {
+    background: var(--smoke-color);
+    border: 1px solid var(--th-border-color);
+    text-align: center;
+    min-height: 170px;
+    display: grid !important;
+    align-items: center;
+    justify-content: center;
+    img {
+        padding: 5px 15px;
+        width: 140px;
+        max-width: 100%;
+        filter: none;
+        transition:all 0.4s ease-in-out;
+        cursor: pointer;
+    }
+
+    &:hover img {
+        transform: scale(1.2);
+    }
+}
+
+.client-box-2-wrapper .swiper-slide:last-child>.brand-box-2 {
+    border-right: none;
+}
+
+/* Brand 2 ---------------------------------- */
+.brand-2-top {
+    .sub-title {
+        font-size: 24px;
+        text-transform: capitalize;
+
+        &::before {
+            width: 80px;
+            height: 1px;
+        }
+
+        &::after {
+            width: 180px;
+            height: 1px;
+        }
+
+        .double-line {
+            &::before {
+                width: 80px;
+                height: 1px;
+            }
+
+            &::after {
+                width: 150px;
+                height: 1px;
+            }
+        }
+    }
+}
+
+.brand-area-2 {
+    background-color: #FFF7E8;
+}
+
+.client-box-2-wrapper {
+    background: var(--white-color);
+    border: 1px solid var(--th-border-color);
+    border-radius: 30px;
+}
+
+.brand-box-2 {
+    text-align: center;
+    padding: 50px 0;
+    border-right: 1px solid var(--th-border-color);
+    margin: 0 -3px;
+    min-height: 170px;
+
+    img {
+        width: 140px;
+        max-width: 100%;
+        filter: none;
+        transition:all 0.4s ease-in-out;
+        cursor: pointer;
+    }
+
+    &:hover {
+        img {
+            transform: scale(1.2);
+        }
+    }
+}
+
+@include md {
+    .brand-2-top .sub-title::before {
+        width: 35px;
+    }
+    .brand-2-top .sub-title::after {
+        width: 60px;
+    }
+    .brand-2-top .sub-title .double-line::before {
+        width: 35px;
+    }
+    .brand-2-top .sub-title .double-line::after {
+        width: 60px;
+    }
+}
+
+/* Brand 3 ---------------------------------- */
+
+.brand-clint-wrp {
+    display: flex;
+    gap: 60px;
+    margin-top: -.35em;
+    flex-wrap: wrap;
+
+    .left-wrap {
+        display: flex;
+        gap: 22px;
+        align-items: center;
+
+        .content {
+            .box-title {
+                font-size: 20px;
+                margin-bottom: 5px;
+                line-height: 1;
+            }
+
+            .box-text {
+                margin-bottom: 0;
+                line-height: 1;
+            }
+        }
+    }
+}
+
+.brand-clint-wrp .right-wrap .content {
+    text-align: center;
+
+    .box-title {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .box-review {
+        font-size: 12px;
+        color: var(--theme-color3);
+    }
+}
+
+.brand-3-wrap { 
+    background: #1A1A1A;
+    border: 1px solid #303030;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    &__item {
+        .brand-box {
+            background: transparent;
+            border: 0;
+            padding: 50px 20px;
+            border: 1px solid #303030;
+            margin: 0;
+
+            a {
+                display: block;
+            }
+
+            img {
+                height: 30px;
+                object-fit: none;
+                padding: 0;
+            }
+
+            &:hover {
+                transform: scale(1);
+            }
+        }
+    }
+}
+
+@include lg {
+    .brand-clint-wrp {
+        gap: 20px;
+    }
+}
+@include sm {
+    .brand-3-wrap {
+        background: #1A1A1A;
+        border: 1px solid #303030;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@include xs {
+    .brand-3-wrap__item .brand-box {
+        padding: 40px 15px;
+    }
+}
+@media (max-width: 420px) {
+    .brand-3-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Brand 5 ---------------------------------- */
+.client-box-2-wrapper.style-2 {
+    border-radius: 0;
+}
+
+/* Brand 6 ---------------------------------- */
+
+@media only screen and (min-width: 1300px) {
+    .brand-area-6 {
+        margin-left: auto;
+        margin-right: auto;
+        margin: 0 40px;
+        border-radius: 40px 40px 0 0;
+    }
+}

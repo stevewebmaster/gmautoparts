@@ -9,7 +9,7 @@ class PageController extends Controller
     public function about()
     {
         $page = Page::where('key', 'about')->firstOrFail();
-        return view('pages.show', ['page' => $page]);
+        return view('pages.about', ['page' => $page]);
     }
 
     public function contact()

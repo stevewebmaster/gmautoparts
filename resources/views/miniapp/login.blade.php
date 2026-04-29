@@ -2,9 +2,9 @@
 @section('title', 'Login')
 
 @section('content')
-    <div style="padding-top: 2rem;">
-        <h1 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Enter PIN</h1>
-        <p style="color: #666; margin-bottom: 1.5rem;">Use the PIN provided to add parts and vehicles from your phone.</p>
+    <div class="card-app" style="margin-top: 1.25rem;">
+        <h1 class="page-title">Enter PIN</h1>
+        <p class="lead-text">Use the PIN provided to add parts and vehicles from your phone.</p>
         <form method="post" action="{{ route('app.login.post') }}">
             @csrf
             <div class="form-group">

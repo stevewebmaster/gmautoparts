@@ -7,8 +7,12 @@ use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('home');
+    return view('home-v2');
 })->name('home');
+
+Route::get('/home-v2', function () {
+    return view('home-v2');
+})->name('home.v2');
 
 Route::get('/parts', [PartController::class, 'index'])->name('parts.index');
 Route::get('/parts/{part:slug}', [PartController::class, 'show'])->name('parts.show');

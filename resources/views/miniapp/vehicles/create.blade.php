@@ -2,7 +2,8 @@
 @section('title', 'Add a vehicle')
 
 @section('content')
-    <h1 style="font-size: 1.35rem; margin-bottom: 1rem;">Add a vehicle (Now Dismantling)</h1>
+    <div class="card-app">
+    <h1 class="page-title">Add a Vehicle (Now Dismantling)</h1>
     <form method="post" action="{{ route('app.vehicles.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
@@ -40,5 +41,6 @@
         </div>
         <button type="submit" class="btn-app btn-primary-app">Save vehicle</button>
     </form>
-    <p style="margin-top: 1rem;"><a href="{{ route('app.dashboard') }}" style="color: #666; font-size: 0.9rem;">← Back</a></p>
+    <a href="{{ route('app.dashboard') }}" class="back-link">← Back</a>
+    </div>
 @endsection
