@@ -6,7 +6,7 @@
 @section('content')
 
     {{-- Breadcrumb --}}
-    <div class="breadcumb-wrapper style-2" data-bg-src="/images/page-headers/header-1.jpg" data-overlay="black" data-opacity="3">
+    <div class="breadcumb-wrapper style-2" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
             <div class="breadcumb-content">
                 <h1 class="breadcumb-title">Inventory Grid</h1>
