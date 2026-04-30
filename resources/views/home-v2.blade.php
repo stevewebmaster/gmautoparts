@@ -16,9 +16,9 @@
             $slides = $categories = $featuredParts = $dismantling = collect();
         }
 
-        // Hero slide images — use DB slides if available, otherwise fall back to template images
-        $heroImages = ['/kars/img/hero/hero_1_1.png', '/kars/img/hero/hero_1_2.png', '/kars/img/hero/hero_1_3.png'];
-        $heroTitles = ['Find Your Perfect Part', 'Quality Parts at Fair Prices', 'Freshly Dismantled Vehicles'];
+        // Hero slide images (public/images/slider-cars/) — paired with titles below when no CMS slides
+        $heroSlideImages = ['/images/slider-cars/Corvette-Slider.png', '/images/slider-cars/Commodore2.png'];
+        $heroTitles = ['Find Your Perfect Part', 'Quality Parts at Fair Prices'];
     @endphp
 
     {{-- ==============================
@@ -40,7 +40,7 @@
                                         <div class="col-xxl-5 col-xl-6 col-lg-6">
                                             <div class="hero-1-content">
                                                 <span class="sub-title" data-ani="slideinup" data-ani-delay="0.2s">
-                                                    <span class="text-theme">Quality</span> Parts NZ
+                                                    <span class="text-theme">KIWI</span> OWNED AND OPERATED
                                                 </span>
                                                 <h1 class="hero-title" data-ani="slideinup" data-ani-delay="0.4s">
                                                     {{ $slide->title ?: 'Find Your Perfect Part' }}
@@ -57,7 +57,7 @@
                                         <div class="col-xxl-7 col-xl-6 col-lg-6">
                                             <div class="hero-img text-end">
                                                 <div class="img-main" data-ani="slideinright" data-ani-delay="0.8s">
-                                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($slide->image) }}"
+                                                    <img src="{{ $heroSlideImages[$i % count($heroSlideImages)] }}"
                                                          alt="{{ $slide->title ?: 'Vehicle' }}">
                                                 </div>
                                             </div>
@@ -69,7 +69,7 @@
                     @endforeach
                 @else
                     {{-- Fallback to template images if no DB slides --}}
-                    @foreach($heroImages as $i => $img)
+                    @foreach($heroSlideImages as $i => $img)
                         <div class="swiper-slide">
                             <div class="hero-inner hero-style1">
                                 <div class="container th-container">
@@ -77,7 +77,7 @@
                                         <div class="col-xxl-5 col-xl-6 col-lg-6">
                                             <div class="hero-1-content">
                                                 <span class="sub-title" data-ani="slideinup" data-ani-delay="0.2s">
-                                                    <span class="text-theme">Luxury</span> Meets Affordability
+                                                    <span class="text-theme">KIWI</span> OWNED AND OPERATED
                                                 </span>
                                                 <h1 class="hero-title" data-ani="slideinup" data-ani-delay="0.4s">
                                                     {{ $heroTitles[$i] }}

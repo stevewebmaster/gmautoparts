@@ -1,6 +1,6 @@
 <div>
-    <div class="reservation-area style-2 home-4-style mb-40">
-        <div class="container th-container p-0">
+    <div class="reservation-area style-2 home-4-style">
+        <div class="container th-container">
             <div class="reservation-wrapper">
                 <div class="reservation-form">
                     <div class="row">
@@ -67,104 +67,109 @@
         </div>
     </div>
 
-    {{-- Top filter bar --}}
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="inventory-top-filer-wrap">
-                <div class="left-content">
-                    <p>
-                        Showing {{ $parts->firstItem() ?? 0 }}–{{ $parts->lastItem() ?? 0 }}
-                        of {{ $parts->total() }} part(s)
-                    </p>
-                </div>
-                <div class="filter-search">
-                    <div class="icon-item active">
-                        <i class="fa-regular fa-grid"></i>
-                    </div>
-                    <div class="icon-item">
-                        <i class="fa-solid fa-list"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Parts Grid --}}
-    <div class="row gy-30 justify-content-center" wire:key="parts-grid-{{ $parts->currentPage() }}">
-
-        @forelse($parts as $part)
-            <div class="col-xxl-4 col-xl-6 col-lg-6 col-sm-6">
-                <div class="feature-list-1">
-                    <div class="box-icon">
-                        @if(is_array($part->images) && count($part->images))
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($part->images[0]) }}"
-                                 alt="{{ $part->title }}" loading="lazy">
-                        @else
-                            <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
-                        @endif
-                        <div class="actions">
-                            <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="fa-regular fa-tag"></i></a>
-                            <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="far fa-heart"></i></a>
-                        </div>
-                    </div>
-                    <div class="car-content">
-                        <div class="media-body">
-                            <h3 class="box-title">
-                                <a href="{{ route('parts.show', $part->slug) }}">{{ $part->title }}</a>
-                            </h3>
-                            <p class="box-text">
-                                <span>Category:</span>
-                                {{ $part->category->name }}
-                                @if($part->vehicle)
-                                    &nbsp;&middot;&nbsp;{{ $part->vehicle->display_name }}
-                                @endif
+    <section class="feature-sec-1 space">
+        <div class="container">
+            {{-- Top filter bar --}}
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="inventory-top-filer-wrap">
+                        <div class="left-content">
+                            <p>
+                                Showing {{ $parts->firstItem() ?? 0 }}–{{ $parts->lastItem() ?? 0 }}
+                                of {{ $parts->total() }} part(s)
                             </p>
                         </div>
-                        <ul class="car-feature">
-                            <li>
-                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-1.svg" alt="icon"></div>
-                                {{ $part->year ?: 'N/A' }}
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-2.svg" alt="icon"></div>
-                                {{ $part->make ?: 'Unknown Make' }}
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-3.svg" alt="icon"></div>
-                                {{ $part->model ?: 'Unknown Model' }}
-                            </li>
-                        </ul>
-                        <div class="car-bottom">
-                            @if($part->price)
-                                <h6 class="box-title">${{ number_format($part->price, 2) }}</h6>
-                            @else
-                                <h6 class="box-title">POA</h6>
-                            @endif
-                            <a class="th-btn sm style3" href="{{ route('parts.show', $part->slug) }}">
-                                View Details <i class="fas fa-arrow-up-right"></i>
-                            </a>
+                        <div class="filter-search">
+                            <div class="icon-item active">
+                                <i class="fa-regular fa-grid"></i>
+                            </div>
+                            <div class="icon-item">
+                                <i class="fa-solid fa-list"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @empty
-            <div class="col-12 text-center py-5">
-                <p class="text-body-secondary">No parts match your filters. Try adjusting the criteria.</p>
-                <button wire:click="clearFilters" type="button" class="th-btn style3 mt-2">
-                    Reset Filters <i class="fas fa-arrow-up-right"></i>
-                </button>
+
+            {{-- Parts Grid --}}
+            <div class="row gy-30 justify-content-center" wire:key="parts-grid-{{ $parts->currentPage() }}">
+
+                @forelse($parts as $part)
+                    <div class="col-xxl-4 col-xl-6 col-lg-6 col-sm-6">
+                        <div class="feature-list-1">
+                            <div class="box-icon">
+                                @if(is_array($part->images) && count($part->images))
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($part->images[0]) }}"
+                                         alt="{{ $part->title }}" loading="lazy">
+                                @else
+                                    <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
+                                @endif
+                                <div class="actions">
+                                    <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="fa-regular fa-tag"></i></a>
+                                    <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="far fa-heart"></i></a>
+                                </div>
+                            </div>
+                            <div class="car-content">
+                                <div class="media-body">
+                                    <h3 class="box-title">
+                                        <a href="{{ route('parts.show', $part->slug) }}">{{ $part->title }}</a>
+                                    </h3>
+                                    <p class="box-text">
+                                        <span>Category:</span>
+                                        {{ $part->category->name }}
+                                        @if($part->vehicle)
+                                            &nbsp;&middot;&nbsp;{{ $part->vehicle->display_name }}
+                                        @endif
+                                    </p>
+                                </div>
+                                <ul class="car-feature">
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-1.svg" alt="icon"></div>
+                                        {{ $part->year ?: 'N/A' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-2.svg" alt="icon"></div>
+                                        {{ $part->make ?: 'Unknown Make' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-3.svg" alt="icon"></div>
+                                        {{ $part->model ?: 'Unknown Model' }}
+                                    </li>
+                                </ul>
+                                <div class="car-bottom">
+                                    @if($part->price)
+                                        <h6 class="box-title">${{ number_format($part->price, 2) }}</h6>
+                                    @else
+                                        <h6 class="box-title">POA</h6>
+                                    @endif
+                                    <a class="th-btn sm style3" href="{{ route('parts.show', $part->slug) }}">
+                                        View Details <i class="fas fa-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center py-5">
+                        <p class="text-body-secondary">No parts match your filters. Try adjusting the criteria.</p>
+                        <button wire:click="clearFilters" type="button" class="th-btn style3 mt-2">
+                            Reset Filters <i class="fas fa-arrow-up-right"></i>
+                        </button>
+                    </div>
+                @endforelse
+
             </div>
-        @endforelse
 
-    </div>
+            {{-- Pagination --}}
+            @if($parts->hasPages())
+                <div class="th-pagination text-center mt-40">
+                    {{ $parts->links() }}
+                </div>
+            @endif
 
-    {{-- Pagination --}}
-    @if($parts->hasPages())
-        <div class="th-pagination text-center mt-40">
-            {{ $parts->links() }}
         </div>
-    @endif
+    </section>
 
 </div>

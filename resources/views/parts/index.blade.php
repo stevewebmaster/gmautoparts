@@ -18,10 +18,6 @@
         </div>
     </div>
 
-    <section class="feature-sec-1 space">
-        <div class="container">
-            @livewire('parts-filter')
-        </div>
-    </section>
+    @livewire('parts-filter')
 
 @endsection
