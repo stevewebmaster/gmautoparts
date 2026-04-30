@@ -256,8 +256,8 @@
 
             <div class="row gy-30 justify-content-center">
                 @foreach($dismantling as $vehicle)
-                    <div class="col-xl-4 col-lg-4 col-sm-6">
-                        <div class="feature-list-1">
+                    <div class="col-xl-6 col-lg-12">
+                        <div class="feature-list-1 list">
                             <div class="box-icon">
                                 @if(is_array($vehicle->images) && count($vehicle->images))
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($vehicle->images[0]) }}"
@@ -271,8 +271,24 @@
                                     <h3 class="box-title">
                                         <a href="{{ route('vehicles.show', $vehicle) }}">{{ $vehicle->display_name }}</a>
                                     </h3>
-                                    <p class="box-text"><span>Parts available:</span> {{ $vehicle->parts_count }}</p>
+                                    <p class="box-text"><span>Stock:</span> {{ $vehicle->stock_number ?: 'N/A' }}</p>
                                 </div>
+                                <ul class="car-feature">
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-1.svg" alt="Engine"></div>
+                                        {{ $vehicle->engine ?: 'Engine N/A' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-2.svg" alt="Transmission"></div>
+                                        {{ $vehicle->transmission ?: 'Transmission N/A' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-3.svg" alt="Available parts"></div>
+                                        {{ $vehicle->parts_count }} parts
+                                    </li>
+                                </ul>
                                 <div class="car-bottom">
                                     <a class="th-btn sm style3" href="{{ route('vehicles.show', $vehicle) }}">
                                         View Parts <i class="fas fa-arrow-up-right"></i>
