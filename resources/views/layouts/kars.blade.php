@@ -102,7 +102,6 @@
                             <ul>
                                 <li><i class="fal fa-location-dot"></i> <a href="https://www.google.com/maps/search/?api=1&query=2+Bruce+Berquist+Drive,+Te+Awamutu">2 Bruce Berquist Drive, Te Awamutu</a></li>
                                 <li><i class="fa-regular fa-phone"></i> <a href="tel:+6478718575">(07) 871-8575</a></li>
-                                <li><i class="fa-regular fa-fax"></i> <span>Fax: 871 8245</span></li>
                                 <li><i class="fa-sharp fa-regular fa-envelope"></i> <a href="mailto:gmautospares@xtra.co.nz">gmautospares@xtra.co.nz</a></li>
                             </ul>
                         </div>
@@ -208,10 +207,9 @@
                                     </div>
                                     <div class="info-box">
                                         <div class="info-contnt">
-                                            <h4 class="footer-info-title">Phone / Fax:</h4>
+                                            <h4 class="footer-info-title">Phone:</h4>
                                             <p class="info-box_text">
-                                                <a href="tel:+6478718575" class="info-box_link">(07) 871-8575</a><br>
-                                                <span>Fax: 871 8245</span>
+                                                <a href="tel:+6478718575" class="info-box_link">(07) 871-8575</a>
                                             </p>
                                         </div>
                                     </div>

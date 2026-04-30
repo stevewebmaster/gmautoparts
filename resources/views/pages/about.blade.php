@@ -4,7 +4,7 @@
 @section('meta_description', $page->meta_description ?? 'Learn more about G&M Auto Parts and how we supply quality used auto parts across New Zealand.')
 
 @section('content')
-    <div class="breadcumb-wrapper" data-bg-src="/kars/img/bg/breadcrumb-bg.jpg" data-overlay="black" data-opacity="3">
+    <div class="breadcumb-wrapper" data-bg-src="/images/page-headers/header-1.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
             <div class="breadcumb-content">
                 <h1 class="breadcumb-title">About Us</h1>

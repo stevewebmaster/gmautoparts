@@ -4,7 +4,7 @@
 @section('meta_description', $page->meta_description ?? 'Contact G&M Autospares for parts enquiries.')
 
 @section('content')
-    <div class="breadcumb-wrapper" data-bg-src="/kars/img/bg/breadcrumb-bg.jpg" data-overlay="black" data-opacity="3">
+    <div class="breadcumb-wrapper" data-bg-src="/images/page-headers/header-1.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
             <div class="breadcumb-content">
                 <h1 class="breadcumb-title">Contact</h1>
@@ -44,9 +44,8 @@
                             <i class="fa-regular fa-phone"></i>
                         </div>
                         <div class="media-body">
-                            <p class="contact-feature_label">Phone & Fax</p>
+                            <p class="contact-feature_label">Phone</p>
                             <a href="tel:+6478718575" class="contact-feature_link">Phone: (07) 871-8575</a>
-                            <span class="contact-feature_link">Fax: 871 8245</span>
                         </div>
                     </div>
                 </div>
