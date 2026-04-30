@@ -1,0 +1,9 @@
+<svg width="230" height="58" viewBox="0 0 230 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="230" height="58" fill="white"/>
+  <path d="M8 36C13 28 22 22 34 22H66C72 22 77 19 80 14L84 8H94L89 16C84 24 76 29 66 29H35C26 29 19 33 14 40L8 36Z" fill="#111111"/>
+  <circle cx="35" cy="41" r="5" fill="#111111"/>
+  <circle cx="67" cy="41" r="5" fill="#111111"/>
+  <path d="M10 49H83" stroke="#EF2323" stroke-width="4" stroke-linecap="round"/>
+  <text x="89" y="33" font-family="Play, Arial, sans-serif" font-weight="700" font-size="44" fill="#121212">KARS</text>
+  <text x="89" y="49" font-family="DM Sans, Arial, sans-serif" font-weight="600" font-size="9" fill="#EF2323">Car Dealer, Rental &amp; Listing</text>
+</svg>
