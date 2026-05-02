@@ -20,7 +20,7 @@
         <div class="container">
             <div class="title-area text-center">
                 <h2 class="sec-title">Our Contact Information</h2>
-                @if($page->content)
+                @if($page?->content)
                     <p class="mb-0">{!! $page->content !!}</p>
                 @endif
             </div>

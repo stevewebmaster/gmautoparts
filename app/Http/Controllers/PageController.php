@@ -8,13 +8,23 @@ class PageController extends Controller
 {
     public function about()
     {
-        $page = Page::where('key', 'about')->firstOrFail();
+        $page = rescue(
+            fn () => Page::where('key', 'about')->first(),
+            null,
+            false
+        );
+
         return view('pages.about', ['page' => $page]);
     }
 
     public function contact()
     {
-        $page = Page::where('key', 'contact')->firstOrFail();
+        $page = rescue(
+            fn () => Page::where('key', 'contact')->first(),
+            null,
+            false
+        );
+
         return view('pages.contact', ['page' => $page]);
     }
 }
