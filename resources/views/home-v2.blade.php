@@ -1,5 +1,37 @@
 @extends('layouts.kars')
 
+@push('head_styles')
+<style>
+    /* Kars theme reserves ~550px for .reservation-right; full width with that column removed */
+    #hero .reservation-wrapper .reservation-form {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .gm-brand-box {
+        min-height: 170px;
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: space-between;
+        grid-template-rows: unset !important;
+    }
+    .gm-brand-box-main {
+        padding: 12px 8px 4px;
+    }
+    .gm-brand-box-yard {
+        font-size: 0.72rem;
+        letter-spacing: 0.02em;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding-top: 6px;
+        margin-top: 2px;
+    }
+    .gm-brand-box-yard:hover {
+        color: var(--theme-color, #ef2323) !important;
+    }
+</style>
+@endpush
+
 @section('title', 'G&M Auto Parts')
 @section('meta_description', 'G&M Auto Parts - quality used car parts in New Zealand. Browse parts and vehicles we are now dismantling.')
 
@@ -16,9 +48,16 @@
             $slides = $categories = $featuredParts = $dismantling = collect();
         }
 
-        // Hero slide images (public/images/slider-cars/) — paired with titles below when no CMS slides
+        // Hero slide images (public/images/slider-cars/) — paired with titles when no CMS slides
         $heroSlideImages = ['/images/slider-cars/Corvette-Slider.png', '/images/slider-cars/Commodore2.png'];
         $heroTitles = ['Find Your Perfect Part', 'Quality Parts at Fair Prices'];
+
+        $manufacturerBrands = collect(config('manufacturers.popular', []))
+            ->filter(function ($b) {
+                return !empty($b['file'])
+                    && file_exists(public_path('images/manufacturers/'.$b['file']));
+            })
+            ->values();
     @endphp
 
     {{-- ==============================
@@ -68,7 +107,7 @@
                         </div>
                     @endforeach
                 @else
-                    {{-- Fallback to template images if no DB slides --}}
+                    {{-- Fallback when no CMS slides --}}
                     @foreach($heroSlideImages as $i => $img)
                         <div class="swiper-slide">
                             <div class="hero-inner hero-style1">
@@ -159,16 +198,55 @@
                             </div>
                         </form>
                     </div>
-                    <div class="reservation-right">
-                        <div class="reservation-right-thumb">
-                            <img src="/kars/img/hero/reservation-right-img.jpg" alt="G&M Auto Parts">
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
     {{-- ======== / Hero Section ======== --}}
+
+    @if($manufacturerBrands->isNotEmpty())
+        {{-- Our Popular Brands (Kars template + manufacturer logos) --}}
+        <div class="brand-area-1 space overflow-hidden">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xxl-6 col-xl-7">
+                        <div class="title-area text-center">
+                            <h2 class="sec-title">Our Popular Brands</h2>
+                            <p>Browse used parts by manufacturer, or see which vehicles we are stripping in the yard — both lists use the same make search.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="swiper th-slider" id="brand-slider-home"
+                             data-slider-options='{"loop":true,"pagination":false,"navigation":false,"autoplay":{"delay":4500,"disableOnInteraction":false},"breakpoints":{"0":{"slidesPerView":2},"576":{"slidesPerView":2},"768":{"slidesPerView":3},"992":{"slidesPerView":4},"1200":{"slidesPerView":5},"1400":{"slidesPerView":6}}}'>
+                            <div class="swiper-wrapper">
+                                @foreach($manufacturerBrands as $brand)
+                                    <div class="swiper-slide">
+                                        <div class="brand-box gm-brand-box">
+                                            <a href="{{ route('parts.index', ['make' => $brand['make']]) }}"
+                                               class="gm-brand-box-main d-flex flex-column align-items-center justify-content-center text-decoration-none text-reset flex-grow-1">
+                                                <img src="{{ asset('images/manufacturers/'.$brand['file']) }}"
+                                                     alt="{{ $brand['label'] }}"
+                                                     loading="lazy"
+                                                     width="140"
+                                                     height="80">
+                                                <span class="small text-muted mt-2 fw-semibold">{{ $brand['label'] }}</span>
+                                            </a>
+                                            <a href="{{ route('vehicles.index', ['make' => $brand['make']]) }}"
+                                               class="gm-brand-box-yard small text-center text-muted text-decoration-none pb-2">
+                                                Now dismantling
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- ==============================
          Featured Parts Section
