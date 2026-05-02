@@ -1,5 +1,58 @@
 @extends('layouts.kars')
 
+@push('head_styles')
+<style>
+    /*
+      About collage: lock to design dimensions so high-res JPGs do not blow up layout.
+      img3 is position:absolute (Kars theme); extra padding-bottom clears the stats row.
+    */
+    #about-sec .img-box1.about-2 {
+        align-items: flex-start;
+        /* flex row height ~300px; img3 sits at top:79% + image height — reserve space below */
+        padding-bottom: clamp(10rem, 28vw, 26rem);
+    }
+    #about-sec .img-box1.about-2 .img1,
+    #about-sec .img-box1.about-2 .img2 {
+        flex-shrink: 0;
+    }
+    #about-sec .img-box1.about-2 .img1 {
+        max-width: 312px;
+    }
+    #about-sec .img-box1.about-2 .img2 {
+        max-width: 370px;
+    }
+    #about-sec .img-box1.about-2 .img1 img {
+        max-width: 312px;
+        max-height: 300px;
+        width: auto;
+        height: auto;
+        object-fit: cover;
+        display: block;
+    }
+    #about-sec .img-box1.about-2 .img2 img {
+        max-width: 370px;
+        max-height: 291px;
+        width: auto;
+        height: auto;
+        object-fit: cover;
+        display: block;
+    }
+    #about-sec .img-box1.about-2 .img3 img {
+        max-width: 424px;
+        max-height: 461px;
+        width: auto;
+        height: auto;
+        object-fit: cover;
+        display: block;
+    }
+    @media (max-width: 991px) {
+        #about-sec .img-box1.about-2 {
+            padding-bottom: clamp(8rem, 22vw, 14rem);
+        }
+    }
+</style>
+@endpush
+
 @section('title', $page->title ?? 'About Us')
 @section('meta_description', $page->meta_description ?? 'Learn more about G&M Auto Parts and how we supply quality used auto parts across New Zealand.')
 
