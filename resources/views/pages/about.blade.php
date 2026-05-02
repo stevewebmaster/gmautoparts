@@ -22,13 +22,13 @@
                 <div class="col-xl-7">
                     <div class="img-box1 about-2">
                         <div class="img1">
-                            <img class="tilt-active" src="{{ asset('images/About Page/424x461.jpg') }}" alt="G&amp;M Auto Parts">
+                            <img class="tilt-active" src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
                         </div>
                         <div class="img2">
-                            <img class="tilt-active" src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
+                            <img class="tilt-active" src="{{ asset('images/About Page/424x461.jpg') }}" alt="G&amp;M Auto Parts">
                         </div>
                         <div class="img3">
-                            <img src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
+                            <img src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
                         </div>
                     </div>
                 </div>
