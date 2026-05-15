@@ -211,7 +211,7 @@
                     <div class="col-lg-4">
                         <div class="widget footer-widget">
                             <h3 class="widget_title">Contact Us</h3>
-                            <div class="footer-call-wrap">
+                            <div class="footer-call-wrap" style="flex-direction: column;">
                                 <div class="info-box">
                                     <div class="info-contnt">
                                         <h4 class="footer-info-title">Visit Us:</h4>
