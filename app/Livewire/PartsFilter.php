@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Part;
 use App\Models\PartCategory;
+use App\Models\Vehicle;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -125,8 +126,24 @@ class PartsFilter extends Component
 
         $parts = $query->latest()->paginate(12);
 
+        $vehicles = collect();
+        if ($this->keyword !== '') {
+            $kw = $this->keyword;
+            $vehicles = Vehicle::where('is_visible', true)
+                ->where(function ($q) use ($kw) {
+                    $q->where('make', 'like', '%' . $kw . '%')
+                        ->orWhere('model', 'like', '%' . $kw . '%')
+                        ->orWhere('year', 'like', '%' . $kw . '%')
+                        ->orWhere('stock_number', 'like', '%' . $kw . '%')
+                        ->orWhere('notes', 'like', '%' . $kw . '%');
+                })
+                ->latest()
+                ->get();
+        }
+
         return view('livewire.parts-filter', [
             'parts' => $parts,
+            'vehicles' => $vehicles,
             'makes' => $this->getMakesProperty(),
             'models' => $this->getModelsProperty(),
             'years' => $this->getYearsProperty(),

@@ -67,6 +67,63 @@
         </div>
     </div>
 
+    @if($vehicles->isNotEmpty())
+    <section class="feature-sec-1 space" style="padding-bottom: 0;">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="text-white">Vehicles Being Dismantled <span style="font-size:1rem; opacity:0.6;">({{ $vehicles->count() }} found)</span></h3>
+                </div>
+            </div>
+            <div class="row gy-30 justify-content-center">
+                @foreach($vehicles as $vehicle)
+                    <div class="col-xl-6 col-lg-12">
+                        <div class="feature-list-1 list">
+                            <div class="box-icon">
+                                @if(is_array($vehicle->images) && count($vehicle->images))
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($vehicle->images[0]) }}" alt="{{ $vehicle->display_name }}">
+                                @else
+                                    <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $vehicle->display_name }}">
+                                @endif
+                            </div>
+                            <div class="car-content">
+                                <div class="media-body">
+                                    <h3 class="box-title">
+                                        <a href="{{ route('vehicles.show', $vehicle) }}">{{ $vehicle->display_name }}</a>
+                                    </h3>
+                                    <p class="box-text"><span>Stock:</span> {{ $vehicle->stock_number ?: 'N/A' }}</p>
+                                </div>
+                                <ul class="car-feature">
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-1.svg" alt="Engine"></div>
+                                        {{ $vehicle->engine ?: 'Engine N/A' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-2.svg" alt="Transmission"></div>
+                                        {{ $vehicle->transmission ?: 'Transmission N/A' }}
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="icon"><img src="/kars/img/icon/car-feature-icon-1-3.svg" alt="Parts"></div>
+                                        {{ $vehicle->parts_count ?? $vehicle->parts()->count() }} parts
+                                    </li>
+                                </ul>
+                                <div class="car-bottom">
+                                    <h6 class="box-title">{{ $vehicle->year ?: 'Year N/A' }}</h6>
+                                    <a class="th-btn sm style3" href="{{ route('vehicles.show', $vehicle) }}">
+                                        View Parts <i class="fas fa-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
     <section class="feature-sec-1 space">
         <div class="container">
             {{-- Top filter bar --}}
