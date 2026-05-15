@@ -2,6 +2,15 @@
 
 @push('head_styles')
 <style>
+    /* Keep input text white so it's visible against the transparent focused background */
+    .reservation-area .form-control,
+    .reservation-area .form-control:focus {
+        color: #fff;
+    }
+    .reservation-area .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
     /* Kars theme reserves ~550px for .reservation-right; full width with that column removed */
     #hero .reservation-wrapper .reservation-form {
         width: 100%;

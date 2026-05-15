@@ -259,6 +259,7 @@
                 <div class="row gy-2 align-items-center">
                     <div class="col-md-12">
                         <p class="copyright-text text-center">Copyright <i class="fal fa-copyright"></i> {{ date('Y') }} <a href="{{ route('home') }}">G&M Auto Parts</a>. All Rights Reserved.</p>
+                        <p class="text-center" style="font-size:0.75rem; opacity:0.45; margin-top:0.35rem;">Website by <a href="https://websitemaster.co.nz" target="_blank" style="color:inherit;">WebsiteMaster.co.nz</a></p>
                     </div>
                 </div>
             </div>
