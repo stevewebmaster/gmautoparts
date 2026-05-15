@@ -208,7 +208,7 @@
                         </div>
                     </div>
                     <!-- Centre: Contact details -->
-                    <div class="col-lg-4 text-center">
+                    <div class="col-lg-4">
                         <div class="widget footer-widget">
                             <h3 class="widget_title">Contact Us</h3>
                             <div class="footer-call-wrap">
