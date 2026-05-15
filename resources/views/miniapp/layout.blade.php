@@ -17,7 +17,7 @@
         .app-header { background: #000; color: #fff; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
         .app-header-inner { display: flex; align-items: center; gap: 1rem; }
         .app-header-logo { display: block; width: clamp(130px, 40vw, 200px); height: auto; }
-        .app-header-name { color: #fff; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; }
+        .app-header-name { color: #fff; font-size: 1.4rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; }
         .app-body { padding: 1rem; padding-bottom: 2rem; max-width: 560px; margin: 0 auto; }
         .card-app { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08); padding: 1rem; }
         .card-app + .card-app { margin-top: 0.9rem; }
