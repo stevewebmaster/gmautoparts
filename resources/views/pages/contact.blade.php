@@ -103,7 +103,7 @@
                             </div>
                             <div class="col-lg-5">
                                 <div class="contact-form-thumb overflow-hidden">
-                                    <img src="/kars/img/contact/contact-page-thumb.jpg" alt="Contact G&M Auto Parts">
+                                    <img src="/images/Contact-Oage/GM-Contact.jpg" alt="Contact G&M Auto Parts">
                                 </div>
                             </div>
                         </div>

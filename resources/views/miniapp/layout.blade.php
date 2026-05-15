@@ -15,11 +15,9 @@
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: #000; min-height: 100vh; color: #1f2937; }
         .app-header { background: #000; color: #fff; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
-        .app-brand { color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.75rem; }
-        .app-brand img { width: 34px; height: 34px; border-radius: 8px; background: rgba(255, 255, 255, 0.14); padding: 3px; }
-        .app-header-logo { display: block; width: clamp(160px, 48vw, 240px); height: auto; margin: 0.4rem 0 0.15rem; }
-        .app-brand-title { font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
-        .app-brand-subtitle { font-size: 0.75rem; opacity: 0.85; }
+        .app-header-inner { display: flex; align-items: center; gap: 1rem; }
+        .app-header-logo { display: block; width: clamp(130px, 40vw, 200px); height: auto; }
+        .app-header-name { color: #fff; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; }
         .app-body { padding: 1rem; padding-bottom: 2rem; max-width: 560px; margin: 0 auto; }
         .card-app { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08); padding: 1rem; }
         .card-app + .card-app { margin-top: 0.9rem; }
@@ -48,14 +46,10 @@
 <body>
     @if(!request()->routeIs('app.login'))
     <header class="app-header">
-        <img class="app-header-logo" src="/gm-parts-logo.svg" alt="G&M Auto Parts">
-        <a class="app-brand" href="{{ route('app.dashboard') }}">
-            <img src="/icons/miniapp-icon.svg" alt="G&M">
-            <span>
-                <span class="app-brand-title">G&M Mini-app</span><br>
-                <span class="app-brand-subtitle">Add parts and vehicles quickly</span>
-            </span>
-        </a>
+        <div class="app-header-inner">
+            <img class="app-header-logo" src="/gm-parts-logo.svg" alt="G&M Auto Parts">
+            <span class="app-header-name">Parts Loader</span>
+        </div>
     </header>
     @endif
     <main class="app-body">

@@ -50,7 +50,7 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') || request()->routeIs('home.v2') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('home') }}">Home</a></li>
                             <li class="nav-item"><a class="nav-link {{ request()->routeIs('about') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('about') }}">About Us</a></li>
-                            <li class="nav-item"><a class="nav-link {{ request()->routeIs('parts.*') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('parts.index') }}">Inventory</a></li>
+                            <li class="nav-item"><a class="nav-link {{ request()->routeIs('parts.*') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('parts.index') }}">Parts</a></li>
                             <li class="nav-item"><a class="nav-link {{ request()->routeIs('vehicles.*') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('vehicles.index') }}">Dealership</a></li>
                             <li class="nav-item"><a class="nav-link {{ request()->routeIs('contact') ? 'active fw-semibold' : '' }} text-dark gm2-nav-link" href="{{ route('contact') }}">Contact Us</a></li>
                         </ul>

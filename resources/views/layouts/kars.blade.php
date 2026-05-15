@@ -79,7 +79,7 @@
                         <a href="{{ route('about') }}">About Us</a>
                     </li>
                     <li class="{{ request()->routeIs('parts.*') ? 'active' : '' }}">
-                        <a href="{{ route('parts.index') }}">Inventory</a>
+                        <a href="{{ route('parts.index') }}">Parts</a>
                     </li>
                     <li class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
                         <a href="{{ route('vehicles.index') }}">Now Dismantling</a>
@@ -141,7 +141,7 @@
                                         <a href="{{ route('about') }}">About Us</a>
                                     </li>
                                     <li class="{{ request()->routeIs('parts.*') ? 'active' : '' }}">
-                                        <a href="{{ route('parts.index') }}">Inventory</a>
+                                        <a href="{{ route('parts.index') }}">Parts</a>
                                     </li>
                                     <li class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
                                         <a href="{{ route('vehicles.index') }}">Now Dismantling</a>
@@ -193,35 +193,12 @@
         <div class="widget-area">
             <div class="container">
                 <div class="row justify-content-between">
-                    <div class="col-md-6 col-xl-3">
+                    <!-- Left: About -->
+                    <div class="col-lg-5">
                         <div class="widget footer-widget">
                             <h3 class="widget_title">About G&M Auto Parts</h3>
                             <div class="th-widget-about">
                                 <p class="about-text">Quality used automotive parts from dismantled vehicles. Browse our catalogue to find what you need at fair prices across New Zealand.</p>
-                                <div class="footer-call-wrap">
-                                    <div class="info-box">
-                                        <div class="info-contnt">
-                                            <h4 class="footer-info-title">Visit Us:</h4>
-                                            <p class="info-box_text">2 Bruce Berquist Drive, Te Awamutu</p>
-                                        </div>
-                                    </div>
-                                    <div class="info-box">
-                                        <div class="info-contnt">
-                                            <h4 class="footer-info-title">Phone:</h4>
-                                            <p class="info-box_text">
-                                                <a href="tel:+6478718575" class="info-box_link">(07) 871-8575</a>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="info-box">
-                                        <div class="info-contnt">
-                                            <h4 class="footer-info-title">Email:</h4>
-                                            <p class="info-box_text">
-                                                <a href="mailto:gmautospares@xtra.co.nz" class="info-box_link">gmautospares@xtra.co.nz</a>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="th-social">
                                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                                     <a href="#"><i class="fab fa-twitter"></i></a>
@@ -230,7 +207,38 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-auto">
+                    <!-- Centre: Contact details -->
+                    <div class="col-lg-4 text-center">
+                        <div class="widget footer-widget">
+                            <h3 class="widget_title">Contact Us</h3>
+                            <div class="footer-call-wrap">
+                                <div class="info-box">
+                                    <div class="info-contnt">
+                                        <h4 class="footer-info-title">Visit Us:</h4>
+                                        <p class="info-box_text">2 Bruce Berquist Drive, Te Awamutu</p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-contnt">
+                                        <h4 class="footer-info-title">Phone:</h4>
+                                        <p class="info-box_text">
+                                            <a href="tel:+6478718575" class="info-box_link">(07) 871-8575</a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="info-contnt">
+                                        <h4 class="footer-info-title">Email:</h4>
+                                        <p class="info-box_text">
+                                            <a href="mailto:gmautospares@xtra.co.nz" class="info-box_link">gmautospares@xtra.co.nz</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right: Quick Links -->
+                    <div class="col-lg-3">
                         <div class="widget widget_nav_menu footer-widget">
                             <h3 class="widget_title">Quick Links</h3>
                             <div class="menu-all-pages-container">
