@@ -2,13 +2,24 @@
 
 @push('head_styles')
 <style>
-    /* Keep input text white so it's visible against the transparent focused background */
+    /* Transparent fields with white text */
     .reservation-area .form-control,
-    .reservation-area .form-control:focus {
-        color: #fff;
+    .reservation-area .form-control:focus,
+    .reservation-area .form-select,
+    .reservation-area .form-select:focus,
+    .reservation-area .nice-select {
+        background-color: transparent !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+        color: #fff !important;
     }
     .reservation-area .form-control::placeholder {
         color: rgba(255, 255, 255, 0.6);
+    }
+    .reservation-area .nice-select .current {
+        color: #fff;
+    }
+    .reservation-area .nice-select::after {
+        border-color: #fff transparent transparent transparent;
     }
 
     /* Kars theme reserves ~550px for .reservation-right; full width with that column removed */
