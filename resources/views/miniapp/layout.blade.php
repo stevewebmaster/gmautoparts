@@ -8,7 +8,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="G&M Mini-app">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/miniapp-icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/miniapp-icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="/icons/miniapp-icon.svg">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/miniapp-icon-192.png">
     <link rel="manifest" href="/app-manifest.json">
     <title>@yield('title', 'G&M Mini-app')</title>
     <style>
