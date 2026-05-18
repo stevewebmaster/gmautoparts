@@ -3,25 +3,32 @@
 @push('head_styles')
 <style>
     /*
-      About collage: lock to design dimensions so high-res JPGs do not blow up layout.
-      img3 is position:absolute (Kars theme); extra padding-bottom clears the stats row.
+      About collage — design layout:
+      Left column: 312×300 top, 370×291 below (bottom shot indented / staggered right).
+      Right column: 424×461 tall, stats row directly underneath (aligned with right stack).
     */
-    #about-sec .img-box1.about-2 {
-        align-items: flex-start;
-        /* flex row height ~300px; img3 sits at top:79% + image height — reserve space below */
-        padding-bottom: clamp(10rem, 28vw, 26rem);
+    #about-sec .gm-about-collage {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: clamp(16px, 3vw, 28px);
+        align-items: start;
+        justify-content: start;
     }
-    #about-sec .img-box1.about-2 .img1,
-    #about-sec .img-box1.about-2 .img2 {
-        flex-shrink: 0;
+    #about-sec .gm-about-stack--left {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(14px, 2.5vw, 22px);
     }
-    #about-sec .img-box1.about-2 .img1 {
-        max-width: 312px;
+    #about-sec .gm-about-photo--bl-stagger {
+        margin-left: clamp(1rem, 4vw, 2.75rem);
     }
-    #about-sec .img-box1.about-2 .img2 {
-        max-width: 370px;
+    #about-sec .gm-about-stack--right {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(14px, 2vw, 22px);
+        align-items: stretch;
     }
-    #about-sec .img-box1.about-2 .img1 img {
+    #about-sec .gm-about-photo--tl img {
         max-width: 312px;
         max-height: 300px;
         width: auto;
@@ -29,7 +36,7 @@
         object-fit: cover;
         display: block;
     }
-    #about-sec .img-box1.about-2 .img2 img {
+    #about-sec .gm-about-photo--bl-stagger img {
         max-width: 370px;
         max-height: 291px;
         width: auto;
@@ -37,7 +44,7 @@
         object-fit: cover;
         display: block;
     }
-    #about-sec .img-box1.about-2 .img3 img {
+    #about-sec .gm-about-photo--tall img {
         max-width: 424px;
         max-height: 461px;
         width: auto;
@@ -45,9 +52,33 @@
         object-fit: cover;
         display: block;
     }
+    #about-sec .gm-about-counters.counter-card-wrap.style-2-inner {
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: 424px;
+        flex-wrap: wrap;
+        gap: 12px 16px;
+        justify-content: space-between;
+    }
+    #about-sec .gm-about-counters .counter-card {
+        flex: 1 1 calc(33.333% - 12px);
+        min-width: 96px;
+    }
     @media (max-width: 991px) {
-        #about-sec .img-box1.about-2 {
-            padding-bottom: clamp(8rem, 22vw, 14rem);
+        #about-sec .gm-about-collage {
+            grid-template-columns: 1fr;
+            justify-items: center;
+        }
+        #about-sec .gm-about-photo--bl-stagger {
+            margin-left: clamp(0.5rem, 6vw, 2rem);
+        }
+        #about-sec .gm-about-stack--right {
+            width: 100%;
+            max-width: 424px;
+        }
+        #about-sec .gm-about-counters .counter-card {
+            flex: 1 1 45%;
         }
     }
 </style>
@@ -73,15 +104,48 @@
         <div class="container">
             <div class="row gy-40 gx-60 flex-wrap-reverse justify-content-center">
                 <div class="col-xl-7">
-                    <div class="img-box1 about-2">
-                        <div class="img1">
-                            <img class="tilt-active" src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
+                    <div class="gm-about-collage">
+                        <div class="gm-about-stack gm-about-stack--left">
+                            <div class="gm-about-photo gm-about-photo--tl">
+                                <img class="tilt-active" src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
+                            </div>
+                            <div class="gm-about-photo gm-about-photo--bl-stagger">
+                                <img class="tilt-active" src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
+                            </div>
                         </div>
-                        <div class="img2">
-                            <img class="tilt-active" src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
-                        </div>
-                        <div class="img3">
-                            <img src="{{ asset('images/About Page/424x461.jpg') }}" alt="G&amp;M Auto Parts">
+                        <div class="gm-about-stack gm-about-stack--right">
+                            <div class="gm-about-photo gm-about-photo--tall">
+                                <img src="{{ asset('images/About Page/424x461.jpg') }}" alt="G&amp;M Auto Parts">
+                            </div>
+                            <div class="counter-card-wrap style-2-inner gm-about-counters">
+                                <div class="counter-card">
+                                    <div class="box-icon">
+                                        <img src="/kars/img/icon/counter_1.1_1.svg" alt="">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="box-number"><span class="counter-number">2500</span><span class="plus-simple">+</span></h4>
+                                        <p class="box-text">Parts Listed</p>
+                                    </div>
+                                </div>
+                                <div class="counter-card">
+                                    <div class="box-icon">
+                                        <img src="/kars/img/icon/counter_1.1_2.svg" alt="">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="box-number"><span class="counter-number">300</span><span class="plus-simple">+</span></h4>
+                                        <p class="box-text">Vehicles Dismantled</p>
+                                    </div>
+                                </div>
+                                <div class="counter-card">
+                                    <div class="box-icon">
+                                        <img src="/kars/img/icon/counter_1.1_3.svg" alt="">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="box-number"><span class="counter-number">98</span><span class="plus-simple">%</span></h4>
+                                        <p class="box-text">Customer Satisfaction</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -103,39 +167,6 @@
                             </div>
                             <div class="sing-thumb">
                                 <img src="/kars/img/about/about-1.1-sing.png" alt="Signature">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-xl-end">
-                <div class="col-xl-8">
-                    <div class="counter-card-wrap style-2-inner">
-                        <div class="counter-card">
-                            <div class="box-icon">
-                                <img src="/kars/img/icon/counter_1.1_1.svg" alt="Icon">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="box-number"><span class="counter-number">2500</span><span class="plus-simple">+</span></h4>
-                                <p class="box-text">Parts Listed</p>
-                            </div>
-                        </div>
-                        <div class="counter-card">
-                            <div class="box-icon">
-                                <img src="/kars/img/icon/counter_1.1_2.svg" alt="Icon">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="box-number"><span class="counter-number">300</span><span class="plus-simple">+</span></h4>
-                                <p class="box-text">Vehicles Dismantled</p>
-                            </div>
-                        </div>
-                        <div class="counter-card">
-                            <div class="box-icon">
-                                <img src="/kars/img/icon/counter_1.1_3.svg" alt="Icon">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="box-number"><span class="counter-number">98</span><span class="plus-simple">%</span></h4>
-                                <p class="box-text">Customer Satisfaction</p>
                             </div>
                         </div>
                     </div>

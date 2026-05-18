@@ -9,10 +9,10 @@
     <div class="breadcumb-wrapper style-2" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
             <div class="breadcumb-content">
-                <h1 class="breadcumb-title">Inventory Grid</h1>
+                <h1 class="breadcumb-title">Parts</h1>
                 <ul class="breadcumb-menu">
                     <li><a href="{{ route('home') }}">Home</a></li>
-                    <li>Inventory</li>
+                    <li>Parts</li>
                 </ul>
             </div>
         </div>
