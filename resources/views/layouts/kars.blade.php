@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/kars/css/magnific-popup.min.css">
     <link rel="stylesheet" href="/kars/css/swiper-bundle.min.css">
     <link rel="stylesheet" href="/kars/css/style.css">
+    <link rel="stylesheet" href="/css/app.css">
     <style>
         .gm-site-logo {
             display: block;

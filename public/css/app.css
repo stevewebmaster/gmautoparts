@@ -637,3 +637,19 @@ a.vehicle-card {
     right: 0.2rem;
   }
 }
+
+/* Compact breadcrumb header for detail pages */
+.breadcumb-wrapper.style-2.compact-header {
+    padding: 52px 0 105px;
+}
+.breadcumb-wrapper.style-2.compact-header .breadcumb-title {
+    font-size: 44px;
+}
+@media (max-width: 767px) {
+    .breadcumb-wrapper.style-2.compact-header {
+        padding: 40px 0 80px;
+    }
+    .breadcumb-wrapper.style-2.compact-header .breadcumb-title {
+        font-size: 30px;
+    }
+}

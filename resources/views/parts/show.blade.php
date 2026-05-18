@@ -4,7 +4,7 @@
 @section('meta_description', Str::limit(strip_tags($part->description), 160))
 
 @section('content')
-    <div class="breadcumb-wrapper style-2" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
+    <div class="breadcumb-wrapper style-2 compact-header" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
             <div class="breadcumb-content">
                 <h1 class="breadcumb-title">{{ $part->title }}</h1>
@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <section class="th-inventory-wrapper inventory-details space-extra-bottom">
+    <section class="th-inventory-wrapper inventory-details space-extra-bottom" style="padding-top: 60px;">
         <div class="container">
             <div class="row gy-4 gx-40">
 
