@@ -142,7 +142,8 @@
                     <span class="upload-icon">🖼️</span> File Upload
                 </button>
             </div>
-            <input type="file" id="input-camera" name="images[]" accept="image/*" capture="environment" multiple style="display:none">
+            {{-- input-camera has no name so it never submits directly; JS merges into input-file --}}
+            <input type="file" id="input-camera" accept="image/*" capture="environment" multiple style="display:none">
             <input type="file" id="input-file"   name="images[]" accept="image/*" multiple style="display:none">
             <div id="photo-preview" class="photo-preview-strip"></div>
             <p class="photo-hint" id="photo-count">No photos selected.</p>
@@ -162,6 +163,9 @@
     var fileInput   = document.getElementById('input-file');
     var preview     = document.getElementById('photo-preview');
     var countLabel  = document.getElementById('photo-count');
+    var canDataTransfer = (function() {
+        try { new DataTransfer(); return true; } catch(e) { return false; }
+    })();
 
     document.getElementById('btn-camera').addEventListener('click', function() { cameraInput.click(); });
     document.getElementById('btn-file').addEventListener('click', function()   { fileInput.click(); });
@@ -195,19 +199,33 @@
             preview.appendChild(wrap);
         });
         countLabel.textContent = allFiles.length ? allFiles.length + ' photo(s) selected.' : 'No photos selected.';
-        syncFormInputs();
+        if (canDataTransfer) {
+            var dt = new DataTransfer();
+            allFiles.forEach(function(f) { dt.items.add(f); });
+            fileInput.files = dt.files;
+        }
     }
 
-    function syncFormInputs() {
-        // Replace both hidden inputs with a DataTransfer so the form submits allFiles
-        var dt = new DataTransfer();
-        allFiles.forEach(function(f) { dt.items.add(f); });
-        cameraInput.files = dt.files;
-        fileInput.files   = new DataTransfer().files; // clear duplicate
-    }
-
-    cameraInput.addEventListener('change', function() { addFiles(this.files); });
-    fileInput.addEventListener('change',   function() { addFiles(this.files); });
+    cameraInput.addEventListener('change', function() {
+        if (canDataTransfer) {
+            addFiles(this.files);
+        } else {
+            // Fallback: swap camera input to have the name so it submits directly
+            cameraInput.name = 'images[]';
+            fileInput.name   = '';
+            countLabel.textContent = this.files.length + ' photo(s) selected (camera).';
+        }
+    });
+    fileInput.addEventListener('change', function() {
+        if (canDataTransfer) {
+            addFiles(this.files);
+        } else {
+            // Fallback: ensure file input has the name and camera doesn't
+            fileInput.name   = 'images[]';
+            cameraInput.name = '';
+            countLabel.textContent = this.files.length + ' photo(s) selected.';
+        }
+    });
 })();
 
 document.getElementById('part_category_id').addEventListener('change', function() {
