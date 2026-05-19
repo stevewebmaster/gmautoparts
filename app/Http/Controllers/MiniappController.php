@@ -91,7 +91,7 @@ class MiniappController extends Controller
             'stock_number' => 'nullable|string|max:100',
             'vehicle_id' => 'nullable|exists:vehicles,id',
             'images' => 'required|array|min:1',
-            'images.*' => 'image|max:5120',
+            'images.*' => 'image|max:20480',
         ]);
 
         $slug = Str::slug($validated['title']);
@@ -149,7 +149,7 @@ class MiniappController extends Controller
             'stock_number' => 'nullable|string|max:100',
             'notes' => 'nullable|string|max:2000',
             'images' => 'required|array|min:1',
-            'images.*' => 'image|max:5120',
+            'images.*' => 'image|max:20480',
         ]);
 
         $paths = [];
