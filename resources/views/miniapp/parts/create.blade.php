@@ -148,7 +148,10 @@
             <div id="photo-preview" class="photo-preview-strip"></div>
             <p class="photo-hint" id="photo-count">No photos selected.</p>
         </div>
-        <button type="submit" class="btn-app btn-primary-app">Save part</button>
+        <button type="submit" class="btn-app btn-primary-app" id="btn-submit">Save part</button>
+        <p class="photo-hint" id="upload-status" style="display:none; text-align:center; margin-top:0.5rem;">
+            ⏳ Uploading and processing photos, please wait…
+        </p>
     </form>
     <a href="{{ route('app.dashboard') }}" class="back-link">← Back</a>
     </div>
@@ -243,5 +246,14 @@ document.getElementById('part_category_id').addEventListener('change', function(
 });
 var catId = document.getElementById('part_category_id').value;
 if (catId) document.getElementById('part_category_id').dispatchEvent(new Event('change'));
+
+// Disable submit button on form submit to prevent double-tap
+document.querySelector('form').addEventListener('submit', function() {
+    var btn = document.getElementById('btn-submit');
+    var status = document.getElementById('upload-status');
+    btn.disabled = true;
+    btn.textContent = 'Uploading…';
+    status.style.display = 'block';
+});
 </script>
 @endpush
