@@ -30,7 +30,7 @@ class CreateFilamentUser extends Command
         User::create([
             'name' => $name,
             'email' => $email,
-            'password' => bcrypt($password),
+            'password' => $password,
         ]);
 
         $this->info('Admin user created. Log in at /admin with: ' . $email);

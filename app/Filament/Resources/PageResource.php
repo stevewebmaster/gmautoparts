@@ -46,7 +46,7 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable(),
             ])
             ->filters([])
-            ->actions(Tables\Actions\EditAction::make())
+            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([]);
     }
 

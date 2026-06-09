@@ -76,7 +76,7 @@ class VehicleResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_visible'),
             ])
-            ->actions(Tables\Actions\EditAction::make())
+            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
             ])]);

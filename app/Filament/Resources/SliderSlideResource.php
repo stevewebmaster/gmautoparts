@@ -59,7 +59,7 @@ class SliderSlideResource extends Resource
             ])
             ->defaultSort('sort_order')
             ->filters([])
-            ->actions(Tables\Actions\EditAction::make())
+            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
             ])]);

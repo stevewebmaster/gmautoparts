@@ -103,7 +103,7 @@ class PartResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_visible'),
                 Tables\Filters\TernaryFilter::make('is_featured'),
             ])
-            ->actions(Tables\Actions\EditAction::make())
+            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
             ])]);
