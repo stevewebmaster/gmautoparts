@@ -7,12 +7,12 @@
     <meta name="theme-color" content="#0f3460">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="G&M Mini-app">
+    <meta name="apple-mobile-web-app-title" content="GM Part Loader">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/miniapp-icon-192.png">
     <link rel="icon" type="image/svg+xml" href="/icons/miniapp-icon.svg">
     <link rel="apple-touch-icon" sizes="192x192" href="/icons/miniapp-icon-192.png">
     <link rel="manifest" href="/app-manifest.json">
-    <title>@yield('title', 'G&M Mini-app')</title>
+    <title>@yield('title', 'GM Part Loader')</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; background: #000; min-height: 100vh; color: #1f2937; }

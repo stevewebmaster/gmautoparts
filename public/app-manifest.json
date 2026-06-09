@@ -1,7 +1,7 @@
 {
   "id": "/app/",
-  "name": "G&M Autospares – Add parts & vehicles",
-  "short_name": "G&M Mini-app",
+  "name": "GM Part Loader",
+  "short_name": "GM Part Loader",
   "description": "Add parts and vehicles to the G&M Autospares website from your phone.",
   "start_url": "/app/login",
   "scope": "/",
