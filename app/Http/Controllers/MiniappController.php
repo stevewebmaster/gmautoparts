@@ -7,6 +7,7 @@ use App\Models\PartCategory;
 use App\Models\PartSubcategory;
 use App\Models\Vehicle;
 use App\Services\ImageOptimizer;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -14,7 +15,7 @@ use Illuminate\View\View;
 
 class MiniappController extends Controller
 {
-    public function login(): View
+    public function login(): View|RedirectResponse
     {
         if (session('miniapp_authenticated')) {
             return redirect()->route('app.dashboard');
