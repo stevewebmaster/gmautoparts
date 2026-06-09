@@ -104,7 +104,10 @@ class MiniappController extends Controller
         $validated['slug'] = $slug;
 
         $paths = [];
-        foreach ($request->file('images') as $file) {
+        foreach ($request->file('images') ?? [] as $file) {
+            if (!$file instanceof \Illuminate\Http\UploadedFile || !$file->isValid()) {
+                continue;
+            }
             $stored = ImageOptimizer::optimizeAndStore($file, 'parts');
             if ($stored) {
                 $paths[] = $stored;
@@ -153,7 +156,10 @@ class MiniappController extends Controller
         ]);
 
         $paths = [];
-        foreach ($request->file('images') as $file) {
+        foreach ($request->file('images') ?? [] as $file) {
+            if (!$file instanceof \Illuminate\Http\UploadedFile || !$file->isValid()) {
+                continue;
+            }
             $stored = ImageOptimizer::optimizeAndStore($file, 'vehicles');
             if ($stored) {
                 $paths[] = $stored;
