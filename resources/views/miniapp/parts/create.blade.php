@@ -166,8 +166,16 @@
     var fileInput   = document.getElementById('input-file');
     var preview     = document.getElementById('photo-preview');
     var countLabel  = document.getElementById('photo-count');
-    var canDataTransfer = (function() {
-        try { new DataTransfer(); return true; } catch(e) { return false; }
+    // Test whether the browser can actually assign files to input.files (fails silently in Samsung/Safari).
+    var canSetFiles = (function() {
+        try {
+            var dt = new DataTransfer();
+            dt.items.add(new File(['x'], 'test.txt', { type: 'text/plain' }));
+            var i = document.createElement('input');
+            i.type = 'file';
+            i.files = dt.files;
+            return i.files.length === 1;
+        } catch(e) { return false; }
     })();
 
     document.getElementById('btn-camera').addEventListener('click', function() { cameraInput.click(); });
@@ -202,7 +210,7 @@
             preview.appendChild(wrap);
         });
         countLabel.textContent = allFiles.length ? allFiles.length + ' photo(s) selected.' : 'No photos selected.';
-        if (canDataTransfer) {
+        if (canSetFiles) {
             var dt = new DataTransfer();
             allFiles.forEach(function(f) { dt.items.add(f); });
             fileInput.files = dt.files;
@@ -210,7 +218,7 @@
     }
 
     cameraInput.addEventListener('change', function() {
-        if (canDataTransfer) {
+        if (canSetFiles) {
             addFiles(this.files);
         } else {
             // Fallback: swap camera input to have the name so it submits directly
@@ -220,7 +228,7 @@
         }
     });
     fileInput.addEventListener('change', function() {
-        if (canDataTransfer) {
+        if (canSetFiles) {
             addFiles(this.files);
         } else {
             // Fallback: ensure file input has the name and camera doesn't
