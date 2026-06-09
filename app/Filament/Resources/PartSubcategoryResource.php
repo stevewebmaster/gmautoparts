@@ -59,9 +59,7 @@ class PartSubcategoryResource extends Resource
             ->defaultSort('part_category_id')
             ->filters([])
             ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ])]);
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
