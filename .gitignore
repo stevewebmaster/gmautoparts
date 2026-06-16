@@ -18,3 +18,12 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# OS files
+.DS_Store
+
+# Local scratch SQLite dump (not used by the app; prod is MySQL)
+/gmauto
+
+# Design reference material (ThemeForest template — not part of the app)
+/Design Ref/
