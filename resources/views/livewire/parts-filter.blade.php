@@ -155,12 +155,14 @@
                     <div class="col-xxl-4 col-xl-6 col-lg-6 col-sm-6">
                         <div class="feature-list-1">
                             <div class="box-icon">
-                                @if(is_array($part->images) && count($part->images))
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($part->images[0]) }}"
-                                         alt="{{ $part->title }}" loading="lazy">
-                                @else
-                                    <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
-                                @endif
+                                <a href="{{ route('parts.show', $part->slug) }}">
+                                    @if(is_array($part->images) && count($part->images))
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($part->images[0]) }}"
+                                             alt="{{ $part->title }}" loading="lazy">
+                                    @else
+                                        <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
+                                    @endif
+                                </a>
                                 <div class="actions">
                                     <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="fa-regular fa-tag"></i></a>
                                     <a href="{{ route('parts.show', $part->slug) }}" class="icon-btn"><i class="far fa-heart"></i></a>

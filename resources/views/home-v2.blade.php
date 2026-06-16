@@ -293,14 +293,14 @@
                 @forelse($featuredParts as $part)
                     <div class="col-xl-3 col-lg-4 col-sm-6">
                         <div class="feature-list-1">
-                            <div class="box-icon">
+                            <a class="box-icon" href="{{ route('parts.show', $part->slug) }}">
                                 @if(is_array($part->images) && count($part->images))
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($part->images[0]) }}"
                                          alt="{{ $part->title }}">
                                 @else
                                     <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $part->title }}">
                                 @endif
-                            </div>
+                            </a>
                             <div class="car-content">
                                 <div class="media-body">
                                     <h3 class="box-title">

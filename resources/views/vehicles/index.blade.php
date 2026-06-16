@@ -25,13 +25,28 @@
                             <div class="col-12">
                                 <div class="select-group-wrapper">
                                     <div class="form-group">
-                                        <input type="text" name="make" class="form-control" placeholder="Make" value="{{ request('make') }}">
+                                        <select name="make" class="form-select nice-select">
+                                            <option value="">All Makes</option>
+                                            @foreach($makes as $make)
+                                                <option value="{{ $make }}" {{ request('make') === $make ? 'selected' : '' }}>{{ $make }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <input type="text" name="model" class="form-control" placeholder="Model" value="{{ request('model') }}">
+                                        <select name="model" class="form-select nice-select">
+                                            <option value="">All Models</option>
+                                            @foreach($models as $model)
+                                                <option value="{{ $model }}" {{ request('model') === $model ? 'selected' : '' }}>{{ $model }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <input type="text" name="year" class="form-control" placeholder="Year" value="{{ request('year') }}">
+                                        <select name="year" class="form-select nice-select">
+                                            <option value="">All Years</option>
+                                            @foreach($years as $year)
+                                                <option value="{{ $year }}" {{ (string) request('year') === (string) $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <input type="text" name="stock_number" class="form-control" placeholder="Stock Number" value="{{ request('stock_number') }}">

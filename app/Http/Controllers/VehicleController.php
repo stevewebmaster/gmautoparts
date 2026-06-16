@@ -43,7 +43,33 @@ class VehicleController extends Controller
 
         $vehicles = $vehiclesQuery->paginate(12);
 
-        return view('vehicles.index', ['vehicles' => $vehicles]);
+        $makes = Vehicle::where('is_visible', true)
+            ->whereNotNull('make')->where('make', '!=', '')
+            ->distinct()->orderBy('make')->pluck('make');
+
+        $modelsQuery = Vehicle::where('is_visible', true)
+            ->whereNotNull('model')->where('model', '!=', '');
+        if ($request->filled('make')) {
+            $modelsQuery->where('make', $request->string('make')->trim());
+        }
+        $models = $modelsQuery->distinct()->orderBy('model')->pluck('model');
+
+        $yearsQuery = Vehicle::where('is_visible', true)
+            ->whereNotNull('year');
+        if ($request->filled('make')) {
+            $yearsQuery->where('make', $request->string('make')->trim());
+        }
+        if ($request->filled('model')) {
+            $yearsQuery->where('model', $request->string('model')->trim());
+        }
+        $years = $yearsQuery->distinct()->orderByDesc('year')->pluck('year');
+
+        return view('vehicles.index', [
+            'vehicles' => $vehicles,
+            'makes' => $makes,
+            'models' => $models,
+            'years' => $years,
+        ]);
     }
 
     public function show(Vehicle $vehicle): View
