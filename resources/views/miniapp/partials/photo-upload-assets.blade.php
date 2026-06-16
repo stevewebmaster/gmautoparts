@@ -25,13 +25,17 @@
 @push('scripts')
 <script>
 (function() {
-    var cameraInput = document.getElementById('input-camera');
-    var fileInput   = document.getElementById('input-file');
     var preview     = document.getElementById('photo-preview');
     var countLabel  = document.getElementById('photo-count');
+    var extra       = document.getElementById('photo-extra-inputs');
+    var cameraInput = document.getElementById('input-camera');
+    var fileInput   = document.getElementById('input-file');
     var form        = cameraInput.closest('form');
 
-    // Can this browser actually have files assigned to an input? (Samsung/Safari can't.)
+    function forEach(list, fn) { Array.prototype.forEach.call(list, fn); }
+    function setCount(n) { countLabel.textContent = n ? n + ' photo(s) selected.' : 'No photos selected.'; }
+
+    // Can this browser actually have files assigned to an input? (Samsung/Safari may not.)
     var canSetFiles = (function() {
         try {
             var dt = new DataTransfer();
@@ -44,76 +48,81 @@
     document.getElementById('btn-camera').addEventListener('click', function() { cameraInput.click(); });
     document.getElementById('btn-file').addEventListener('click', function()   { fileInput.click(); });
 
-    // --- Enhanced path: consolidate everything into fileInput, deletable preview ---
-    var allFiles = [];
-
-    function renderPreview() {
-        preview.innerHTML = '';
-        allFiles.forEach(function(file, idx) {
-            var wrap = document.createElement('div');
-            wrap.className = 'photo-thumb-wrap';
-            var img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.className = 'photo-thumb';
-            var del = document.createElement('button');
-            del.type = 'button';
-            del.className = 'photo-thumb-del';
-            del.innerHTML = '&times;';
-            del.addEventListener('click', function() {
-                allFiles.splice(idx, 1);
-                writeBack();
-                renderPreview();
-            });
-            wrap.appendChild(img);
-            wrap.appendChild(del);
-            preview.appendChild(wrap);
-        });
-        countLabel.textContent = allFiles.length ? allFiles.length + ' photo(s) selected.' : 'No photos selected.';
-    }
-
-    function writeBack() {
-        var dt = new DataTransfer();
-        allFiles.forEach(function(f) { dt.items.add(f); });
-        fileInput.files = dt.files;
-    }
-
-    function addToAll(fileList) {
-        for (var i = 0; i < fileList.length; i++) { allFiles.push(fileList[i]); }
-    }
-
     if (canSetFiles) {
-        cameraInput.addEventListener('change', function() {
-            addToAll(this.files);
-            this.value = '';        // clear camera input so it doesn't double-submit
-            writeBack();            // everything now lives in fileInput
-            renderPreview();
-        });
-        fileInput.addEventListener('change', function() {
-            // fileInput may already hold consolidated files; rebuild allFiles from it
-            allFiles = [];
-            addToAll(this.files);
-            renderPreview();
-        });
-    } else {
-        // --- Fallback path: no preview/delete; just report counts. Both native
-        //     inputs keep their own files and post directly. ---
-        function updateCount() {
-            var n = (cameraInput.files ? cameraInput.files.length : 0) +
-                    (fileInput.files ? fileInput.files.length : 0);
-            countLabel.textContent = n ? n + ' photo(s) selected.' : 'No photos selected.';
+        // --- Enhanced path: accumulate everything into fileInput; deletable preview ---
+        var allFiles = [];
+
+        function writeBack() {
+            var dt = new DataTransfer();
+            allFiles.forEach(function(f) { dt.items.add(f); });
+            fileInput.files = dt.files;   // (does not fire 'change')
         }
-        cameraInput.addEventListener('change', updateCount);
-        fileInput.addEventListener('change', updateCount);
+
+        function render() {
+            preview.innerHTML = '';
+            allFiles.forEach(function(file, idx) {
+                var wrap = document.createElement('div'); wrap.className = 'photo-thumb-wrap';
+                var img = document.createElement('img'); img.className = 'photo-thumb';
+                img.src = URL.createObjectURL(file);
+                var del = document.createElement('button');
+                del.type = 'button'; del.className = 'photo-thumb-del'; del.innerHTML = '&times;';
+                del.addEventListener('click', function() { allFiles.splice(idx, 1); writeBack(); render(); });
+                wrap.appendChild(img); wrap.appendChild(del); preview.appendChild(wrap);
+            });
+            setCount(allFiles.length);
+        }
+
+        function onPick() {
+            // Append this selection (never reset), then clear the input so the
+            // same file can be picked again and the camera input stays empty.
+            forEach(this.files, function(f) { allFiles.push(f); });
+            this.value = '';
+            writeBack();
+            render();
+        }
+
+        cameraInput.addEventListener('change', onPick);
+        fileInput.addEventListener('change', onPick);
+    } else {
+        // --- Fallback: keep each pick in its own images[] input so all submit ---
+        function renderAll() {
+            preview.innerHTML = '';
+            var n = 0;
+            forEach(form.querySelectorAll('input.photo-input'), function(inp) {
+                if (!inp.files) return;
+                forEach(inp.files, function(file) {
+                    n++;
+                    var wrap = document.createElement('div'); wrap.className = 'photo-thumb-wrap';
+                    var img = document.createElement('img'); img.className = 'photo-thumb';
+                    try { img.src = URL.createObjectURL(file); } catch (e) {}
+                    wrap.appendChild(img); preview.appendChild(wrap);
+                });
+            });
+            setCount(n);
+        }
+
+        function lockIn() {
+            if (!this.files || this.files.length === 0) return;
+            var isCamera = this.getAttribute('capture') !== null;
+            var fresh = this.cloneNode(false);   // empty clone, same attrs (incl. name/capture/class)
+            this.parentNode.insertBefore(fresh, this.nextSibling);
+            this.removeAttribute('id');          // avoid duplicate ids; keep id on the fresh one
+            extra.appendChild(this);             // hidden, but still submits its files
+            fresh.addEventListener('change', lockIn);
+            if (isCamera) { cameraInput = fresh; } else { fileInput = fresh; }
+            renderAll();
+        }
+
+        cameraInput.addEventListener('change', lockIn);
+        fileInput.addEventListener('change', lockIn);
     }
 
-    // Belt-and-braces for every browser: never submit an empty file input
-    // (a stray empty images[] entry is what caused the original 500).
+    // Every browser: never submit an empty file input (a stray empty images[]
+    // entry was the original 500 trigger), and show progress feedback.
     if (form) {
         form.addEventListener('submit', function() {
-            [cameraInput, fileInput].forEach(function(inp) {
-                if (!inp.files || inp.files.length === 0) {
-                    inp.removeAttribute('name');
-                }
+            forEach(form.querySelectorAll('input[type=file]'), function(inp) {
+                if (!inp.files || inp.files.length === 0) { inp.removeAttribute('name'); }
             });
             var btn = document.getElementById('btn-submit');
             var status = document.getElementById('upload-status');

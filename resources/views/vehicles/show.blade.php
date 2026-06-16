@@ -22,13 +22,27 @@
             <div class="row gy-4 gx-40">
                 <div class="col-xxl-8 col-lg-7">
 
-                    {{-- Vehicle image --}}
+                    {{-- Vehicle image gallery --}}
                     @if(is_array($vehicle->images) && count($vehicle->images))
                         <div class="mb-4">
                             <img src="{{ \Illuminate\Support\Facades\Storage::url($vehicle->images[0]) }}"
                                  alt="{{ $vehicle->display_name }}"
+                                 id="vehicle-main-image"
                                  class="img-fluid w-100 rounded"
                                  style="max-height: 480px; object-fit: cover;">
+                            @if(count($vehicle->images) > 1)
+                                <div class="d-flex gap-2 mt-2 flex-wrap">
+                                    @foreach($vehicle->images as $img)
+                                        <button type="button"
+                                                onclick="document.getElementById('vehicle-main-image').src='{{ \Illuminate\Support\Facades\Storage::url($img) }}'"
+                                                class="p-0 border-0 rounded overflow-hidden"
+                                                style="width:80px;height:60px;cursor:pointer;">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($img) }}"
+                                                 alt="" class="w-100 h-100" style="object-fit:cover;">
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     @endif
 
