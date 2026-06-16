@@ -7,7 +7,7 @@
                         <div class="col-12">
                             <div class="select-group-wrapper">
                                 <div class="form-group">
-                                    <select wire:model.live="make" class="form-select nice-select">
+                                    <select wire:model.live="make" class="form-select">
                                         <option value="">All Makes</option>
                                         @foreach($makes as $m)
                                             <option value="{{ $m }}">{{ $m }}</option>
@@ -15,7 +15,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <select wire:model.live="model" class="form-select nice-select">
+                                    <select wire:model.live="model" class="form-select">
                                         <option value="">All Models</option>
                                         @foreach($models as $m)
                                             <option value="{{ $m }}">{{ $m }}</option>
@@ -23,7 +23,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <select wire:model.live="year" class="form-select nice-select">
+                                    <select wire:model.live="year" class="form-select">
                                         <option value="">All Years</option>
                                         @foreach($years as $y)
                                             <option value="{{ $y }}">{{ $y }}</option>
@@ -59,7 +59,7 @@
                         </div>
                         <div class="filter-search">
                             <div class="form-group mb-0">
-                                <select wire:model.live="sort" class="form-select nice-select">
+                                <select wire:model.live="sort" class="form-select">
                                     <option value="latest">Sort By Latest</option>
                                     <option value="oldest">Sort By Oldest</option>
                                     <option value="year_desc">Year: Newest First</option>

@@ -7,7 +7,7 @@
                         <div class="col-12">
                             <div class="select-group-wrapper">
                                 <div class="form-group">
-                                    <select wire:model.live="make" class="form-select nice-select">
+                                    <select wire:model.live="make" class="form-select">
                                         <option value="">All Makes</option>
                                         @foreach($makes as $m)
                                             <option value="{{ $m }}">{{ $m }}</option>
@@ -15,7 +15,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <select wire:model.live="model" class="form-select nice-select">
+                                    <select wire:model.live="model" class="form-select">
                                         <option value="">All Models</option>
                                         @foreach($models as $m)
                                             <option value="{{ $m }}">{{ $m }}</option>
@@ -23,7 +23,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <select wire:model.live="year" class="form-select nice-select">
+                                    <select wire:model.live="year" class="form-select">
                                         <option value="">All Years</option>
                                         @foreach($years as $y)
                                             <option value="{{ $y }}">{{ $y }}</option>
@@ -31,7 +31,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <select wire:model.live="category" class="form-select nice-select">
+                                    <select wire:model.live="category" class="form-select">
                                         <option value="">All Categories</option>
                                         @foreach($categories as $cat)
                                             <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="advance-search-wrapper stye-2 home-4-style">
                         <div class="form-group">
-                            <select wire:model.live="subcategory" class="form-select nice-select">
+                            <select wire:model.live="subcategory" class="form-select">
                                 <option value="">All Subcategories</option>
                                 @foreach($subcategories as $sub)
                                     <option value="{{ $sub->id }}">{{ $sub->name }}</option>
