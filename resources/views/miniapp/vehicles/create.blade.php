@@ -1,6 +1,8 @@
 @extends('miniapp.layout')
 @section('title', 'Add a vehicle')
 
+@include('miniapp.partials.photo-upload-assets')
+
 @section('content')
     <div class="card-app">
     <h1 class="page-title">Add a Vehicle (Now Dismantling)</h1>
@@ -34,12 +36,11 @@
             <label for="notes">Notes</label>
             <textarea id="notes" name="notes" placeholder="Any extra details">{{ old('notes') }}</textarea>
         </div>
-        <div class="form-group">
-            <label for="images">Photos *</label>
-            <input type="file" id="images" name="images[]" accept="image/*" capture="environment" multiple>
-            <p class="photo-hint">Take or select at least one photo. On phone you can use camera.</p>
-        </div>
-        <button type="submit" class="btn-app btn-primary-app">Save vehicle</button>
+        @include('miniapp.partials.photo-upload')
+        <button type="submit" class="btn-app btn-primary-app" id="btn-submit">Save vehicle</button>
+        <p class="photo-hint" id="upload-status" style="display:none; text-align:center; margin-top:0.5rem;">
+            ⏳ Uploading and processing photos, please wait…
+        </p>
     </form>
     <a href="{{ route('app.dashboard') }}" class="back-link">← Back</a>
     </div>

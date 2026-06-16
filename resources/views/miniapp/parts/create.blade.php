@@ -1,75 +1,7 @@
 @extends('miniapp.layout')
 @section('title', 'Add a part')
 
-@push('styles')
-<style>
-.photo-upload-options {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-}
-.btn-upload-option {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.85rem 0.5rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    background: #f1f5f9;
-    border: 2px solid #cbd5e1;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-}
-.btn-upload-option:active {
-    background: #e2e8f0;
-    border-color: #94a3b8;
-}
-.upload-icon {
-    font-size: 1.6rem;
-    line-height: 1;
-}
-.photo-preview-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.photo-thumb-wrap {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid #cbd5e1;
-}
-.photo-thumb {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-.photo-thumb-del {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 20px;
-    height: 20px;
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    font-size: 0.8rem;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-</style>
-@endpush
+@include('miniapp.partials.photo-upload-assets')
 
 @section('content')
     <div class="card-app">
@@ -132,22 +64,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group">
-            <label>Photos *</label>
-            <div class="photo-upload-options">
-                <button type="button" class="btn-upload-option" id="btn-camera">
-                    <span class="upload-icon">📷</span> Camera
-                </button>
-                <button type="button" class="btn-upload-option" id="btn-file">
-                    <span class="upload-icon">🖼️</span> File Upload
-                </button>
-            </div>
-            {{-- input-camera has no name so it never submits directly; JS merges into input-file --}}
-            <input type="file" id="input-camera" accept="image/*" capture="environment" multiple style="display:none">
-            <input type="file" id="input-file"   name="images[]" accept="image/*" multiple style="display:none">
-            <div id="photo-preview" class="photo-preview-strip"></div>
-            <p class="photo-hint" id="photo-count">No photos selected.</p>
-        </div>
+        @include('miniapp.partials.photo-upload')
         <button type="submit" class="btn-app btn-primary-app" id="btn-submit">Save part</button>
         <p class="photo-hint" id="upload-status" style="display:none; text-align:center; margin-top:0.5rem;">
             ⏳ Uploading and processing photos, please wait…
@@ -159,86 +76,7 @@
 
 @push('scripts')
 <script>
-// Photo upload: camera vs file picker
-(function() {
-    var allFiles = [];
-    var cameraInput = document.getElementById('input-camera');
-    var fileInput   = document.getElementById('input-file');
-    var preview     = document.getElementById('photo-preview');
-    var countLabel  = document.getElementById('photo-count');
-    // Test whether the browser can actually assign files to input.files (fails silently in Samsung/Safari).
-    var canSetFiles = (function() {
-        try {
-            var dt = new DataTransfer();
-            dt.items.add(new File(['x'], 'test.txt', { type: 'text/plain' }));
-            var i = document.createElement('input');
-            i.type = 'file';
-            i.files = dt.files;
-            return i.files.length === 1;
-        } catch(e) { return false; }
-    })();
-
-    document.getElementById('btn-camera').addEventListener('click', function() { cameraInput.click(); });
-    document.getElementById('btn-file').addEventListener('click', function()   { fileInput.click(); });
-
-    function addFiles(fileList) {
-        for (var i = 0; i < fileList.length; i++) {
-            allFiles.push(fileList[i]);
-        }
-        renderPreview();
-    }
-
-    function renderPreview() {
-        preview.innerHTML = '';
-        allFiles.forEach(function(file, idx) {
-            var wrap = document.createElement('div');
-            wrap.className = 'photo-thumb-wrap';
-            var img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.className = 'photo-thumb';
-            var del = document.createElement('button');
-            del.type = 'button';
-            del.className = 'photo-thumb-del';
-            del.innerHTML = '&times;';
-            del.dataset.idx = idx;
-            del.addEventListener('click', function() {
-                allFiles.splice(parseInt(this.dataset.idx), 1);
-                renderPreview();
-            });
-            wrap.appendChild(img);
-            wrap.appendChild(del);
-            preview.appendChild(wrap);
-        });
-        countLabel.textContent = allFiles.length ? allFiles.length + ' photo(s) selected.' : 'No photos selected.';
-        if (canSetFiles) {
-            var dt = new DataTransfer();
-            allFiles.forEach(function(f) { dt.items.add(f); });
-            fileInput.files = dt.files;
-        }
-    }
-
-    cameraInput.addEventListener('change', function() {
-        if (canSetFiles) {
-            addFiles(this.files);
-        } else {
-            // Fallback: swap camera input to have the name so it submits directly
-            cameraInput.name = 'images[]';
-            fileInput.name   = '';
-            countLabel.textContent = this.files.length + ' photo(s) selected (camera).';
-        }
-    });
-    fileInput.addEventListener('change', function() {
-        if (canSetFiles) {
-            addFiles(this.files);
-        } else {
-            // Fallback: ensure file input has the name and camera doesn't
-            fileInput.name   = 'images[]';
-            cameraInput.name = '';
-            countLabel.textContent = this.files.length + ' photo(s) selected.';
-        }
-    });
-})();
-
+// Part-specific: load subcategories when a category is chosen.
 document.getElementById('part_category_id').addEventListener('change', function() {
     var id = this.value;
     var sub = document.getElementById('part_subcategory_id');
@@ -254,14 +92,5 @@ document.getElementById('part_category_id').addEventListener('change', function(
 });
 var catId = document.getElementById('part_category_id').value;
 if (catId) document.getElementById('part_category_id').dispatchEvent(new Event('change'));
-
-// Disable submit button on form submit to prevent double-tap
-document.querySelector('form').addEventListener('submit', function() {
-    var btn = document.getElementById('btn-submit');
-    var status = document.getElementById('upload-status');
-    btn.disabled = true;
-    btn.textContent = 'Uploading…';
-    status.style.display = 'block';
-});
 </script>
 @endpush
