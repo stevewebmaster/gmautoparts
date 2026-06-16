@@ -82,13 +82,13 @@
                 @forelse($vehicles as $vehicle)
                     <div class="col-xl-6 col-lg-12">
                         <div class="feature-list-1 list">
-                            <div class="box-icon">
+                            <a class="box-icon" href="{{ route('vehicles.show', $vehicle) }}">
                                 @if(is_array($vehicle->images) && count($vehicle->images))
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($vehicle->images[0]) }}" alt="{{ $vehicle->display_name }}">
                                 @else
                                     <img src="/kars/img/featured/featured-1-1.jpg" alt="{{ $vehicle->display_name }}">
                                 @endif
-                            </div>
+                            </a>
                             <div class="car-content">
                                 <div class="media-body">
                                     <h3 class="box-title">

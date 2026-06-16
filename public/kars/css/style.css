@@ -19913,6 +19913,7 @@ input {
   color: var(--white-color);
 }
 .feature-list-1 .box-icon {
+  display: block;
   position: relative;
 }
 .feature-list-1 .box-icon img {
@@ -20007,6 +20008,9 @@ input {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  gap: 8px 10px;
   padding-left: 0;
   border-bottom: 1px solid var(--th-border-color);
   padding-bottom: 13px;
@@ -21548,6 +21552,11 @@ input {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  gap: 0 15px;
   border-bottom: 1px solid var(--th-border-color);
   padding-bottom: 12px;
   margin-bottom: 14px;
@@ -21557,6 +21566,10 @@ input {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-flex: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
   gap: 0 10px;
 }
 .vehicle-overview-body .overview-item .left p {
