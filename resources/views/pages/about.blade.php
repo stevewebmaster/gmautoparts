@@ -3,60 +3,35 @@
 @push('head_styles')
 <style>
     /*
-      About collage — design layout:
-      Left column: 312×300 top, 370×291 below (bottom shot indented / staggered right).
-      Right column: 424×461 tall, stats row directly underneath (aligned with right stack).
+      About collage — aligned grid layout.
+      The tall image spans both rows of the left column, so its height always
+      matches the two stacked images beside it. object-fit: cover keeps every
+      photo filled and undistorted regardless of its source aspect ratio.
     */
     #about-sec .gm-about-collage {
+        max-width: 560px;
+    }
+    #about-sec .gm-about-grid {
         display: grid;
-        grid-template-columns: auto auto;
-        gap: clamp(16px, 3vw, 28px);
-        align-items: start;
-        justify-content: start;
+        grid-template-columns: 1fr 1.25fr;
+        grid-template-rows: 1fr 1fr;
+        gap: clamp(10px, 1.4vw, 16px);
+        height: clamp(360px, 40vw, 470px);
     }
-    #about-sec .gm-about-stack--left {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(14px, 2.5vw, 22px);
-    }
-    #about-sec .gm-about-photo--bl-stagger {
-        margin-left: clamp(1rem, 4vw, 2.75rem);
-    }
-    #about-sec .gm-about-stack--right {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(14px, 2vw, 22px);
-        align-items: stretch;
-    }
-    #about-sec .gm-about-photo--tl img {
-        max-width: 312px;
-        max-height: 300px;
-        width: auto;
-        height: auto;
+    #about-sec .gm-about-photo--tl  { grid-column: 1; grid-row: 1; }
+    #about-sec .gm-about-photo--bl  { grid-column: 1; grid-row: 2; }
+    #about-sec .gm-about-photo--tall { grid-column: 2; grid-row: 1 / span 2; }
+    #about-sec .gm-about-photo img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
         display: block;
-    }
-    #about-sec .gm-about-photo--bl-stagger img {
-        max-width: 370px;
-        max-height: 291px;
-        width: auto;
-        height: auto;
-        object-fit: cover;
-        display: block;
-    }
-    #about-sec .gm-about-photo--tall img {
-        max-width: 424px;
-        max-height: 461px;
-        width: auto;
-        height: auto;
-        object-fit: cover;
-        display: block;
+        border-radius: 8px;
     }
     #about-sec .gm-about-counters.counter-card-wrap.style-2-inner {
-        margin: 0 !important;
+        margin: clamp(16px, 2vw, 24px) 0 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
-        max-width: 424px;
         flex-wrap: wrap;
         gap: 12px 16px;
         justify-content: space-between;
@@ -65,17 +40,10 @@
         flex: 1 1 calc(33.333% - 12px);
         min-width: 96px;
     }
-    @media (max-width: 991px) {
-        #about-sec .gm-about-collage {
-            grid-template-columns: 1fr;
-            justify-items: center;
-        }
-        #about-sec .gm-about-photo--bl-stagger {
-            margin-left: clamp(0.5rem, 6vw, 2rem);
-        }
-        #about-sec .gm-about-stack--right {
-            width: 100%;
-            max-width: 424px;
+    @media (max-width: 575px) {
+        #about-sec .gm-about-grid {
+            grid-template-columns: 1fr 1fr;
+            height: clamp(300px, 70vw, 380px);
         }
         #about-sec .gm-about-counters .counter-card {
             flex: 1 1 45%;
@@ -105,19 +73,18 @@
             <div class="row gy-40 gx-60 flex-wrap-reverse justify-content-center">
                 <div class="col-xl-7">
                     <div class="gm-about-collage">
-                        <div class="gm-about-stack gm-about-stack--left">
+                        <div class="gm-about-grid">
                             <div class="gm-about-photo gm-about-photo--tl">
-                                <img class="tilt-active" src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
+                                <img src="{{ asset('images/About Page/312x300.jpg') }}" alt="G&amp;M Auto Parts">
                             </div>
-                            <div class="gm-about-photo gm-about-photo--bl-stagger">
-                                <img class="tilt-active" src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
+                            <div class="gm-about-photo gm-about-photo--bl">
+                                <img src="{{ asset('images/About Page/370x291.jpg') }}" alt="G&amp;M Auto Parts">
                             </div>
-                        </div>
-                        <div class="gm-about-stack gm-about-stack--right">
                             <div class="gm-about-photo gm-about-photo--tall">
                                 <img src="{{ asset('images/About Page/424x461.jpg') }}" alt="G&amp;M Auto Parts">
                             </div>
-                            <div class="counter-card-wrap style-2-inner gm-about-counters">
+                        </div>
+                        <div class="counter-card-wrap style-2-inner gm-about-counters">
                                 <div class="counter-card">
                                     <div class="box-icon">
                                         <img src="/kars/img/icon/counter_1.1_1.svg" alt="">
@@ -145,7 +112,6 @@
                                         <p class="box-text">Customer Satisfaction</p>
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
