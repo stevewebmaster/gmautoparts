@@ -37,6 +37,8 @@ Route::prefix('app')->name('app.')->middleware(['web', 'miniapp.auth'])->group(f
     Route::get('categories/{category}/subcategories', [\App\Http\Controllers\MiniappController::class, 'subcategories'])->name('subcategories');
     Route::get('parts/new', [\App\Http\Controllers\MiniappController::class, 'createPart'])->name('parts.create');
     Route::post('parts', [\App\Http\Controllers\MiniappController::class, 'storePart'])->name('parts.store');
+    Route::get('stock', [\App\Http\Controllers\MiniappController::class, 'stock'])->name('stock');
+    Route::post('stock/{part}/status', [\App\Http\Controllers\MiniappController::class, 'updatePartStatus'])->name('stock.status');
     Route::get('vehicles/new', [\App\Http\Controllers\MiniappController::class, 'createVehicle'])->name('vehicles.create');
     Route::post('vehicles', [\App\Http\Controllers\MiniappController::class, 'storeVehicle'])->name('vehicles.store');
 });

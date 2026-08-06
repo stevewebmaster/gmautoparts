@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PartStatus;
 use App\Models\Part;
 use App\Models\PartCategory;
 use App\Models\PartSubcategory;
@@ -11,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class MiniappController extends Controller
@@ -135,6 +137,48 @@ class MiniappController extends Controller
         }
 
         return redirect()->route('app.dashboard')->with('success', 'Part added. It will appear on the website.');
+    }
+
+    /**
+     * Stock list for marking parts sold from the yard. Search covers the things
+     * you can read off a part or a shelf label: title, stock number, make, model.
+     */
+    public function stock(Request $request): View
+    {
+        $search = trim((string) $request->get('q', ''));
+        $status = (string) $request->get('status', '');
+
+        $parts = Part::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($inner) use ($search) {
+                    foreach (['title', 'stock_number', 'make', 'model'] as $column) {
+                        $inner->orWhere($column, 'like', '%' . $search . '%');
+                    }
+                });
+            })
+            ->when(in_array($status, PartStatus::values(), true), fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('miniapp.parts.stock', [
+            'parts' => $parts,
+            'search' => $search,
+            'status' => $status,
+        ]);
+    }
+
+    public function updatePartStatus(Request $request, Part $part): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(PartStatus::values())],
+        ]);
+
+        $part->update(['status' => $validated['status']]);
+
+        $label = PartStatus::from($validated['status'])->label();
+
+        return back()->with('success', "\"{$part->title}\" is now marked {$label}.");
     }
 
     public function createVehicle(): View

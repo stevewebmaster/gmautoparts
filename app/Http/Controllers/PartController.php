@@ -12,7 +12,7 @@ class PartController extends Controller
     public function index(Request $request): View
     {
         $query = Part::query()
-            ->where('is_visible', true)
+            ->listable()
             ->with(['category', 'subcategory', 'vehicle']);
 
         $this->applyFilters($query, $request);
@@ -32,7 +32,9 @@ class PartController extends Controller
 
     public function show(Part $part): View
     {
-        if (!$part->is_visible) {
+        // Sold parts keep their page so existing links and search results stay
+        // useful; withdrawn parts are gone for good.
+        if (!$part->is_visible || $part->isWithdrawn()) {
             abort(404);
         }
         $part->load(['category', 'subcategory', 'vehicle']);
@@ -50,6 +52,13 @@ class PartController extends Controller
         ]);
 
         $part = Part::findOrFail($validated['part_id']);
+
+        // Guard against enquiries on stock that has gone since the page loaded.
+        if (!$part->isEnquirable()) {
+            return back()->withErrors([
+                'part_id' => 'Sorry, this part is no longer available. Please get in touch and we will look out for another.',
+            ])->withInput();
+        }
 
         $adminEmail = config('mail.from.address', env('ADMIN_EMAIL', 'admin@example.com'));
 

@@ -199,9 +199,19 @@
                                 </ul>
                                 <div class="car-bottom">
                                     @if($part->price)
-                                        <h6 class="box-title">${{ number_format($part->price, 2) }}</h6>
+                                        <h6 class="box-title">
+                                            ${{ number_format($part->price, 2) }}
+                                            @if($part->status === \App\Enums\PartStatus::OnHold)
+                                                <span class="gm-stock-badge gm-stock-badge--hold">On hold</span>
+                                            @endif
+                                        </h6>
                                     @else
-                                        <h6 class="box-title">POA</h6>
+                                        <h6 class="box-title">
+                                            POA
+                                            @if($part->status === \App\Enums\PartStatus::OnHold)
+                                                <span class="gm-stock-badge gm-stock-badge--hold">On hold</span>
+                                            @endif
+                                        </h6>
                                     @endif
                                     <a class="th-btn sm style3" href="{{ route('parts.show', $part->slug) }}">
                                         View Details <i class="fas fa-arrow-up-right"></i>

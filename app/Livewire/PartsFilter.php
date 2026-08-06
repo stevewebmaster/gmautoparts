@@ -37,7 +37,7 @@ class PartsFilter extends Component
 
     public function getMakesProperty(): array
     {
-        return Part::where('is_visible', true)
+        return Part::listable()
             ->whereNotNull('make')
             ->where('make', '!=', '')
             ->distinct()
@@ -48,7 +48,7 @@ class PartsFilter extends Component
 
     public function getModelsProperty(): array
     {
-        $q = Part::where('is_visible', true)->whereNotNull('model')->where('model', '!=', '');
+        $q = Part::listable()->whereNotNull('model')->where('model', '!=', '');
         if ($this->make) {
             $q->where('make', $this->make);
         }
@@ -57,7 +57,7 @@ class PartsFilter extends Component
 
     public function getYearsProperty(): array
     {
-        $q = Part::where('is_visible', true)->whereNotNull('year')->where('year', '!=', '');
+        $q = Part::listable()->whereNotNull('year')->where('year', '!=', '');
         if ($this->make) {
             $q->where('make', $this->make);
         }
@@ -97,7 +97,7 @@ class PartsFilter extends Component
     public function render()
     {
         $query = Part::query()
-            ->where('is_visible', true)
+            ->listable()
             ->with(['category', 'subcategory', 'vehicle']);
 
         if ($this->make) {

@@ -3,6 +3,8 @@
 @section('title', 'Parts Catalogue')
 @section('meta_description', 'Browse our catalogue of quality used car parts. Filter by make, model, year and category.')
 
+@include('partials.stock-badge-styles')
+
 @section('content')
 
     {{-- Breadcrumb --}}

@@ -3,6 +3,8 @@
 @section('title', $part->title)
 @section('meta_description', Str::limit(strip_tags($part->description), 160))
 
+@include('partials.stock-badge-styles')
+
 @section('content')
     <div class="breadcumb-wrapper style-2 compact-header" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
         <div class="container">
@@ -74,10 +76,31 @@
                             </ul>
                         </div>
 
+                        @if($part->isSold())
+                            <div class="gm-stock-notice">
+                                <div>
+                                    <h5 class="gm-stock-notice-title">This part has sold</h5>
+                                    <p>We often get the same part in again — give us a call on
+                                        <a href="tel:+6478498814" class="text-inherit"><strong>07 849 8814</strong></a>
+                                        and we will keep an eye out for you.</p>
+                                </div>
+                            </div>
+                        @elseif($part->status === \App\Enums\PartStatus::OnHold)
+                            <div class="gm-stock-notice gm-stock-notice--hold">
+                                <div>
+                                    <h5 class="gm-stock-notice-title">Currently on hold</h5>
+                                    <p>This part is being held for another customer. Enquire anyway — it may become available.</p>
+                                </div>
+                            </div>
+                        @endif
+
                         @if($part->price)
                             <div class="single-inventory-content">
                                 <h5 class="title" style="font-size:2rem; color: var(--theme-color);">
                                     ${{ number_format($part->price, 2) }}
+                                    @if($part->isSold())
+                                        <span class="gm-stock-badge gm-stock-badge--sold">Sold</span>
+                                    @endif
                                 </h5>
                             </div>
                         @endif
@@ -153,10 +176,13 @@
                             <div class="inventory-owner-wrap">
                                 <div class="inventory-owner-top">
                                     <div class="content">
-                                        <h6 class="box-title">Enquire About This Part</h6>
+                                        <h6 class="box-title">
+                                            {{ $part->isEnquirable() ? 'Enquire About This Part' : 'Part No Longer Available' }}
+                                        </h6>
                                         <p class="saving">{{ $part->title }}</p>
                                     </div>
                                 </div>
+                                @if($part->isEnquirable())
                                 <div class="contact-form style-3 mt-30">
                                     <form action="{{ route('parts.enquire') }}" method="post" class="ajax-contact">
                                         @csrf
@@ -193,6 +219,16 @@
                                         @endif
                                     </form>
                                 </div>
+                                @else
+                                    <p class="mt-30 mb-0">
+                                        @if($errors->has('part_id'))
+                                            {{ $errors->first('part_id') }}
+                                        @else
+                                            This one has gone, but we get the same parts in regularly. Give us a call
+                                            and we will let you know when another turns up.
+                                        @endif
+                                    </p>
+                                @endif
                                 <div class="inventory-owner-bottom mt-3">
                                     <a href="tel:+6478498814" class="th-btn style-2 w-100">
                                         <i class="fa-solid fa-phone"></i> 07 849 8814

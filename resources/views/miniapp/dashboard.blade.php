@@ -7,6 +7,7 @@
         <p class="lead-text">Choose what to add to the website.</p>
         <a href="{{ route('app.parts.create') }}" class="btn-app btn-primary-app">Add a Part</a>
         <a href="{{ route('app.vehicles.create') }}" class="btn-app btn-secondary-app">Add a Vehicle (Now Dismantling)</a>
+        <a href="{{ route('app.stock') }}" class="btn-app btn-secondary-app">Manage Stock (Mark Sold)</a>
     </div>
     <p style="margin-top: 1rem;"><a href="{{ route('app.logout') }}" class="muted-link">Log out</a></p>
 @endsection
