@@ -213,6 +213,59 @@ git pull origin main
 
 ---
 
+## 6. Cron – scheduler and queue worker (one entry does both)
+
+The app needs **one** cron entry. Laravel's scheduler runs everything else from there:
+
+```cron
+* * * * * cd /container/application && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Add it with `crontab -e` on the SiteHost SSH user. Use the container path
+(`/container/application`); if `php` is not in cron's PATH, use its full path —
+find it with `which php`.
+
+That single entry drives both scheduled commands (see `app/Console/Kernel.php`):
+
+| Command | Frequency | Purpose |
+| --- | --- | --- |
+| `images:optimize` | every 5 min | Resizes newly-uploaded photos down to web size, out of the request. |
+| `queue:work --stop-when-empty` | every minute | Drains queued jobs, then exits. |
+
+The queue worker is run **from the scheduler rather than as a supervised
+daemon** deliberately: there is no long-running process to keep alive, nothing
+to restart after a deploy, and it survives container restarts for free. The
+trade-off is up to ~60s before a queued job starts, which does not matter for
+the background work this app does.
+
+### Verifying cron is actually running
+
+```bash
+cd /container/application
+php artisan schedule:list          # what should run, and when it is next due
+php artisan schedule:run           # run it once by hand; should report the due commands
+php artisan queue:work --stop-when-empty   # drain the queue by hand
+php artisan queue:failed           # anything that failed all 3 attempts
+php artisan queue:retry all        # re-queue everything that failed
+```
+
+If `schedule:list` looks right but nothing ever happens on its own, the cron
+entry is missing or `php` is not resolvable inside cron.
+
+### Queue and cache config
+
+- `QUEUE_CONNECTION=database` in the server `.env`. The `jobs`, `job_batches`
+  and `failed_jobs` tables come from migrations, so `php artisan migrate --force`
+  is all that is needed.
+- `CACHE_DRIVER=file`. The cache must work — the throttle middleware on the
+  contact and enquiry forms and `withoutOverlapping()` on scheduled commands
+  both depend on it. If `config/cache.php` is ever missing, Laravel silently
+  falls back to a null store and both quietly stop working.
+- After any deploy that touches `config/`, run `php artisan config:cache` (the
+  "update only" steps above already do).
+
+---
+
 ## When PHP/Composer aren’t in SSH (build on Mac, upload)
 
 On some SiteHost SSH users, `php` and `composer` are not in PATH. Then:

@@ -12,7 +12,17 @@ class Kernel extends ConsoleKernel
         // Sweep newly-uploaded photos down to web size, out of the request.
         $schedule->command('images:optimize')
             ->everyFiveMinutes()
-            ->withoutOverlapping()
+            ->withoutOverlapping(10)
+            ->runInBackground();
+
+        // Drain queued jobs. Scheduled rather than run as a supervised daemon so
+        // the single schedule:run cron entry is all the server needs, and there
+        // is no process to keep alive or restart after a deploy. --max-time keeps
+        // each run inside its minute; retry_after in config/queue.php sits above
+        // it so a job still running is never released back onto the queue.
+        $schedule->command('queue:work --stop-when-empty --tries=3 --max-time=55')
+            ->everyMinute()
+            ->withoutOverlapping(5)
             ->runInBackground();
     }
 
