@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\PartStatus;
+use App\Services\GoogleProductFeed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Part extends Model
@@ -25,6 +27,13 @@ class Part extends Model
                 $part->sold_at = null;
             }
         });
+
+        // Keep the Google feed honest: marking a part sold should drop it from
+        // the next fetch rather than waiting out the cache TTL.
+        $flushFeed = fn () => Cache::forget(GoogleProductFeed::CACHE_KEY);
+
+        static::saved($flushFeed);
+        static::deleted($flushFeed);
     }
     protected $fillable = [
         'title',

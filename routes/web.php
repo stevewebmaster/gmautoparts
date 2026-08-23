@@ -20,6 +20,8 @@ Route::get('/parts/{part:slug}', [PartController::class, 'show'])->name('parts.s
 Route::get('/now-dismantling', [VehicleController::class, 'index'])->name('vehicles.index');
 Route::get('/now-dismantling/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
 
+Route::get('/feeds/google.xml', [\App\Http\Controllers\FeedController::class, 'google'])->name('feeds.google');
+
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit')->middleware('throttle:5,1');

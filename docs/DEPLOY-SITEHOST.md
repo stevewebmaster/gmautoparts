@@ -258,9 +258,13 @@ entry is missing or `php` is not resolvable inside cron.
   and `failed_jobs` tables come from migrations, so `php artisan migrate --force`
   is all that is needed.
 - `CACHE_DRIVER=file`. The cache must work — the throttle middleware on the
-  contact and enquiry forms and `withoutOverlapping()` on scheduled commands
-  both depend on it. If `config/cache.php` is ever missing, Laravel silently
-  falls back to a null store and both quietly stop working.
+  contact and enquiry forms, `withoutOverlapping()` on scheduled commands, and
+  the Google product feed all depend on it. If `config/cache.php` is ever
+  missing, Laravel silently falls back to a null store and they quietly stop
+  working.
+- `APP_URL` must be the real `https://` domain. The Google product feed roots
+  every URL there rather than on the request host — see
+  [GOOGLE-SHOPPING.md](GOOGLE-SHOPPING.md).
 - After any deploy that touches `config/`, run `php artisan config:cache` (the
   "update only" steps above already do).
 
