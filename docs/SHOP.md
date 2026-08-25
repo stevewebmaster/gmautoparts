@@ -32,8 +32,33 @@ Set per part, in the Parts Loader app when loading, or in Filament (including a
 
 > **Existing parts have no band and are therefore not sold online until banded.**
 > That is deliberate: the alternative was defaulting everything to a guessed band
-> and silently under-charging freight on every large item. Use the Filament
-> filter "Not set — not sold online" to work through the backlog.
+> and silently under-charging freight on every large item.
+
+### Banding stock in bulk
+
+To get existing stock banded quickly:
+
+```bash
+php artisan parts:guess-shipping-bands --dry-run   # preview, saves nothing
+php artisan parts:guess-shipping-bands             # apply
+```
+
+It assigns a band from keywords in the subcategory and title, falling back to
+the part's category. Keywords are ordered smallest to largest on purpose, so a
+specific component beats a general assembly word — otherwise "Gearbox ECU"
+bands as a whole gearbox. Matching is anchored at a word start, so "ecu" does
+not match the middle of "nosecut".
+
+**It only touches parts with no band at all**, so it is safe to re-run and will
+never overwrite a correction made in the admin. `--force` re-bands everything,
+including corrections.
+
+Parts in **SPECIALS** are deliberately left unbanded — the category is too mixed
+to guess.
+
+These are estimates. Review them in Filament afterwards using the shipping band
+filter, especially anything large or awkward: a wrong band is a silent margin
+leak, not something anyone will notice.
 
 Rates live in [`config/shipping.php`](../config/shipping.php) — **review them
 against real courier invoices**, they are estimates.
