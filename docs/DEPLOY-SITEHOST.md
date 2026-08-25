@@ -231,6 +231,7 @@ That single entry drives both scheduled commands (see `app/Console/Kernel.php`):
 | --- | --- | --- |
 | `images:optimize` | every 5 min | Resizes newly-uploaded photos down to web size, out of the request. |
 | `queue:work --stop-when-empty` | every minute | Drains queued jobs, then exits. |
+| `reservations:release-expired` | daily 06:00 | Puts uncollected reserved parts back on sale. |
 
 The queue worker is run **from the scheduler rather than as a supervised
 daemon** deliberately: there is no long-running process to keep alive, nothing

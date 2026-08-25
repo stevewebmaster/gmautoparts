@@ -171,6 +171,62 @@
                 <div class="col-xxl-4 col-lg-5">
                     <aside class="sidebar-area">
 
+                        {{-- Reserve for collection: the purchase path, shown above the
+                             enquiry form so it is the primary action. --}}
+                        @if($part->isReservable())
+                            <div class="widget widget-style-smoke shadow-style gm-reserve-widget">
+                                <div class="inventory-owner-wrap">
+                                    <div class="inventory-owner-top">
+                                        <div class="content">
+                                            <h6 class="box-title">Reserve This Part</h6>
+                                            <p class="saving">Free to reserve &middot; pay when you collect</p>
+                                        </div>
+                                    </div>
+
+                                    @if($errors->has('reserve'))
+                                        <p class="gm-reserve-error">{{ $errors->first('reserve') }}</p>
+                                    @endif
+
+                                    <div class="contact-form style-3 mt-30">
+                                        <form action="{{ route('reservations.store', $part->slug) }}" method="post">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="form-group col-12">
+                                                    <label for="res-name">Your name *</label>
+                                                    <input type="text" id="res-name" name="name" class="form-control pill"
+                                                           placeholder="Your name" required value="{{ old('name') }}">
+                                                </div>
+                                                <div class="form-group col-12">
+                                                    <label for="res-email">Email *</label>
+                                                    <input type="email" id="res-email" name="email" class="form-control pill"
+                                                           placeholder="Your email" required value="{{ old('email') }}">
+                                                </div>
+                                                <div class="form-group col-12">
+                                                    <label for="res-phone">Phone</label>
+                                                    <input type="text" id="res-phone" name="phone" class="form-control pill"
+                                                           placeholder="Your phone" value="{{ old('phone') }}">
+                                                </div>
+                                                <div class="form-group col-12">
+                                                    <label for="res-notes">Anything we should know?</label>
+                                                    <textarea id="res-notes" name="notes" class="form-control"
+                                                              rows="2" placeholder="e.g. when you plan to collect">{{ old('notes') }}</textarea>
+                                                </div>
+                                                <div class="form-btn col-12">
+                                                    <button type="submit" class="th-btn w-100">
+                                                        Reserve for Collection <i class="fas fa-arrow-up-right"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="gm-reserve-note">
+                                                Nothing to pay now. We hold the part for
+                                                {{ \App\Models\Reservation::HOLD_DAYS }} days and you pay when you pick it up.
+                                            </p>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         {{-- Enquiry form --}}
                         <div class="widget widget-style-smoke shadow-style">
                             <div class="inventory-owner-wrap">

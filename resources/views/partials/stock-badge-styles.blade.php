@@ -41,6 +41,24 @@
         color: inherit;
     }
     .gm-stock-notice p { margin: 0; font-size: 0.95rem; color: inherit; }
+
+    /* Reserve-for-collection widget on the part page. */
+    .gm-reserve-widget { border: 2px solid var(--theme-color, #0f3460); }
+    .gm-reserve-note {
+        margin: 0.9rem 0 0;
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+    .gm-reserve-error {
+        margin: 0.9rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-radius: 8px;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        font-size: 0.9rem;
+    }
 </style>
 @endpush
 @endonce

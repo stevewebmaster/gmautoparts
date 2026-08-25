@@ -24,6 +24,13 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->withoutOverlapping(5)
             ->runInBackground();
+
+        // Put uncollected reservations back on the market. Runs in the morning
+        // so released stock is live for the day rather than overnight.
+        $schedule->command('reservations:release-expired')
+            ->dailyAt('06:00')
+            ->withoutOverlapping(10)
+            ->runInBackground();
     }
 
     protected function commands(): void

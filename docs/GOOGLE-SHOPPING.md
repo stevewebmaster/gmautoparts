@@ -82,23 +82,56 @@ returns a relative path — fine for an `<img>` tag on the site, but invalid in 
 
 ---
 
-## Before Google will approve the feed
+## The purchase path
 
-The feed being valid is **not** sufficient. Google requires a genuine purchase
-path, and an enquiry form does not count — products will be disapproved.
+Google requires a genuine purchase path before it will approve products — an
+enquiry form does not count. Google accepts **"payment upon collection"**, so no
+cart or payment gateway is needed. The site implements this as
+**reserve for collection**:
 
-Google does accept **"payment upon collection"** as a payment method, so a
-full ecommerce checkout is not needed. What is needed:
+1. An **available** part shows a Reserve form on its page.
+2. Submitting it creates a `Reservation` with a reference (e.g. `GM-A4K7RT`),
+   snapshots the part title and price, and sets the part to **on hold** — so it
+   drops to `out_of_stock` in this feed straight away.
+3. The customer lands on a **confirmation page** at `/reservations/{reference}`
+   and is emailed a copy. Both emails are queued.
+4. The part is held for **7 days** (`Reservation::HOLD_DAYS`). A scheduled
+   command, `reservations:release-expired`, puts uncollected parts back on sale
+   each morning at 06:00.
+5. G&M marks it **Collected** (part becomes sold) or **Cancelled** (part goes
+   back to available) in the Parts Loader app or in Filament.
 
-1. A **reserve-for-collection flow** that behaves like a checkout: select the
-   part, confirm, receive an order confirmation page and email, pay on pickup.
-   (This is the next planned piece of work.)
-2. A published **returns policy** page, also entered in Merchant Center.
-3. A published **shipping policy** page.
+Only `available` parts can be reserved — `Part::isReservable()`. This is
+deliberately stricter than `isEnquirable()`, which allows on-hold parts, so the
+same part cannot be reserved twice. The check is re-run inside a locking
+transaction at submit time to close the race between two people clicking Reserve
+at once.
 
-Until those exist, the feed can still be submitted — Merchant Center's
-Diagnostics tab is the fastest way to see exactly what Google wants, and item
-level errors there are more specific than any documentation.
+### Policy pages
+
+`/returns-policy` and `/shipping-policy` are published and editable in the admin
+under Content → Pages. They are seeded by `PolicyPageSeeder`:
+
+```bash
+php artisan db:seed --class=PolicyPageSeeder
+```
+
+The seeder uses `firstOrCreate`, so re-running it will never overwrite edits
+made in the admin.
+
+> ⚠️ **The seeded policy text is a draft that G&M must review and approve**
+> before the feed is submitted. It contains assumptions — a 30 day warranty on
+> used mechanical parts, 14 days for change of mind, customer pays return
+> freight, indicative freight costs — that need confirming. Google requires the
+> published policy to be accurate. Note also that the NZ Consumer Guarantees Act
+> applies to used goods sold by a trader and cannot be contracted out of for
+> consumer sales.
+
+Both policies must also be entered in Merchant Center itself, not just published
+on the site.
+
+Merchant Center's **Diagnostics** tab is the fastest way to see what Google still
+wants — item level errors there are far more specific than the documentation.
 
 ## Setting it up in Merchant Center
 

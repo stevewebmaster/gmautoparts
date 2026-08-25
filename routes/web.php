@@ -29,6 +29,22 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 Route::post('/enquire', [PartController::class, 'enquire'])->name('parts.enquire')->middleware('throttle:10,1');
 
 /*
+| Reserve for collection — the purchase path Google requires before it will
+| show products. Payment happens on collection.
+*/
+Route::post('/parts/{part:slug}/reserve', [\App\Http\Controllers\ReservationController::class, 'store'])
+    ->name('reservations.store')
+    ->middleware('throttle:10,1');
+Route::get('/reservations/{reference}', [\App\Http\Controllers\ReservationController::class, 'show'])
+    ->name('reservations.show');
+
+// Policy pages Google checks for. Whitelisted rather than a catch-all so
+// unknown URLs still 404 properly.
+Route::get('/{page:key}', [PageController::class, 'show'])
+    ->where('page', 'returns-policy|shipping-policy|terms-and-conditions')
+    ->name('pages.show');
+
+/*
 | Mini-app: add parts and vehicles from phone (PIN-protected)
 */
 Route::prefix('app')->name('app.')->middleware(['web', 'miniapp.auth'])->group(function () {
@@ -40,6 +56,8 @@ Route::prefix('app')->name('app.')->middleware(['web', 'miniapp.auth'])->group(f
     Route::get('parts/new', [\App\Http\Controllers\MiniappController::class, 'createPart'])->name('parts.create');
     Route::post('parts', [\App\Http\Controllers\MiniappController::class, 'storePart'])->name('parts.store');
     Route::get('stock', [\App\Http\Controllers\MiniappController::class, 'stock'])->name('stock');
+    Route::get('reservations', [\App\Http\Controllers\MiniappController::class, 'reservations'])->name('reservations');
+    Route::post('reservations/{reservation}/status', [\App\Http\Controllers\MiniappController::class, 'updateReservationStatus'])->name('reservations.status');
     Route::post('stock/{part}/status', [\App\Http\Controllers\MiniappController::class, 'updatePartStatus'])->name('stock.status');
     Route::get('vehicles/new', [\App\Http\Controllers\MiniappController::class, 'createVehicle'])->name('vehicles.create');
     Route::post('vehicles', [\App\Http\Controllers\MiniappController::class, 'storeVehicle'])->name('vehicles.store');

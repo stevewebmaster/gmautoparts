@@ -96,6 +96,15 @@ class Part extends Model
         return $this->status === PartStatus::Withdrawn;
     }
 
+    /**
+     * Whether the part can be reserved. Stricter than isEnquirable(): a part
+     * already on hold for someone else must not be reservable a second time.
+     */
+    public function isReservable(): bool
+    {
+        return $this->is_visible && $this->status === PartStatus::Available;
+    }
+
     /** Whether the part can still be enquired about. */
     public function isEnquirable(): bool
     {

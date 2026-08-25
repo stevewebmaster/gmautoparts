@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PartStatus;
+use App\Enums\ReservationStatus;
 use App\Models\Part;
+use App\Models\Reservation;
 use App\Models\PartCategory;
 use App\Models\PartSubcategory;
 use App\Models\Vehicle;
@@ -55,7 +57,9 @@ class MiniappController extends Controller
 
     public function dashboard(): View
     {
-        return view('miniapp.dashboard');
+        return view('miniapp.dashboard', [
+            'holdingCount' => Reservation::holding()->count(),
+        ]);
     }
 
     public function subcategories(PartCategory $category)
@@ -179,6 +183,51 @@ class MiniappController extends Controller
         $label = PartStatus::from($validated['status'])->label();
 
         return back()->with('success', "\"{$part->title}\" is now marked {$label}.");
+    }
+
+    /**
+     * Reservations waiting to be collected, oldest first so the ones closest to
+     * expiring surface at the top.
+     */
+    public function reservations(Request $request): View
+    {
+        $status = (string) $request->get('status', ReservationStatus::Reserved->value);
+
+        $reservations = Reservation::query()
+            ->with('part')
+            ->when(in_array($status, ReservationStatus::values(), true), fn ($q) => $q->where('status', $status))
+            ->orderByRaw('expires_at IS NULL, expires_at ASC')
+            ->orderByDesc('id')
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('miniapp.reservations.index', [
+            'reservations' => $reservations,
+            'status' => $status,
+            'holdingCount' => Reservation::holding()->count(),
+        ]);
+    }
+
+    public function updateReservationStatus(Request $request, Reservation $reservation): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in([
+                ReservationStatus::Collected->value,
+                ReservationStatus::Cancelled->value,
+            ])],
+        ]);
+
+        // Route through the model so the part's status follows: collected sells
+        // it, cancelled puts it back on the market.
+        if ($validated['status'] === ReservationStatus::Collected->value) {
+            $reservation->markCollected();
+            $message = "{$reservation->reference} marked collected. The part is now Sold.";
+        } else {
+            $reservation->cancel();
+            $message = "{$reservation->reference} cancelled. The part is back on sale.";
+        }
+
+        return back()->with('success', $message);
     }
 
     public function createVehicle(): View
