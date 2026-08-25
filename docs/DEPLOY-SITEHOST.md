@@ -221,9 +221,39 @@ The app needs **one** cron entry. Laravel's scheduler runs everything else from 
 * * * * * cd /container/application && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-Add it with `crontab -e` on the SiteHost SSH user. Use the container path
-(`/container/application`); if `php` is not in cron's PATH, use its full path —
-find it with `which php`.
+### ⚠️ SiteHost does NOT use your SSH user's crontab
+
+`crontab -e` / `crontab -l` as your SSH user is the **wrong place** — the entry
+is ignored, and `crontab -l` will report "no crontab for <user>" even after you
+add one. SiteHost Cloud Containers read a file instead:
+
+```bash
+nano ~/container/crontabs/crontab
+```
+
+(the container sees this as `/container/crontabs/crontab`). SiteHost loads it
+for the **`www-data`** user, so the command must use the container path
+`/container/application`, not `~/`.
+
+Because jobs run as `www-data` and not your SSH user, that user needs write
+access or every scheduled run fails silently:
+
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+If `php` is not in cron's PATH, use its full path — find it with `which php`.
+
+Confirm SiteHost is picking the file up:
+
+```bash
+grep -a CRON /container/logs/rsyslog/syslog | tail -5
+```
+
+You want a line like
+`CRON[..]: (root) CMD (/bin/cat /cron/crontab | /usr/bin/crontab -u www-data -)`.
+Add `MAILTO=you@example.com` as the first line of the crontab file to have
+output emailed while debugging.
 
 That single entry drives both scheduled commands (see `app/Console/Kernel.php`):
 
@@ -251,8 +281,14 @@ php artisan queue:failed           # anything that failed all 3 attempts
 php artisan queue:retry all        # re-queue everything that failed
 ```
 
-If `schedule:list` looks right but nothing ever happens on its own, the cron
-entry is missing or `php` is not resolvable inside cron.
+If `schedule:list` looks right but nothing ever happens on its own: the entry is
+in the wrong crontab (see the warning above — it must be
+`~/container/crontabs/crontab`, not `crontab -e`), `php` is not resolvable
+inside cron, or `www-data` cannot write to `storage/`.
+
+**What breaks without cron:** queued order confirmation emails never send, so a
+customer pays and hears nothing; parts held by abandoned checkouts are never
+released; reservations never expire; uploaded photos are never resized.
 
 ### Queue and cache config
 
