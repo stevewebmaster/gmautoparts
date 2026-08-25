@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Enums\PartStatus;
 use App\Models\Part;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 /**
  * Builds a Google Merchant Center product feed (RSS 2.0 + the g: namespace).
@@ -28,9 +26,6 @@ class GoogleProductFeed
 
     /** Google product taxonomy path for used vehicle parts. */
     public const GOOGLE_CATEGORY = 'Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Parts';
-
-    public const TITLE_LIMIT = 150;
-    public const DESCRIPTION_LIMIT = 5000;
 
     /** Google accepts up to 10 additional images per item. */
     public const MAX_ADDITIONAL_IMAGES = 10;
@@ -62,7 +57,7 @@ class GoogleProductFeed
             '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
             '  <channel>',
             '    <title>' . $this->escape($shopName . ' — Used Car Parts') . '</title>',
-            '    <link>' . $this->escape($this->absolute('/')) . '</link>',
+            '    <link>' . $this->escape(PartPresenter::absolute('/')) . '</link>',
             '    <description>' . $this->escape('Quality used car parts from ' . $shopName . '.') . '</description>',
             implode("\n", $items),
             '  </channel>',
@@ -73,14 +68,14 @@ class GoogleProductFeed
 
     protected function item(Part $part): string
     {
-        $images = array_values(array_filter((array) $part->images));
+        $images = PartPresenter::imageUrls($part);
 
         $lines = [
-            'id' => 'part-' . $part->id,
-            'title' => $this->title($part),
-            'description' => $this->description($part),
-            'link' => $this->absolute(route('parts.show', $part->slug, absolute: false)),
-            'image_link' => $this->imageUrl($images[0]),
+            'id' => PartPresenter::id($part),
+            'title' => PartPresenter::title($part),
+            'description' => PartPresenter::description($part),
+            'link' => PartPresenter::url($part),
+            'image_link' => $images[0],
             'availability' => $part->status === PartStatus::Available ? 'in_stock' : 'out_of_stock',
             'price' => number_format((float) $part->price, 2, '.', '') . ' ' . self::CURRENCY,
             'condition' => 'used',
@@ -88,7 +83,7 @@ class GoogleProductFeed
             'google_product_category' => self::GOOGLE_CATEGORY,
         ];
 
-        if ($productType = $this->productType($part)) {
+        if ($productType = PartPresenter::productType($part)) {
             $lines['product_type'] = $productType;
         }
 
@@ -99,84 +94,12 @@ class GoogleProductFeed
         }
 
         foreach (array_slice($images, 1, self::MAX_ADDITIONAL_IMAGES) as $image) {
-            $xml[] = '      <g:additional_image_link>' . $this->escape($this->imageUrl($image)) . '</g:additional_image_link>';
+            $xml[] = '      <g:additional_image_link>' . $this->escape($image) . '</g:additional_image_link>';
         }
 
         $xml[] = '    </item>';
 
         return implode("\n", $xml);
-    }
-
-    /**
-     * Prefixes year/make/model onto the part title, skipping any bit the title
-     * already mentions — otherwise "Toyota Hilux Headlight" becomes
-     * "2010 Toyota Hilux Toyota Hilux Headlight".
-     */
-    protected function title(Part $part): string
-    {
-        $title = trim((string) $part->title);
-        $prefix = [];
-
-        foreach ([$part->year, $part->make, $part->model] as $bit) {
-            $bit = trim((string) $bit);
-
-            if ($bit !== '' && ! Str::contains(Str::lower($title), Str::lower($bit))) {
-                $prefix[] = $bit;
-            }
-        }
-
-        $full = trim(implode(' ', $prefix) . ' ' . $title);
-
-        return Str::limit($full, self::TITLE_LIMIT, '');
-    }
-
-    protected function description(Part $part): string
-    {
-        $description = trim(strip_tags((string) $part->description));
-
-        if ($description === '') {
-            $vehicle = trim(implode(' ', array_filter([$part->year, $part->make, $part->model])));
-
-            $description = $vehicle !== ''
-                ? "Used {$part->title} removed from a {$vehicle}. Contact us to check fitment for your vehicle."
-                : "Used {$part->title}. Contact us to check fitment for your vehicle.";
-        }
-
-        return Str::limit($description, self::DESCRIPTION_LIMIT, '');
-    }
-
-    protected function productType(Part $part): ?string
-    {
-        $parts = array_filter([
-            $part->category?->name,
-            $part->subcategory?->name,
-        ]);
-
-        return $parts ? implode(' > ', $parts) : null;
-    }
-
-    /**
-     * Images must be addressed on the public disk explicitly: FILESYSTEM_DISK is
-     * `local`, and only the `public` disk defines a url, so a bare
-     * Storage::url() yields a relative path that Google rejects.
-     */
-    protected function imageUrl(string $path): string
-    {
-        return $this->absolute(Storage::disk('public')->url($path));
-    }
-
-    /**
-     * Roots a path at APP_URL rather than the incoming request host. The feed is
-     * cached, so request-relative URLs would bake in whichever hostname happened
-     * to trigger the rebuild.
-     */
-    protected function absolute(string $pathOrUrl): string
-    {
-        if (Str::startsWith($pathOrUrl, ['http://', 'https://'])) {
-            return $pathOrUrl;
-        }
-
-        return rtrim((string) config('app.url'), '/') . '/' . ltrim($pathOrUrl, '/');
     }
 
     /**

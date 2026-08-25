@@ -43,6 +43,7 @@
 
     @livewireStyles
     @stack('head_styles')
+    @stack('head_scripts')
 </head>
 
 <body class="">

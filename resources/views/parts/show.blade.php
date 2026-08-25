@@ -4,6 +4,7 @@
 @section('meta_description', Str::limit(strip_tags($part->description), 160))
 
 @include('partials.stock-badge-styles')
+@include('partials.part-structured-data')
 
 @section('content')
     <div class="breadcumb-wrapper style-2 compact-header" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">

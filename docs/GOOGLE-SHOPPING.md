@@ -133,6 +133,36 @@ on the site.
 Merchant Center's **Diagnostics** tab is the fastest way to see what Google still
 wants — item level errors there are far more specific than the documentation.
 
+---
+
+## Product structured data (works without Merchant Center)
+
+Part pages emit schema.org `Product` and `BreadcrumbList` JSON-LD via
+`partials/part-structured-data.blade.php`. Google reads this from the page
+alone — **no Merchant Center account, no feed, and no purchase path required** —
+so it earns rich results in ordinary Search independently of everything above.
+
+Google distinguishes two cases, and both are covered:
+
+- **Merchant listings** — pages where the part can be bought. Priced,
+  available parts carry a full `Offer`.
+- **Product snippets** — the variant intended for pages you *cannot* buy from.
+  Unpriced parts get `Product` markup with no `Offer`, which is still valid.
+
+Availability maps `available` → `InStock`, `on_hold` → `OutOfStock`,
+`sold` → `SoldOut`.
+
+Values come from `App\Services\PartPresenter`, the same source the Merchant
+feed uses. That is deliberate: **Google matches the landing page markup against
+the feed item**, so `sku` equals the feed `id`, and name, url, image and
+availability all agree. If you change one, change it in `PartPresenter` so both
+follow.
+
+Validate with [Google's Rich Results Test](https://search.google.com/test/rich-results)
+against a live part URL after deploying.
+
+---
+
 ## Setting it up in Merchant Center
 
 1. Create/verify the Merchant Center account and claim the website domain.
