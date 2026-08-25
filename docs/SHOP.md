@@ -1,5 +1,7 @@
 # Online shop — cart, checkout and Stripe
 
+> **Outstanding tasks and client decisions:** [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md)
+
 The site sells parts online: multi-item cart, card payment via Stripe hosted
 Checkout, and either free collection from Te Awamutu or couriered delivery.
 

@@ -2,6 +2,16 @@
 
 Laravel 10 website for G&M Autospares (automotive wrecker, New Zealand) with parts catalogue, filtering, “Now Dismantling” vehicles, and Filament admin panel.
 
+## 🚦 Picking this back up?
+
+**Start here: [docs/LAUNCH-CHECKLIST.md](docs/LAUNCH-CHECKLIST.md)** — what is done, what is
+left, and what needs a decision from G&M before the shop can go live.
+
+Other guides: [DEPLOY-SITEHOST.md](docs/DEPLOY-SITEHOST.md) (deploy, cron, server paths) ·
+[SHOP.md](docs/SHOP.md) (cart, checkout, Stripe, freight bands) ·
+[GOOGLE-SHOPPING.md](docs/GOOGLE-SHOPPING.md) (Merchant feed, structured data) ·
+[MINIAPP.md](docs/MINIAPP.md) (the Parts Loader app)
+
 ## Requirements
 
 - PHP 8.2+

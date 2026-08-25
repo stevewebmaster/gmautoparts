@@ -1,5 +1,7 @@
 # Deploy G&M Autospares to SiteHost
 
+> **Outstanding tasks and client decisions:** [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md)
+
 Use this after you’ve pushed the latest code to GitHub (`git push origin main`).
 
 ---

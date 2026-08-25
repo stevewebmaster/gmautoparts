@@ -1,5 +1,7 @@
 # Google Shopping (Merchant Center) product feed
 
+> **Outstanding tasks and client decisions:** [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md)
+
 The site publishes a Google Merchant Center product feed of the parts catalogue.
 
 **Feed URL:** `https://<your-domain>/feeds/google.xml`
