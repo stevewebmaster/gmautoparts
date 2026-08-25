@@ -25,6 +25,13 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(5)
             ->runInBackground();
 
+        // Unpaid checkouts hold their parts for an hour. Sweep often, because
+        // every stale order is a part nobody else can buy.
+        $schedule->command('orders:release-stale')
+            ->everyTenMinutes()
+            ->withoutOverlapping(5)
+            ->runInBackground();
+
         // Put uncollected reservations back on the market. Runs in the morning
         // so released stock is live for the day rather than overnight.
         $schedule->command('reservations:release-expired')

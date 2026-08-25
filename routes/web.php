@@ -38,6 +38,22 @@ Route::post('/parts/{part:slug}/reserve', [\App\Http\Controllers\ReservationCont
 Route::get('/reservations/{reference}', [\App\Http\Controllers\ReservationController::class, 'show'])
     ->name('reservations.show');
 
+/*
+| Shop: cart, checkout, Stripe return URLs and webhook.
+*/
+Route::get('/cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{part:slug}', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/remove/{part}', [\App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+
+Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store')->middleware('throttle:10,1');
+Route::get('/checkout/success/{reference}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/cancel/{reference}', [\App\Http\Controllers\CheckoutController::class, 'cancel'])->name('checkout.cancel');
+
+// Stripe posts here server-to-server; CSRF-exempt, signature-verified instead.
+Route::post('/stripe/webhook', [\App\Http\Controllers\CheckoutController::class, 'webhook'])->name('stripe.webhook');
+
 // Policy pages Google checks for. Whitelisted rather than a catch-all so
 // unknown URLs still 404 properly.
 Route::get('/{page:key}', [PageController::class, 'show'])
@@ -56,6 +72,8 @@ Route::prefix('app')->name('app.')->middleware(['web', 'miniapp.auth'])->group(f
     Route::get('parts/new', [\App\Http\Controllers\MiniappController::class, 'createPart'])->name('parts.create');
     Route::post('parts', [\App\Http\Controllers\MiniappController::class, 'storePart'])->name('parts.store');
     Route::get('stock', [\App\Http\Controllers\MiniappController::class, 'stock'])->name('stock');
+    Route::get('orders', [\App\Http\Controllers\MiniappController::class, 'orders'])->name('orders');
+    Route::post('orders/{order}/status', [\App\Http\Controllers\MiniappController::class, 'updateOrderStatus'])->name('orders.status');
     Route::get('reservations', [\App\Http\Controllers\MiniappController::class, 'reservations'])->name('reservations');
     Route::post('reservations/{reservation}/status', [\App\Http\Controllers\MiniappController::class, 'updateReservationStatus'])->name('reservations.status');
     Route::post('stock/{part}/status', [\App\Http\Controllers\MiniappController::class, 'updatePartStatus'])->name('stock.status');

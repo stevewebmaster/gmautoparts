@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PartStatus;
+use App\Enums\OrderStatus;
 use App\Enums\ReservationStatus;
+use App\Models\Order;
 use App\Models\Part;
 use App\Models\Reservation;
 use App\Models\PartCategory;
@@ -59,6 +61,7 @@ class MiniappController extends Controller
     {
         return view('miniapp.dashboard', [
             'holdingCount' => Reservation::holding()->count(),
+            'toPackCount' => Order::where('status', OrderStatus::Paid)->count(),
         ]);
     }
 
@@ -92,6 +95,7 @@ class MiniappController extends Controller
             'description' => 'nullable|string|max:5000',
             'price' => 'nullable|numeric|min:0',
             'condition' => 'nullable|string|max:100',
+            'shipping_band' => ['nullable', Rule::in(\App\Enums\ShippingBand::values())],
             'make' => 'nullable|string|max:100',
             'model' => 'nullable|string|max:100',
             'year' => 'nullable|string|max:20',
@@ -183,6 +187,48 @@ class MiniappController extends Controller
         $label = PartStatus::from($validated['status'])->label();
 
         return back()->with('success', "\"{$part->title}\" is now marked {$label}.");
+    }
+
+    /**
+     * Paid orders waiting to be picked, packed and sent. Pending orders are
+     * shown too so unpaid checkouts are visible, but they need no action —
+     * they release themselves.
+     */
+    public function orders(Request $request): View
+    {
+        $status = (string) $request->get('status', OrderStatus::Paid->value);
+
+        $orders = Order::query()
+            ->with('items')
+            ->when(in_array($status, OrderStatus::values(), true), fn ($q) => $q->where('status', $status))
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('miniapp.orders.index', [
+            'orders' => $orders,
+            'status' => $status,
+            'toPackCount' => Order::where('status', OrderStatus::Paid)->count(),
+        ]);
+    }
+
+    public function updateOrderStatus(Request $request, Order $order): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in([
+                OrderStatus::Dispatched->value,
+                OrderStatus::Collected->value,
+            ])],
+        ]);
+
+        $status = OrderStatus::from($validated['status']);
+
+        $order->update([
+            'status' => $status,
+            'dispatched_at' => $status === OrderStatus::Dispatched ? now() : $order->dispatched_at,
+        ]);
+
+        return back()->with('success', "{$order->reference} marked {$status->label()}.");
     }
 
     /**

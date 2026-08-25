@@ -42,6 +42,7 @@
     </style>
 
     @livewireStyles
+    @include('partials.shop-styles')
     @stack('head_styles')
     @stack('head_scripts')
 </head>
@@ -151,6 +152,14 @@
                                     <li class="{{ request()->routeIs('contact') ? 'active' : '' }}">
                                         <a href="{{ route('contact') }}">Contact Us</a>
                                     </li>
+                                    <li class="{{ request()->routeIs('cart.*') || request()->routeIs('checkout.*') ? 'active' : '' }}">
+                                        <a href="{{ route('cart.index') }}">
+                                            Cart
+                                            @if(($gmNavCartCount = app(\App\Services\Cart::class)->count()) > 0)
+                                                <span class="gm-cart-count">{{ $gmNavCartCount }}</span>
+                                            @endif
+                                        </a>
+                                    </li>
                                 </ul>
                             </nav>
                             <button type="button" class="th-menu-toggle d-block d-lg-none"><i class="far fa-bars"></i></button>
@@ -158,6 +167,12 @@
                         <div class="col-auto d-none d-xl-block">
                             <div class="header-button">
                                 <button type="button" class="simple-icon searchBoxToggler"><i class="far fa-search"></i></button>
+                                <a href="{{ route('cart.index') }}" class="simple-icon gm-cart-link" aria-label="Cart">
+                                    <i class="far fa-shopping-cart"></i>
+                                    @if(($gmCartCount = app(\App\Services\Cart::class)->count()) > 0)
+                                        <span class="gm-cart-count">{{ $gmCartCount }}</span>
+                                    @endif
+                                </a>
                                 <a href="{{ route('parts.index') }}" class="th-btn">Browse Parts <i class="fa-solid fa-circle-plus"></i></a>
                             </div>
                         </div>

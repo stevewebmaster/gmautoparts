@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PartStatus;
+use App\Enums\ShippingBand;
 use App\Filament\Resources\PartResource\Pages;
 use App\Models\Part;
 use Filament\Forms;
@@ -71,6 +72,12 @@ class PartResource extends Resource
                         ->minValue(0)
                         ->default(1)
                         ->required(),
+                    Forms\Components\Select::make('shipping_band')
+                        ->label('Shipping band')
+                        ->options(ShippingBand::options())
+                        ->native(false)
+                        ->helperText('Sets the freight price online. Leave empty and the part is NOT sold online — it falls back to reserve/enquire and is left out of the Google feed.')
+                        ->columnSpanFull(),
                 ])->columns(2),
                 Forms\Components\Section::make('Vehicle compatibility')->schema([
                     Forms\Components\TextInput::make('make'),
@@ -115,6 +122,12 @@ class PartResource extends Resource
                     ->color(fn (PartStatus $state) => $state->color())
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('shipping_band')
+                    ->label('Freight')
+                    ->badge()
+                    ->formatStateUsing(fn (?ShippingBand $state) => $state?->shortLabel() ?? 'Not set')
+                    ->color(fn (?ShippingBand $state) => $state?->color() ?? 'danger')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('sold_at')
                     ->dateTime('d M Y')
                     ->placeholder('—')
@@ -128,11 +141,36 @@ class PartResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->options(PartStatus::options())
                     ->multiple(),
+                Tables\Filters\SelectFilter::make('shipping_band')
+                    ->label('Shipping band')
+                    ->options(ShippingBand::options() + ['__none' => 'Not set — not sold online'])
+                    ->query(function ($query, array $data) {
+                        if (($data['value'] ?? null) === '__none') {
+                            return $query->whereNull('shipping_band');
+                        }
+
+                        return $data['value'] ? $query->where('shipping_band', $data['value']) : $query;
+                    }),
                 Tables\Filters\TernaryFilter::make('is_visible'),
                 Tables\Filters\TernaryFilter::make('is_featured'),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
+                // Bulk banding: existing stock has no band, so it needs working
+                // through in batches rather than one part at a time.
+                Tables\Actions\BulkAction::make('setShippingBand')
+                    ->label('Set shipping band')
+                    ->icon('heroicon-o-truck')
+                    ->color('info')
+                    ->form([
+                        Forms\Components\Select::make('shipping_band')
+                            ->label('Shipping band')
+                            ->options(ShippingBand::options())
+                            ->required()
+                            ->native(false),
+                    ])
+                    ->action(fn ($records, array $data) => $records->each->update(['shipping_band' => $data['shipping_band']]))
+                    ->deselectRecordsAfterCompletion(),
                 Tables\Actions\BulkAction::make('markSold')
                     ->label('Mark as sold')
                     ->icon('heroicon-o-check-circle')

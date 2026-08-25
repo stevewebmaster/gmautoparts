@@ -5,6 +5,7 @@
 
 @include('partials.stock-badge-styles')
 @include('partials.part-structured-data')
+@include('partials.shop-styles')
 
 @section('content')
     <div class="breadcumb-wrapper style-2 compact-header" data-bg-src="/images/page-headers/Parts-Header.jpg" data-overlay="black" data-opacity="3">
@@ -172,9 +173,42 @@
                 <div class="col-xxl-4 col-lg-5">
                     <aside class="sidebar-area">
 
-                        {{-- Reserve for collection: the purchase path, shown above the
-                             enquiry form so it is the primary action. --}}
-                        @if($part->isReservable())
+                        {{-- Buy online. Only parts with a real shipping band can be
+                             bought; anything quote-only falls through to Reserve. --}}
+                        @if($part->isPurchasable())
+                            <div class="widget widget-style-smoke shadow-style gm-reserve-widget">
+                                <div class="inventory-owner-wrap">
+                                    <div class="inventory-owner-top">
+                                        <div class="content">
+                                            <h6 class="box-title">Buy This Part</h6>
+                                            <p class="saving">
+                                                ${{ number_format((float) $part->price, 2) }}
+                                                &middot; {{ $part->shipping_band->shortLabel() }} freight
+                                            </p>
+                                        </div>
+                                    </div>
+                                    @if($errors->has('cart'))
+                                        <p class="gm-reserve-error">{{ $errors->first('cart') }}</p>
+                                    @endif
+                                    <div class="mt-30">
+                                        <form action="{{ route('cart.add', $part->slug) }}" method="post">
+                                            @csrf
+                                            <button type="submit" class="th-btn w-100">
+                                                Add to Cart <i class="fas fa-arrow-up-right"></i>
+                                            </button>
+                                        </form>
+                                        <p class="gm-reserve-note">
+                                            Secure payment by card. Free collection from Te Awamutu, or we
+                                            courier NZ-wide &mdash; freight is worked out at checkout.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Reserve for collection: kept for parts that cannot be sold
+                             online (no price, or quote-only freight). --}}
+                        @if($part->isReservable() && ! $part->isPurchasable())
                             <div class="widget widget-style-smoke shadow-style gm-reserve-widget">
                                 <div class="inventory-owner-wrap">
                                     <div class="inventory-owner-top">

@@ -7,6 +7,9 @@
         <p class="lead-text">Choose what to add to the website.</p>
         <a href="{{ route('app.parts.create') }}" class="btn-app btn-primary-app">Add a Part</a>
         <a href="{{ route('app.vehicles.create') }}" class="btn-app btn-secondary-app">Add a Vehicle (Now Dismantling)</a>
+        <a href="{{ route('app.orders') }}" class="btn-app btn-primary-app">
+            {{ $toPackCount ? "Orders to Pack ({$toPackCount})" : 'Online Orders' }}
+        </a>
         <a href="{{ route('app.stock') }}" class="btn-app btn-secondary-app">Manage Stock (Mark Sold)</a>
         <a href="{{ route('app.reservations') }}" class="btn-app btn-secondary-app">
             {{ $holdingCount ? "Reservations ({$holdingCount})" : 'Reservations' }}

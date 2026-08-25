@@ -35,6 +35,19 @@
             <label for="price">Price ($)</label>
             <input type="number" id="price" name="price" value="{{ old('price') }}" min="0" step="0.01" placeholder="Leave blank for Enquire">
         </div>
+
+        <div class="form-group">
+            <label for="shipping_band">Shipping size</label>
+            <select id="shipping_band" name="shipping_band">
+                <option value="">Not sold online (quote freight)</option>
+                @foreach(\App\Enums\ShippingBand::cases() as $band)
+                    <option value="{{ $band->value }}" {{ old('shipping_band') === $band->value ? 'selected' : '' }}>
+                        {{ $band->label() }}
+                    </option>
+                @endforeach
+            </select>
+            <p class="photo-hint">Needed to sell this part online. Leave blank and customers reserve or enquire instead.</p>
+        </div>
         <div class="form-group">
             <label for="condition">Condition</label>
             <input type="text" id="condition" name="condition" value="{{ old('condition') }}" placeholder="e.g. Used, Refurbished">

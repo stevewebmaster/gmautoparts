@@ -232,6 +232,7 @@ That single entry drives both scheduled commands (see `app/Console/Kernel.php`):
 | `images:optimize` | every 5 min | Resizes newly-uploaded photos down to web size, out of the request. |
 | `queue:work --stop-when-empty` | every minute | Drains queued jobs, then exits. |
 | `reservations:release-expired` | daily 06:00 | Puts uncollected reserved parts back on sale. |
+| `orders:release-stale` | every 10 min | Releases parts held by unpaid checkouts. |
 
 The queue worker is run **from the scheduler rather than as a supervised
 daemon** deliberately: there is no long-running process to keep alive, nothing
@@ -263,6 +264,9 @@ entry is missing or `php` is not resolvable inside cron.
   the Google product feed all depend on it. If `config/cache.php` is ever
   missing, Laravel silently falls back to a null store and they quietly stop
   working.
+- `STRIPE_KEY`, `STRIPE_SECRET` and `STRIPE_WEBHOOK_SECRET` for the online shop —
+  see [SHOP.md](SHOP.md). Without the webhook secret, paid orders stay stuck at
+  "awaiting payment".
 - `APP_URL` must be the real `https://` domain. The Google product feed roots
   every URL there rather than on the request host — see
   [GOOGLE-SHOPPING.md](GOOGLE-SHOPPING.md).

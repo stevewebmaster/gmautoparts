@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PartStatus;
+use App\Enums\ShippingBand;
 use App\Services\GoogleProductFeed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -49,6 +50,7 @@ class Part extends Model
         'condition',
         'status',
         'quantity',
+        'shipping_band',
         'images',
         'vehicle_id',
         'is_visible',
@@ -68,6 +70,7 @@ class Part extends Model
         'images' => 'array',
         'price' => 'decimal:2',
         'status' => PartStatus::class,
+        'shipping_band' => ShippingBand::class,
         'quantity' => 'integer',
         'sold_at' => 'datetime',
         'is_visible' => 'boolean',
@@ -94,6 +97,42 @@ class Part extends Model
     public function isWithdrawn(): bool
     {
         return $this->status === PartStatus::Withdrawn;
+    }
+
+    /**
+     * Whether the part can be bought online. Needs a price and a real shipping
+     * band on top of being available — a part with no band set cannot have its
+     * freight priced, so it is not sold online at all.
+     */
+    public function isPurchasable(): bool
+    {
+        return $this->isReservable()
+            && $this->price > 0
+            && $this->shipping_band?->isShippable() === true;
+    }
+
+    /**
+     * Eligible for the Google Merchant feed: priced and banded, so the checkout
+     * Google requires actually works for it. On-hold parts stay in (as
+     * out_of_stock) to keep the listing alive; quote-only parts do not, because
+     * they cannot be bought online at all.
+     */
+    public function scopeFeedable(Builder $query): Builder
+    {
+        return $query->listable()
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
+            ->whereIn('shipping_band', ShippingBand::shippable());
+    }
+
+    /** In the shop: available, priced and banded. */
+    public function scopePurchasable(Builder $query): Builder
+    {
+        return $query->visible()
+            ->where('status', PartStatus::Available)
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
+            ->whereIn('shipping_band', ShippingBand::shippable());
     }
 
     /**

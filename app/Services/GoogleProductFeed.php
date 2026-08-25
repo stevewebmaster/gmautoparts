@@ -16,6 +16,8 @@ use App\Models\Part;
  *    wrong — it is an internal yard code, not a manufacturer part number.
  *  - Parts with no price are skipped rather than sent at 0.00, because Google
  *    rejects a null or zero price outright.
+ *  - Quote-only parts are skipped too: Google requires a working checkout, and
+ *    a part with no shipping band cannot be bought online.
  */
 class GoogleProductFeed
 {
@@ -35,9 +37,7 @@ class GoogleProductFeed
         $items = [];
 
         Part::query()
-            ->listable()
-            ->whereNotNull('price')
-            ->where('price', '>', 0)
+            ->feedable()
             ->with(['category', 'subcategory'])
             ->chunkById(200, function ($parts) use (&$items) {
                 foreach ($parts as $part) {
