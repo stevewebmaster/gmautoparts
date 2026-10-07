@@ -23,8 +23,12 @@ class Order extends Model
         'paid_at', 'dispatched_at', 'cancelled_at', 'expires_at',
     ];
 
+    // Defaults are set here as well as in the migration: a freshly created model
+    // does not read column defaults back, and Stripe needs the currency before
+    // the order is ever re-fetched.
     protected $attributes = [
         'status' => OrderStatus::Pending->value,
+        'currency' => 'NZD',
     ];
 
     protected $casts = [
