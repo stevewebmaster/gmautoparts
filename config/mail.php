@@ -30,4 +30,13 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'noreply@gmautospares.co.nz'),
         'name' => env('MAIL_FROM_NAME', 'G&M Autospares'),
     ],
+
+    // Where the yard's own notifications go: paid orders, reservations, part
+    // enquiries and the contact form. Kept separate from the from address so
+    // mail can be sent as noreply@ while still reaching an inbox someone reads.
+    // Comma-separated in .env for more than one inbox, with no spaces.
+    'admin_addresses' => array_values(array_filter(array_map('trim', explode(',', (string) env(
+        'ADMIN_EMAIL',
+        env('MAIL_FROM_ADDRESS', 'noreply@gmautospares.co.nz'),
+    ))))),
 ];

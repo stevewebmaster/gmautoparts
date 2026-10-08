@@ -69,11 +69,11 @@ class ReservationController extends Controller
      */
     protected function sendEmails(Reservation $reservation): void
     {
-        $adminEmail = config('mail.from.address', env('ADMIN_EMAIL', 'admin@example.com'));
+        $adminEmails = config('mail.admin_addresses');
 
         try {
             Mail::to($reservation->email)->queue(new ReservationConfirmation($reservation));
-            Mail::to($adminEmail)->queue(new ReservationReceived($reservation));
+            Mail::to($adminEmails)->queue(new ReservationReceived($reservation));
         } catch (\Throwable $e) {
             Log::error('Reservation emails could not be queued', [
                 'reference' => $reservation->reference,

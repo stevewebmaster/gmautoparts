@@ -17,15 +17,16 @@ class ContactController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        $adminEmail = config('mail.from.address', env('ADMIN_EMAIL', 'admin@example.com'));
+        $adminEmails = config('mail.admin_addresses');
 
         Mail::raw(
             "Contact form submission\n\n" .
             "From: {$validated['name']} <{$validated['email']}>\n" .
             "Phone: " . ($validated['phone'] ?? 'N/A') . "\n\n" .
             "Message:\n" . $validated['message'],
-            function ($message) use ($adminEmail) {
-                $message->to($adminEmail)
+            function ($message) use ($adminEmails, $validated) {
+                $message->to($adminEmails)
+                    ->replyTo($validated['email'], $validated['name'])
                     ->subject('Website contact form - G&M Autospares');
             }
         );

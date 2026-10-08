@@ -60,7 +60,7 @@ class PartController extends Controller
             ])->withInput();
         }
 
-        $adminEmail = config('mail.from.address', env('ADMIN_EMAIL', 'admin@example.com'));
+        $adminEmails = config('mail.admin_addresses');
 
         Mail::raw(
             "Part enquiry from website\n\n" .
@@ -68,8 +68,9 @@ class PartController extends Controller
             "From: {$validated['name']} <{$validated['email']}>\n" .
             "Phone: " . ($validated['phone'] ?? 'N/A') . "\n\n" .
             "Message:\n" . ($validated['message'] ?? 'No message'),
-            function ($message) use ($adminEmail, $part) {
-                $message->to($adminEmail)
+            function ($message) use ($adminEmails, $part, $validated) {
+                $message->to($adminEmails)
+                    ->replyTo($validated['email'], $validated['name'])
                     ->subject('Part Enquiry: ' . $part->title);
             }
         );

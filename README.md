@@ -42,7 +42,7 @@ Generic steps:
    - `APP_DEBUG=false` in production
    - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` – your MySQL credentials
    - `MAIL_*` – SMTP settings for contact form and part enquiries
-   - `ADMIN_EMAIL` – address to receive contact/enquiry emails (optional; can use `MAIL_FROM_ADDRESS`)
+   - `ADMIN_EMAIL` – inbox(es) for orders, reservations, enquiries and the contact form; comma-separated for more than one (falls back to `MAIL_FROM_ADDRESS`)
    - `MINIAPP_PIN` – (optional) PIN for the mini-app at `/app` so the client can add parts/vehicles from their phone; leave empty to disable
 
 4. **Database**

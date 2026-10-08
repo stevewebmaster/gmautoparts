@@ -241,11 +241,11 @@ class CheckoutController extends Controller
 
     protected function sendEmails(Order $order): void
     {
-        $adminEmail = config('mail.from.address', env('ADMIN_EMAIL', 'admin@example.com'));
+        $adminEmails = config('mail.admin_addresses');
 
         try {
             Mail::to($order->email)->queue(new OrderConfirmation($order));
-            Mail::to($adminEmail)->queue(new OrderReceived($order));
+            Mail::to($adminEmails)->queue(new OrderReceived($order));
         } catch (\Throwable $e) {
             Log::error('Order emails could not be queued', [
                 'order' => $order->reference,

@@ -99,11 +99,26 @@ nano .env
 
 In `.env` set at least:
 
-- `APP_URL=https://gm.websitemaster.co.nz` (or your domain; **https**, no trailing slash)
+- `APP_URL=https://gmautospares.co.nz` (the live domain; **https**, no trailing slash)
 - `APP_DEBUG=false`
 - `DB_HOST=mariadb1011`
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (SiteHost MySQL)
-- `MAIL_*` if you use contact form
+- Mail, via SiteHost's internal relay — no login, no TLS, and the domain's SPF
+  record already allows it:
+  ```
+  MAIL_MAILER=smtp
+  MAIL_HOST=smtpd
+  MAIL_PORT=25
+  MAIL_ENCRYPTION=null
+  MAIL_USERNAME=null
+  MAIL_PASSWORD=null
+  MAIL_FROM_ADDRESS=noreply@gmautospares.co.nz
+  ADMIN_EMAIL=gmautospares@xtra.co.nz,info@gmautospares.co.nz
+  ```
+  `ADMIN_EMAIL` receives paid orders, reservations, part enquiries and the
+  contact form. Comma-separated for several inboxes, no spaces. Blank the
+  username: if one is set, Laravel tries to log in to a relay that does not
+  expect it.
 - `MINIAPP_PIN=1234` (or your chosen PIN) if you use the mini-app at `/app`
 
 Then:
