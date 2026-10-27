@@ -21,7 +21,7 @@ A part is included only if **all** of these are true:
 | status is `available` or `on_hold` | `sold` and `withdrawn` parts are dropped entirely — a sold wrecker part is not coming back. |
 | has a price | Google rejects a null or zero price, so unpriced parts cannot be fed. **No price, no Google.** |
 | has at least one image | `image_link` is a required attribute. |
-| shipping band is Small, Medium or Large | Google expects a working checkout. A part with **no band**, or set to **Quote only**, cannot be bought online, so it is not fed. This one catches people out — existing stock imported before shipping bands existed has no band, and is silently absent from the feed until one is set. |
+| has a courier freight size | Google expects a working checkout. A part with **no freight size**, or set to **Truck / quote**, cannot be bought online, so it is not fed. This one catches people out — a part nobody has measured yet is silently absent from the feed until it is sized. |
 
 `available` maps to `in_stock`; `on_hold` maps to `out_of_stock` (still listed,
 but not purchasable right now).
@@ -79,8 +79,8 @@ to see Google's verdict.
   without that, a stray control byte pasted into a description would make the
   whole feed unparseable.
 - Up to 10 `additional_image_link` entries per item.
-- **`shipping`** is sent twice per item, once per island, at the band's rate from
-  `config/shipping.php`: postcodes `0*-6*` (North Island) and `7*-9*` (South
+- **`shipping`** is sent twice per item, once per island, at the freight size's
+  rate from `config/shipping.php` — the same amount checkout charges: postcodes `0*-6*` (North Island) and `7*-9*` (South
   Island). This is what stops Merchant Center flagging **"Missing shipping
   weight"**. Parts are never weighed, and a feed price overrides the account's
   shipping settings for those postcodes, so Google no longer needs a weight.

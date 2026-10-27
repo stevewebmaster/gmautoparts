@@ -115,7 +115,6 @@
                                 <div class="gm-line">
                                     <div class="gm-line-body">
                                         <p class="gm-line-title">{{ $part->title }}</p>
-                                        <p class="gm-line-meta">{{ $part->shipping_band?->shortLabel() }}</p>
                                     </div>
                                     <div class="gm-line-price">${{ number_format((float) $part->price, 2) }}</div>
                                 </div>
@@ -160,12 +159,11 @@
 
 @push('scripts')
 <script>
-    // Live freight preview. The server recalculates from the same table at
-    // submit time — this is display only and is never trusted for the charge.
+    // Live freight preview. The amounts come from the same Cart::shipping()
+    // the server charges at submit — this is display only and is never trusted
+    // for the charge.
     (function () {
-        var rates = @json(config('shipping.rates'));
-        var rural = {{ (float) config('shipping.rural_surcharge', 0) }};
-        var band  = @json(optional($band)->value);
+        var freight = @json($freight);
         var subtotal = {{ (float) $subtotal }};
 
         var form = document.getElementById('checkout-form');
@@ -184,9 +182,8 @@
             deliveryFields.style.display = pickup ? 'none' : '';
 
             var ship = 0;
-            if (!pickup && band && rates[band]) {
-                ship = parseFloat(rates[band][regionSelect.value] || 0);
-                if (ruralBox.checked) ship += rural;
+            if (!pickup && freight[regionSelect.value]) {
+                ship = parseFloat(freight[regionSelect.value][ruralBox.checked ? 'rural' : 'urban']);
             }
 
             shipOut.textContent = money(ship);

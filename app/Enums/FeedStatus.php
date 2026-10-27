@@ -34,7 +34,7 @@ enum FeedStatus: string
             self::NotListable => 'Sold or withdrawn',
             self::NoPhoto => 'No photo',
             self::NoPrice => 'No price',
-            self::NoBand => 'No shipping band',
+            self::NoBand => 'No freight size',
             self::QuoteOnly => 'Quote only',
         };
     }
@@ -48,8 +48,8 @@ enum FeedStatus: string
             self::NotListable => 'Sold parts and withdrawn parts are dropped from the feed. This is correct — a sold wrecker part is not coming back.',
             self::NoPhoto => 'Google will not list a product without an image. Add at least one photo.',
             self::NoPrice => 'Google rejects a missing or zero price. Add a price.',
-            self::NoBand => 'Without a shipping band the freight cannot be priced, so the part cannot be bought online and Google will not take it. Set a band.',
-            self::QuoteOnly => 'Too big to price freight for automatically, so it is not sold online and not sent to Google. Deliberate — change the band if that is wrong.',
+            self::NoBand => 'Without a freight size the freight cannot be priced, so the part cannot be bought online and Google will not take it. Measure it and set the satchel or box it goes in.',
+            self::QuoteOnly => 'Truck freight, priced per destination, so it is not sold online and not sent to Google. Deliberate — change the freight size if it will go by courier.',
         };
     }
 

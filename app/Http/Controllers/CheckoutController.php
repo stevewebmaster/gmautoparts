@@ -35,7 +35,7 @@ class CheckoutController extends Controller
         return view('checkout.show', [
             'items' => $this->cart->purchasable(),
             'subtotal' => $this->cart->subtotal(),
-            'band' => $this->cart->dominantBand(),
+            'freight' => $this->cart->freightByRegion(),
             'regions' => config('shipping.regions'),
         ]);
     }
@@ -116,6 +116,8 @@ class CheckoutController extends Controller
                         'price' => $part->price,
                         'quantity' => 1,
                         'shipping_band' => $part->shipping_band,
+                        'shipping' => $region ? $part->shipping_band->rate($region) : null,
+                        'ship_as' => $region ? $part->shipping_band->shipAs($region) : null,
                     ]);
 
                     // Hold it while they pay; released if they never do.

@@ -46,7 +46,6 @@
                                 <p class="gm-line-title"><a href="{{ route('parts.show', $part->slug) }}">{{ $part->title }}</a></p>
                                 <p class="gm-line-meta">
                                     {{ collect([$part->year, $part->make, $part->model])->filter()->join(' ') ?: $part->category?->name }}
-                                    @if($part->shipping_band) &middot; {{ $part->shipping_band->shortLabel() }} @endif
                                 </p>
                                 @unless($part->isPurchasable())
                                     <p class="gm-line-meta" style="color:#b91c1c;">No longer available</p>
@@ -70,8 +69,10 @@
                         <div class="gm-total-row gm-muted">
                             <span>Freight</span>
                             <span>
-                                @if($band)
-                                    Calculated at checkout ({{ $band->shortLabel() }} rate)
+                                @if($items->contains(fn($p) => $p->isPurchasable()))
+                                    @foreach($freight as $region => $amounts)
+                                        {{ $regions[$region] }} ${{ number_format($amounts['urban'], 2) }}@if(! $loop->last)<br>@endif
+                                    @endforeach
                                 @else
                                     Free collection
                                 @endif

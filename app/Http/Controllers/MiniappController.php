@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PartStatus;
 use App\Enums\OrderStatus;
 use App\Enums\ReservationStatus;
+use App\Enums\ShippingBand;
 use App\Models\Order;
 use App\Models\Part;
 use App\Models\Reservation;
@@ -95,7 +96,7 @@ class MiniappController extends Controller
             'description' => 'nullable|string|max:5000',
             'price' => 'nullable|numeric|min:0',
             'condition' => 'nullable|string|max:100',
-            'shipping_band' => ['nullable', Rule::in(\App\Enums\ShippingBand::values())],
+            'shipping_band' => ['nullable', Rule::in(ShippingBand::values())],
             'make' => 'nullable|string|max:100',
             'model' => 'nullable|string|max:100',
             'year' => 'nullable|string|max:20',
@@ -155,6 +156,7 @@ class MiniappController extends Controller
     {
         $search = trim((string) $request->get('q', ''));
         $status = (string) $request->get('status', '');
+        $unsized = $request->boolean('unsized');
 
         $parts = Part::query()
             ->when($search !== '', function ($query) use ($search) {
@@ -165,6 +167,8 @@ class MiniappController extends Controller
                 });
             })
             ->when(in_array($status, PartStatus::values(), true), fn ($query) => $query->where('status', $status))
+            // Parts on sale that cannot be bought online until measured.
+            ->when($unsized, fn ($query) => $query->where('status', PartStatus::Available)->whereNull('shipping_band'))
             ->latest()
             ->paginate(25)
             ->withQueryString();
@@ -173,7 +177,35 @@ class MiniappController extends Controller
             'parts' => $parts,
             'search' => $search,
             'status' => $status,
+            'unsized' => $unsized,
         ]);
+    }
+
+    /** Measure an existing part and set the satchel or box it goes in. */
+    public function editFreight(Part $part): View
+    {
+        // Back to the same search or filter afterwards, so working down a
+        // list of unmeasured parts does not lose your place.
+        $previous = url()->previous();
+        $returnTo = str_starts_with($previous, route('app.stock')) ? $previous : route('app.stock');
+
+        return view('miniapp.parts.freight', ['part' => $part, 'returnTo' => $returnTo]);
+    }
+
+    public function updateFreight(Request $request, Part $part): RedirectResponse
+    {
+        $validated = $request->validate([
+            'shipping_band' => ['nullable', Rule::in(ShippingBand::values())],
+            'return_to' => 'nullable|string',
+        ]);
+
+        $part->update(['shipping_band' => $validated['shipping_band'] ?? null]);
+
+        $size = $part->shipping_band?->shortLabel() ?? 'not measured';
+        $returnTo = $validated['return_to'] ?? '';
+
+        return redirect()->to(str_starts_with($returnTo, route('app.stock')) ? $returnTo : route('app.stock'))
+            ->with('success', "\"{$part->title}\" freight set to {$size}.");
     }
 
     public function updatePartStatus(Request $request, Part $part): RedirectResponse

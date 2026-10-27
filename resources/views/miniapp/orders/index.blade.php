@@ -78,7 +78,10 @@
 
                 <ul class="ord-parts">
                     @foreach($order->items as $item)
-                        <li>{{ $item->title }} — ${{ number_format((float) $item->price, 2) }}</li>
+                        <li>
+                            {{ $item->title }} — ${{ number_format((float) $item->price, 2) }}
+                            @if($item->ship_as)<br><strong>Send as {{ $item->ship_as->shortLabel() }}</strong>@endif
+                        </li>
                     @endforeach
                 </ul>
                 <p class="ord-meta">

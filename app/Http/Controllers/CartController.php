@@ -19,7 +19,8 @@ class CartController extends Controller
             'items' => $this->cart->items(),
             'unavailable' => $this->cart->unavailable(),
             'subtotal' => $this->cart->subtotal(),
-            'band' => $this->cart->dominantBand(),
+            'freight' => $this->cart->freightByRegion(),
+            'regions' => config('shipping.regions'),
         ]);
     }
 

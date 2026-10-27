@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\ShippingBand;
 use App\Models\Part;
 use Illuminate\Support\Collection;
 
@@ -91,9 +90,10 @@ class Cart
     /**
      * Freight for the whole cart.
      *
-     * Charged as the HIGHEST band present, once — not the sum of every item.
-     * Several parts normally travel as one consignment, so summing would
-     * overcharge badly on a multi-part order.
+     * Each part is charged its own freight. NZ Couriers charge per item even
+     * within one consignment, so charging only the biggest part — as this
+     * once did — lost the full price of every other box. A pair of headlights
+     * to Christchurch is two boxes and two charges.
      */
     public function shipping(string $fulfilment, ?string $region = null, bool $isRural = false): float
     {
@@ -113,9 +113,7 @@ class Cart
             return 0.0;
         }
 
-        $rate = $items
-            ->map(fn (Part $part) => $part->shipping_band?->rate($region) ?? 0.0)
-            ->max() ?: 0.0;
+        $rate = (float) $items->sum(fn (Part $part) => $part->shipping_band?->rate($region) ?? 0.0);
 
         if ($isRural) {
             $rate += (float) config('shipping.rural_surcharge', 0);
@@ -129,16 +127,23 @@ class Cart
         return round($this->subtotal() + $this->shipping($fulfilment, $region, $isRural), 2);
     }
 
-    /** The band driving the freight charge, for showing on the cart. */
-    public function dominantBand(): ?ShippingBand
+    /**
+     * Delivery freight to each region, urban and rural, as the server will
+     * charge it. Lets the checkout page preview freight without repeating the
+     * rate rules in JavaScript.
+     */
+    public function freightByRegion(): array
     {
-        $order = [ShippingBand::Small, ShippingBand::Medium, ShippingBand::Large];
+        $freight = [];
 
-        return $this->purchasable()
-            ->map(fn (Part $part) => $part->shipping_band)
-            ->filter()
-            ->sortByDesc(fn (ShippingBand $band) => array_search($band, $order, true))
-            ->first();
+        foreach (array_keys(config('shipping.regions')) as $region) {
+            $freight[$region] = [
+                'urban' => $this->shipping('delivery', $region),
+                'rural' => $this->shipping('delivery', $region, true),
+            ];
+        }
+
+        return $freight;
     }
 
     protected function ids(): array

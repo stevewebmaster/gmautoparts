@@ -1,22 +1,20 @@
 <?php
 
 /*
- | Freight rates, in NZD, by size band and destination region.
+ | Freight rates, by freight size and destination region.
  |
- | A wrecker cannot compute freight from weight in any reliable way — nobody is
- | going to weigh every alternator as it comes off a car — so parts are banded
- | by size when they are loaded, and each band has a flat rate per region.
+ | Every part is given a freight size when it is loaded: one of the same
+ | satchels and box sizes the yard picks in NZ Couriers' eDespatchIT when it
+ | prints the label (see App\Enums\ShippingBand). Nothing else is guessed — the
+ | price online is what that label will cost, so the yard is never out of pocket
+ | and the customer is never overcharged.
  |
- | Anything too big or awkward to price this way is banded `quote_only` and is
- | not sold online at all; those parts fall back to reserve-and-collect.
+ | Anything too big or heavy for a courier (bumpers, doors, gearboxes, engines)
+ | goes by truck, is sized `quote_only`, and is not sold online at all; those
+ | parts fall back to reserve-and-collect.
  |
- | Multi-item orders are charged the HIGHEST band in the cart, once, rather than
- | the sum of each item. Several parts normally go in one consignment, so summing
- | would overcharge badly on a three-part order.
- |
- | Rates are deliberately in config, not the database: they change rarely, and a
- | wrong rate is a silent margin leak rather than something anyone would notice.
- | Review them against actual courier invoices.
+ | Each part in an order is charged its own freight, because NZ Couriers charge
+ | per item even within one consignment.
  |
  | The Google product feed sends these same rates per item, so Google Shopping
  | follows any change here on its next fetch.
@@ -27,24 +25,51 @@ return [
         'south_island' => 'South Island',
     ],
 
-    'rates' => [
-        'small' => [
-            'north_island' => 12.00,
-            'south_island' => 18.00,
-        ],
-        'medium' => [
-            'north_island' => 20.00,
-            'south_island' => 30.00,
-        ],
-        'large' => [
-            'north_island' => 75.00,
-            'south_island' => 110.00,
-        ],
+    /*
+     | What NZ Couriers charge G&M per box, copied from the "Cost" column in
+     | eDespatchIT: BEFORE the variable adjustment and GST below, exactly as the
+     | screen shows it. From the Te Awamutu (HLZ) depot:
+     |
+     |   north_island — Paraparaumu, rated KAP | LH (long haul)
+     |   south_island — Christchurch, rated CHC | NZ (inter-island)
+     |
+     | Long haul is the dearest North Island urban rate, so nowhere on the North
+     | Island is under-charged. Rates as at October 2026.
+     */
+    'courier_rates' => [
+        'box_015' => ['north_island' => 12.35, 'south_island' => 27.33],
+        'box_025' => ['north_island' => 19.56, 'south_island' => 40.33],
+        'box_030' => ['north_island' => 16.77, 'south_island' => 49.46],
+        'box_035' => ['north_island' => 19.49, 'south_island' => 57.66],
+        'box_040' => ['north_island' => 22.84, 'south_island' => 66.47],
+        'box_050' => ['north_island' => 27.63, 'south_island' => 82.18],
+        'box_060' => ['north_island' => 33.09, 'south_island' => 98.57],
+        'box_075' => ['north_island' => 41.23, 'south_island' => 123.14],
+        'box_085' => ['north_island' => 46.65, 'south_island' => 139.50],
+        'box_100' => ['north_island' => 54.84, 'south_island' => 164.08],
+        'box_125' => ['north_island' => 68.43, 'south_island' => 205.00],
     ],
 
     /*
-     | Added on top for rural delivery addresses. Couriers charge a rural
-     | surcharge on every consignment regardless of size.
+     | The percentage eDespatchIT adds on top of every box rate ("Includes
+     | agreed variable adjustments of 18.40%"). It moves with fuel prices, so it
+     | can be changed in .env without a deploy — then `php artisan config:cache`.
+     */
+    'variable_adjustment' => (float) env('NZC_VARIABLE_ADJUSTMENT', 18.4),
+
+    'gst' => 15,
+
+    /*
+     | Prepaid NZ Couriers satchels: one flat price to anywhere in the country,
+     | GST inclusive, and not subject to the variable adjustment.
+     */
+    'satchels' => [
+        'e20' => 12.00,
+        'e60' => 28.00,
+    ],
+
+    /*
+     | Added on top for rural delivery addresses, once per order.
      */
     'rural_surcharge' => 6.50,
 

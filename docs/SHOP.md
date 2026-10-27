@@ -15,61 +15,89 @@ A part is purchasable only if **all** of these hold (`Part::isPurchasable()`):
 | --- | --- |
 | visible, status `available` | Obvious, and stops double-selling |
 | has a price | Nothing to charge otherwise |
-| has a **shipping band** that is not `quote_only` | Freight cannot be priced without it |
+| has a **freight size** that is not truck freight | Freight cannot be priced without it |
 
 Anything failing the last two falls back to the existing **reserve for
 collection** flow, so nothing is lost — it just cannot be bought outright.
 
-### Shipping bands
+### Freight sizes
 
-Set per part, in the Parts Loader app when loading, or in Filament (including a
-**bulk "Set shipping band" action** for working through existing stock).
+Every part is given a **freight size**: the NZ Couriers satchel or box it goes in,
+picked from the same list the yard uses in eDespatchIT when printing a label. The
+price online is what that label costs, so the yard is not out of pocket and the
+customer is not overcharged.
 
-| Band | Meaning |
+| Size | Use |
 | --- | --- |
-| Small | Fits a courier bag |
-| Medium | Boxed, one person lifts it |
-| Large | Bulky, still couriable |
-| Quote only | Engines, doors, panels — **not sold online** |
+| E20 satchel | Door handles, sensors, small parts — one price anywhere |
+| E60 satchel | Bigger than a 0.015 m³ box |
+| 0.015 – 0.125 m³ box | Boxed parts, by the box's volume. 0.015 takes up to 10 kg, 0.025 up to 15 kg, 0.03 up to 20 kg, the rest up to 25 kg |
+| Truck / quote | Bumpers, doors, gearboxes, engines — **not sold online**, reserve instead |
 
-> **Existing parts have no band and are therefore not sold online until banded.**
-> That is deliberate: the alternative was defaulting everything to a guessed band
-> and silently under-charging freight on every large item.
+Set when loading in the Parts Loader app — which has a **measure the box** helper:
+type L × W × H in cm and the weight, and it picks the smallest box that fits — or
+for existing stock under **Manage Stock → Needs freight size**. Also in Filament,
+including a bulk **Set freight size** action.
 
-### Banding stock in bulk
+> **A part with no freight size is not sold online and not sent to Google.**
+> That is deliberate: guessing box sizes is what put headlights at $20 freight.
 
-To get existing stock banded quickly:
+### How the price is worked out
+
+[`config/shipping.php`](../config/shipping.php) holds the courier's **Cost**
+column from eDespatchIT, as the screen shows it, for each box to each island:
+
+- **North Island** is Paraparaumu (rated *long haul*) — the dearest North Island
+  urban rate, so nowhere on the North Island is under-charged
+- **South Island** is Christchurch (rated *inter-island*)
+
+The customer pays cost **+ the variable adjustment** (18.4%, the fuel-linked
+figure under the eDespatchIT total) **+ GST**, rounded up to the dollar. Satchels
+are a flat price anywhere.
+
+When the adjustment changes, set `NZC_VARIABLE_ADJUSTMENT` in `.env` and run
+`php artisan config:cache` — checkout and Google both follow. No deploy needed.
+When the box rates themselves change, update `courier_rates` and deploy.
+
+**A part is charged the cheapest way to send it, from its own size upward.** A
+part fits in anything bigger, and the courier rates are not in size order: a
+0.015 m³ box to the South Island costs more than an E60 satchel, so a 0.015 m³
+part is charged — and sent — as an E60 to the South Island. That is the yard's
+own rule of thumb, applied automatically. The yard's order email and **Online
+Orders** in the Parts Loader app say what to send each part as, so the label
+matches what the customer paid.
+
+To print the current table:
+
+```bash
+php artisan tinker --execute='foreach (App\Enums\ShippingBand::cases() as $s) echo $s->shortLabel(), "  ", $s->isShippable() ? $s->ratesSummary() : "not sold online", PHP_EOL;'
+```
+
+### Each part is charged its own freight
+
+NZ Couriers charge per item, even several items on one consignment, so a cart is
+charged the **sum** of each part's freight. (This used to charge only the
+biggest part, which lost the full freight on every other box — a pair of
+headlights to Christchurch is two boxes.) Rural adds a flat surcharge per order.
+
+### Sizing stock in bulk
 
 ```bash
 php artisan parts:guess-shipping-bands --dry-run   # preview, saves nothing
 php artisan parts:guess-shipping-bands             # apply
 ```
 
-It assigns a band from keywords in the subcategory and title, falling back to
-the part's category. Keywords are ordered smallest to largest on purpose, so a
-specific component beats a general assembly word — otherwise "Gearbox ECU"
-bands as a whole gearbox. Matching is anchored at a word start, so "ecu" does
-not match the middle of "nosecut".
+Only sizes what is safe to size from a part's name: small parts as an **E20
+satchel**, and truck freight (bumpers, doors, bonnets, engines, gearboxes,
+nosecuts…) as **Truck / quote**. Anything boxed is left for the yard to measure.
+Keywords are matched against the subcategory and title, smallest first, so a
+specific component beats a general assembly word ("Gearbox ECU" is a satchel,
+not a gearbox), and anchored at a word start so "ecu" does not match the middle
+of "nosecut".
 
-**It only touches parts with no band at all**, so it is safe to re-run and will
-never overwrite a correction made in the admin. `--force` re-bands everything,
+**It only touches parts with no size at all**, so it is safe to re-run and will
+never overwrite a correction made in the admin. `--force` re-sizes everything,
 including corrections.
-
-Parts in **SPECIALS** are deliberately left unbanded — the category is too mixed
-to guess.
-
-These are estimates. Review them in Filament afterwards using the shipping band
-filter, especially anything large or awkward: a wrong band is a silent margin
-leak, not something anyone will notice.
-
-Rates live in [`config/shipping.php`](../config/shipping.php) — **review them
-against real courier invoices**, they are estimates.
-
-### Freight is charged once, at the highest band
-
-A cart with a small, a medium and a large part is charged the **large** rate
-once, not the sum of all three. Several parts normally travel as one
-consignment, so summing would overcharge badly. Rural adds a flat surcharge.
 
 ---
 

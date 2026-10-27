@@ -64,19 +64,24 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[Steve]** Put cron logging back to `/dev/null` in
       `~/container/crontabs/crontab` and delete `storage/logs/cron.log`
       (it grows ~1 MB/day otherwise)
-- [ ] **[Steve]** Apply the shipping bands — safe to re-run, only touches parts with
-      no band, never overwrites a correction:
+- [ ] **[Steve]** Deploy the freight-size change and run `php artisan migrate --force`.
+      Small parts become E20 satchels; **Medium and Large parts lose their band and
+      drop out of the shop and Google until measured** — there is no honest way to
+      convert them.
+- [ ] **[Steve]** Size the obvious ones — satchel parts and truck freight. Safe to
+      re-run, only touches parts with no size, never overwrites a correction:
       ```bash
       cd ~/container/application
       php artisan parts:guess-shipping-bands
       php artisan cache:clear
       ```
-- [ ] **[G&M]** Review the bands in **Admin → Catalogue → Parts** (filter by shipping
-      band). They were guessed from the part name. A wrong band does not error — it
-      quietly loses money on every sale.
+- [ ] **[G&M]** Measure the rest: Parts Loader app → **Manage Stock → Needs freight
+      size**. Tap **Freight** on a part, type the box's L × W × H and weight, and it
+      picks the box. A size that is too small does not error — it quietly loses money
+      on every sale.
 - [ ] **[G&M]** Load and price the rest of the stock. Only 4 parts are live, and a part
       with no price cannot be sold online *or* listed on Google. Parts loaded from
-      here get a shipping size in the Parts Loader app, so this backlog is a one-off.
+      here get a freight size in the Parts Loader app, so this backlog is a one-off.
 
 ## Phase 3 — Turn on card payments
 
@@ -116,8 +121,14 @@ prove the chain works. Test webhooks take a minute to recreate.
 
 ## Phase 5 — Worth doing once live
 
-- [ ] **[Steve/G&M]** Check the freight rates against real courier invoices — the
-      values in `config/shipping.php` are estimates, not quotes
+- [ ] **[Steve/G&M]** Check the first few orders' freight against the courier
+      invoices. Rates are from G&M's own eDespatchIT screen (October 2026), so they
+      should match. When the variable adjustment moves, set `NZC_VARIABLE_ADJUSTMENT`
+      in `.env` and `config:cache`
+- [ ] **[Steve]** Consider GoSweetSpot (NZ Couriers' integration API): create the
+      consignment and label straight from a paid order, and optionally quote the
+      exact address at checkout. Needs every part's box size, which this freight-size
+      work provides. Google still needs the fixed table.
 - [ ] **[Steve]** Add a `sitemap.xml` and `robots.txt` — neither exists. Cheapest
       remaining SEO gap; a sitemap of part pages helps Google find stock as it loads.
 - [ ] **[G&M]** Consider Google **free local listings** — G&M has a physical yard, so
@@ -142,20 +153,33 @@ trader cannot contract out of the guarantees on used goods sold to consumers.
 | Return freight — change of mind | Customer pays | Confirm |
 | Return freight — faulty part | G&M pays | Confirm |
 | Refund turnaround | 10 working days | Confirm |
-| Small freight — North / South | $12 / $18 | Check vs invoices |
-| Medium freight — North / South | $20 / $30 | Check vs invoices |
-| Large freight — North / South | $75 / $110 | Check vs invoices |
-| Rural delivery surcharge | +$6.50 | Check vs invoices |
+| E20 / E60 satchel price | $12 / $28 anywhere, incl. GST | Confirm, and that satchels carry no fuel adjustment |
+| Where an E60 sits | Bigger than a 0.015 m³ box, smaller than 0.025 | Confirm — it decides which parts get sent South as an E60 |
+| E60 weight limit | Assumed to take anything a 0.015 m³ box does (10 kg) | Confirm |
+| 0.025 m³ box to North Island | Charged as a 0.03 m³ box — the screen shows 0.03 **cheaper** ($16.77 vs $19.56) | Check that screenshot figure |
+| Multi-part orders | Each part charged its own freight | Confirm. Option: refund the difference when parts are packed together |
+| Rural delivery surcharge | +$6.50 per order | Check vs invoices — per order or per item? |
 | Free-freight threshold | Off | Decide if wanted |
 
 ### How freight is charged
 
-A basket is charged the **largest band in it, once** — not the sum of every part.
-Several parts normally travel as one consignment, so summing would overcharge badly.
-A cart with a headlight, an alternator and a door pays the door's rate and no more.
+Each part has a **freight size** — the NZ Couriers satchel or box it goes in, the
+same list as eDespatchIT. The price is the courier's cost from G&M's own eDespatchIT
+screen, plus the variable adjustment, plus GST, rounded up to the dollar. North
+Island is priced to Paraparaumu (long haul), South Island to Christchurch.
 
-Parts too big to price this way — engines, gearboxes, nosecuts, panels, seats — are
-banded **quote only**. They are not sold online and not sent to Google; their pages
+| Example | North Island | South Island |
+| --- | ---: | ---: |
+| Door handle, sensor (E20 satchel) | $12 | $12 |
+| Vacuum pump (0.015 m³ box — South goes as an E60) | $17 | $28 |
+| 0.05 m³ box | $38 | $112 |
+| Big headlight (0.125 m³ box) | $94 | $280 |
+
+A basket pays **each part's freight**, because NZ Couriers charge per item even on
+one consignment.
+
+Bumpers, doors, gearboxes, engines, nosecuts and panels go by **truck** and are
+sized *Truck / quote*. They are not sold online and not sent to Google; their pages
 offer *Reserve for collection* instead, so nothing is lost.
 
 ---

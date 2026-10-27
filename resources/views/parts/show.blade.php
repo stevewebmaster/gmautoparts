@@ -173,7 +173,7 @@
                 <div class="col-xxl-4 col-lg-5">
                     <aside class="sidebar-area">
 
-                        {{-- Buy online. Only parts with a real shipping band can be
+                        {{-- Buy online. Only parts with a courier freight size can be
                              bought; anything quote-only falls through to Reserve. --}}
                         @if($part->isPurchasable())
                             <div class="widget widget-style-smoke shadow-style gm-reserve-widget">
@@ -181,10 +181,7 @@
                                     <div class="inventory-owner-top">
                                         <div class="content">
                                             <h6 class="box-title">Buy This Part</h6>
-                                            <p class="saving">
-                                                ${{ number_format((float) $part->price, 2) }}
-                                                &middot; {{ $part->shipping_band->shortLabel() }} freight
-                                            </p>
+                                            <p class="saving">${{ number_format((float) $part->price, 2) }}</p>
                                         </div>
                                     </div>
                                     @if($errors->has('cart'))
@@ -199,7 +196,10 @@
                                         </form>
                                         <p class="gm-reserve-note">
                                             Secure payment by card. Free collection from Te Awamutu, or we
-                                            courier NZ-wide &mdash; freight is worked out at checkout.
+                                            courier NZ-wide:
+                                            @foreach($part->shipping_band->rates() as $region => $rate)
+                                                {{ config("shipping.regions.{$region}") }} ${{ number_format($rate, 2) }}@if(! $loop->last),@else.@endif
+                                            @endforeach
                                         </p>
                                     </div>
                                 </div>

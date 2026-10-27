@@ -74,10 +74,10 @@ class PartResource extends Resource
                         ->default(1)
                         ->required(),
                     Forms\Components\Select::make('shipping_band')
-                        ->label('Shipping band')
-                        ->options(ShippingBand::options())
+                        ->label('Freight size')
+                        ->options(ShippingBand::optionsWithRates())
                         ->native(false)
-                        ->helperText('Sets the freight price online. Leave empty and the part is NOT sold online — it falls back to reserve/enquire and is left out of the Google feed.')
+                        ->helperText('The NZ Couriers satchel or box it goes in — pick it the same way as in eDespatchIT. Sets the freight price online. Leave empty and the part is NOT sold online — it falls back to reserve/enquire and is left out of the Google feed.')
                         ->columnSpanFull(),
                 ])->columns(2),
                 Forms\Components\Section::make('Vehicle compatibility')->schema([
@@ -151,8 +151,8 @@ class PartResource extends Resource
                     ->options(PartStatus::options())
                     ->multiple(),
                 Tables\Filters\SelectFilter::make('shipping_band')
-                    ->label('Shipping band')
-                    ->options(ShippingBand::options() + ['__none' => 'Not set — not sold online'])
+                    ->label('Freight size')
+                    ->options(['__none' => 'Not set — not sold online'] + ShippingBand::options())
                     ->query(function ($query, array $data) {
                         if (($data['value'] ?? null) === '__none') {
                             return $query->whereNull('shipping_band');
@@ -175,16 +175,16 @@ class PartResource extends Resource
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
-                // Bulk banding: existing stock has no band, so it needs working
-                // through in batches rather than one part at a time.
+                // Bulk sizing: for a run of parts that all go in the same
+                // satchel or box, rather than one part at a time.
                 Tables\Actions\BulkAction::make('setShippingBand')
-                    ->label('Set shipping band')
+                    ->label('Set freight size')
                     ->icon('heroicon-o-truck')
                     ->color('info')
                     ->form([
                         Forms\Components\Select::make('shipping_band')
-                            ->label('Shipping band')
-                            ->options(ShippingBand::options())
+                            ->label('Freight size')
+                            ->options(ShippingBand::optionsWithRates())
                             ->required()
                             ->native(false),
                     ])

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
  *  - Parts with no price are skipped rather than sent at 0.00, because Google
  *    rejects a null or zero price outright.
  *  - Quote-only parts are skipped too: Google requires a working checkout, and
- *    a part with no shipping band cannot be bought online.
+ *    a part with no freight size cannot be bought online.
  */
 class GoogleProductFeed
 {
@@ -145,8 +145,8 @@ class GoogleProductFeed
     /**
      * Freight to each island, at the rates the checkout charges. Without this
      * Merchant Center falls back to the account's shipping settings, which want
-     * a weight per product — and parts are banded by size, never weighed. A
-     * price here overrides the account settings for those postcodes, so no
+     * a weight per product — and parts are sized by courier box, never weighed.
+     * A price here overrides the account settings for those postcodes, so no
      * weight is needed.
      *
      * The rural surcharge is left out: it depends on the address rather than

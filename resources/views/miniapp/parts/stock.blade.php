@@ -20,9 +20,12 @@
     .stock-status--on_hold   { background: #fef3c7; color: #92400e; }
     .stock-status--sold      { background: #fee2e2; color: #991b1b; }
     .stock-status--withdrawn { background: #e5e7eb; color: #374151; }
+    .stock-freight { display: inline-block; margin: 0.35rem 0 0 0.3rem; padding: 0.15em 0.6em; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: #e0f2fe; color: #075985; }
+    .stock-freight--none { background: #fee2e2; color: #991b1b; }
     .stock-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
     .stock-actions form { margin: 0; }
     .btn-stock { padding: 0.55rem 0.9rem; font-size: 0.88rem; font-weight: 600; border-radius: 10px; border: 1px solid #d1d5db; background: #fff; color: #1f2937; cursor: pointer; }
+    a.btn-stock { display: inline-block; text-decoration: none; }
     .btn-stock:active { transform: scale(0.98); }
     .btn-stock--sold { background: #b91c1c; border-color: #b91c1c; color: #fff; }
     .btn-stock--back { background: #047857; border-color: #047857; color: #fff; }
@@ -35,23 +38,28 @@
 @section('content')
     <div class="card-app">
         <h1 class="page-title">Manage Stock</h1>
-        <p class="lead-text">Mark parts sold as they leave the yard. Sold parts stay on the website but drop out of the parts listing.</p>
+        <p class="lead-text">Mark parts sold as they leave the yard. Sold parts stay on the website but drop out of the parts listing. A part needs a freight size before it can be bought online.</p>
 
         <form class="stock-search" method="get" action="{{ route('app.stock') }}">
             <input type="search" name="q" value="{{ $search }}" placeholder="Search title, stock #, make, model" inputmode="search">
             @if($status !== '')
                 <input type="hidden" name="status" value="{{ $status }}">
             @endif
+            @if($unsized)
+                <input type="hidden" name="unsized" value="1">
+            @endif
             <button type="submit" class="btn-app btn-primary-app">Search</button>
         </form>
 
         <div class="stock-filters">
             <a href="{{ route('app.stock', array_filter(['q' => $search])) }}"
-               class="stock-chip {{ $status === '' ? 'is-active' : '' }}">All</a>
+               class="stock-chip {{ $status === '' && ! $unsized ? 'is-active' : '' }}">All</a>
             @foreach(\App\Enums\PartStatus::cases() as $case)
                 <a href="{{ route('app.stock', array_filter(['q' => $search, 'status' => $case->value])) }}"
                    class="stock-chip {{ $status === $case->value ? 'is-active' : '' }}">{{ $case->label() }}</a>
             @endforeach
+            <a href="{{ route('app.stock', array_filter(['q' => $search, 'unsized' => 1])) }}"
+               class="stock-chip {{ $unsized ? 'is-active' : '' }}">Needs freight size</a>
         </div>
     </div>
 
@@ -69,6 +77,9 @@
                         {{ collect([$part->stock_number ? '#' . $part->stock_number : null, $part->year, $part->make, $part->model])->filter()->implode(' · ') ?: 'No stock details' }}
                     </p>
                     <span class="stock-status stock-status--{{ $part->status->value }}">{{ $part->status->label() }}</span>
+                    <span class="stock-freight {{ $part->shipping_band ? '' : 'stock-freight--none' }}">
+                        {{ $part->shipping_band?->shortLabel() ?? 'No freight size' }}
+                    </span>
 
                     <div class="stock-actions">
                         @if($part->status !== \App\Enums\PartStatus::Sold)
@@ -92,12 +103,15 @@
                                 <button type="submit" class="btn-stock">On Hold</button>
                             </form>
                         @endif
+                        <a href="{{ route('app.stock.freight', $part) }}" class="btn-stock">Freight</a>
                     </div>
                 </div>
             </div>
         @empty
             <p class="stock-empty">
-                @if($search !== '' || $status !== '')
+                @if($unsized && $search === '')
+                    Every part on sale has a freight size.
+                @elseif($search !== '' || $status !== '' || $unsized)
                     No parts match that search.
                 @else
                     No parts yet. Add one from the dashboard.

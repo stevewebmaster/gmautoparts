@@ -24,9 +24,10 @@ Every number is a link to the list behind it.
 
 ### The Google Shopping panel
 
-Google will only list a part if it has **a photo**, **a price**, and **a shipping
-band**. The panel counts the parts missing each of those and links straight to
-them, so you can work through the list. Parts marked *Quote only*, *Hidden*, or
+Google will only list a part if it has **a photo**, **a price**, and **a freight
+size**. The panel counts the parts missing each of those and links straight to
+them, so you can work through the list. To measure parts in the yard, use the
+Parts Loader app: **Manage Stock → Needs freight size**. Parts marked *Quote only*, *Hidden*, or
 *Sold* are left out on purpose — those are fine.
 
 You can see the same thing per part: the **Google** column on the Parts list says

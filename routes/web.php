@@ -77,6 +77,8 @@ Route::prefix('app')->name('app.')->middleware(['web', 'miniapp.auth'])->group(f
     Route::get('reservations', [\App\Http\Controllers\MiniappController::class, 'reservations'])->name('reservations');
     Route::post('reservations/{reservation}/status', [\App\Http\Controllers\MiniappController::class, 'updateReservationStatus'])->name('reservations.status');
     Route::post('stock/{part}/status', [\App\Http\Controllers\MiniappController::class, 'updatePartStatus'])->name('stock.status');
+    Route::get('stock/{part}/freight', [\App\Http\Controllers\MiniappController::class, 'editFreight'])->name('stock.freight');
+    Route::post('stock/{part}/freight', [\App\Http\Controllers\MiniappController::class, 'updateFreight'])->name('stock.freight.update');
     Route::get('vehicles/new', [\App\Http\Controllers\MiniappController::class, 'createVehicle'])->name('vehicles.create');
     Route::post('vehicles', [\App\Http\Controllers\MiniappController::class, 'storeVehicle'])->name('vehicles.store');
 });

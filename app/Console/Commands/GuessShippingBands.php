@@ -8,105 +8,112 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 /**
- * One-off helper to get existing stock banded so it can be sold online.
+ * One-off helper to size the parts that can be sized without a tape measure.
  *
- * This is a STARTING POINT, not an authority. Categories are too coarse on
- * their own — an ECU and a gearbox both live under GEARBOX — so keyword rules
- * matched against the subcategory and title take precedence, and the category
- * only supplies a fallback.
+ * Only two calls are safe from a part's name: small parts that go in an E20
+ * satchel, and truck freight. Anything boxed has to be measured — box sizes
+ * span more than $200 of South Island freight, and guessing them is how
+ * headlights ended up at $20. Those are left unsized for the yard to measure
+ * in the Parts Loader app (Manage Stock → Needs freight size).
  *
- * By default it only touches parts with no band at all, so it can be re-run
+ * Categories are too coarse on their own — an ECU and a gearbox both live
+ * under GEARBOX — so keyword rules matched against the subcategory and title
+ * take precedence, and the category only supplies a fallback.
+ *
+ * By default it only touches parts with no size at all, so it can be re-run
  * safely and will never overwrite a correction made in the admin.
  */
 class GuessShippingBands extends Command
 {
     protected $signature = 'parts:guess-shipping-bands
                             {--dry-run : Show what would change without saving}
-                            {--force : Also re-band parts that already have a band (overwrites corrections)}';
+                            {--force : Also re-size parts that already have a size (overwrites corrections)}';
 
-    protected $description = 'Assign a starting shipping band to parts based on category and title keywords.';
+    protected $description = 'Size parts that are obviously satchel or truck freight, from category and title keywords.';
 
-    /**
-     * Checked against "{subcategory} {title}", first match wins, so order
-     * matters: more specific phrases must come before looser ones.
-     */
     /**
      * Checked against "{subcategory} {title}", first match wins.
      *
      * Ordered smallest to largest deliberately: a specific component name must
-     * beat a general assembly word, or "Gearbox ECU" bands as a whole gearbox
+     * beat a general assembly word, or "Gearbox ECU" sizes as a whole gearbox
      * because the title happens to mention one.
+     *
+     * A null means "boxed — measure it". It still has to match and stop here,
+     * or "Engine Alternator" would fall through to the ENGINE category and be
+     * marked truck freight.
      */
     protected array $keywordBands = [
-        // Fits a courier bag.
-        'ecu' => ShippingBand::Small,
-        'control module' => ShippingBand::Small,
-        'control unit' => ShippingBand::Small,
-        'sensor' => ShippingBand::Small,
-        'solenoid' => ShippingBand::Small,
-        'check strap' => ShippingBand::Small,
-        'cable' => ShippingBand::Small,
-        'repeater' => ShippingBand::Small,
-        'driving light' => ShippingBand::Small,
-        'clock spring' => ShippingBand::Small,
-        'resistor' => ShippingBand::Small,
-        'heater tap' => ShippingBand::Small,
-        'over flow bottle' => ShippingBand::Small,
-        'fuel flap' => ShippingBand::Small,
-        'speaker cover' => ShippingBand::Small,
-        'fuse box' => ShippingBand::Small,
-        'coil pack' => ShippingBand::Small,
-        'distributor' => ShippingBand::Small,
-        'egr valve' => ShippingBand::Small,
-        'shifter' => ShippingBand::Small,
-        'guages' => ShippingBand::Small,
-        'gauges' => ShippingBand::Small,
+        // Fits an E20 satchel.
+        'ecu' => ShippingBand::SatchelE20,
+        'control module' => ShippingBand::SatchelE20,
+        'control unit' => ShippingBand::SatchelE20,
+        'sensor' => ShippingBand::SatchelE20,
+        'solenoid' => ShippingBand::SatchelE20,
+        'check strap' => ShippingBand::SatchelE20,
+        'cable' => ShippingBand::SatchelE20,
+        'repeater' => ShippingBand::SatchelE20,
+        'driving light' => ShippingBand::SatchelE20,
+        'clock spring' => ShippingBand::SatchelE20,
+        'resistor' => ShippingBand::SatchelE20,
+        'heater tap' => ShippingBand::SatchelE20,
+        'fuel flap' => ShippingBand::SatchelE20,
+        'speaker cover' => ShippingBand::SatchelE20,
+        'coil pack' => ShippingBand::SatchelE20,
+        // Before 'door lh', so "Door LH Exterior Handle" is not a whole door.
+        'handle' => ShippingBand::SatchelE20,
 
-        // Boxed, one person lifts it.
-        'alternator' => ShippingBand::Medium,
-        'starter' => ShippingBand::Medium,
-        'headlight' => ShippingBand::Medium,
-        'tail lamp' => ShippingBand::Medium,
-        'instrument cluster' => ShippingBand::Medium,
-        'water pump' => ShippingBand::Medium,
-        'steering pump' => ShippingBand::Medium,
-        'air conditioning pump' => ShippingBand::Medium,
-        'heater fan' => ShippingBand::Medium,
-        'heater control' => ShippingBand::Medium,
-        'throttle body' => ShippingBand::Medium,
-        'air flow metre' => ShippingBand::Medium,
-        'lower arm' => ShippingBand::Medium,
-        'control arm' => ShippingBand::Medium,
-        'glovebox' => ShippingBand::Medium,
-        'airbag' => ShippingBand::Medium,
-        'air bag' => ShippingBand::Medium,
-        'intake manifold' => ShippingBand::Medium,
-        'exhaust manifold' => ShippingBand::Medium,
-        'shroud' => ShippingBand::Medium,
-        'front cover' => ShippingBand::Medium,
+        // Boxed — measure it.
+        'over flow bottle' => null,
+        'fuse box' => null,
+        'distributor' => null,
+        'egr valve' => null,
+        'shifter' => null,
+        'guages' => null,
+        'gauges' => null,
+        'alternator' => null,
+        'starter' => null,
+        'headlight' => null,
+        'tail lamp' => null,
+        'instrument cluster' => null,
+        'water pump' => null,
+        'vacuum pump' => null,
+        'steering pump' => null,
+        'air conditioning pump' => null,
+        'heater fan' => null,
+        'heater control' => null,
+        'throttle body' => null,
+        'air flow metre' => null,
+        'lower arm' => null,
+        'control arm' => null,
+        'glovebox' => null,
+        'airbag' => null,
+        'air bag' => null,
+        'intake manifold' => null,
+        'exhaust manifold' => null,
+        'shroud' => null,
+        'front cover' => null,
+        'guard' => null,
+        'grille' => null,
+        'radiator' => null,
+        'exhaust' => null,
+        'carpet' => null,
+        'hoodlining' => null,
+        'driveshaft' => null,
+        'driveaxle' => null,
+        'steering rack' => null,
+        'cradle' => null,
+        'centre console' => null,
+        'tank' => null,
+        'wheel' => null,
 
-        // Bulky but still couriable.
-        'bonnet' => ShippingBand::Large,
-        'bootlid' => ShippingBand::Large,
-        'tailgate' => ShippingBand::Large,
-        'bumper' => ShippingBand::Large,
-        'guard' => ShippingBand::Large,
-        'grille' => ShippingBand::Large,
-        'door lh' => ShippingBand::Large,
-        'door rh' => ShippingBand::Large,
-        'radiator' => ShippingBand::Large,
-        'exhaust' => ShippingBand::Large,
-        'carpet' => ShippingBand::Large,
-        'hoodlining' => ShippingBand::Large,
-        'driveshaft' => ShippingBand::Large,
-        'driveaxle' => ShippingBand::Large,
-        'steering rack' => ShippingBand::Large,
-        'cradle' => ShippingBand::Large,
-        'centre console' => ShippingBand::Large,
-        'tank' => ShippingBand::Large,
-        'wheel' => ShippingBand::Large,
-
-        // Too big or heavy to courier at a flat rate.
+        // Truck freight. G&M: "bumpers, doors, gearboxes, engines are all
+        // truck items". Bonnets, bootlids and tailgates are bigger again.
+        'bonnet' => ShippingBand::QuoteOnly,
+        'bootlid' => ShippingBand::QuoteOnly,
+        'tailgate' => ShippingBand::QuoteOnly,
+        'bumper' => ShippingBand::QuoteOnly,
+        'door lh' => ShippingBand::QuoteOnly,
+        'door rh' => ShippingBand::QuoteOnly,
         'engine assembl' => ShippingBand::QuoteOnly,
         'engine conversion' => ShippingBand::QuoteOnly,
         'cylinder block' => ShippingBand::QuoteOnly,
@@ -128,29 +135,16 @@ class GuessShippingBands extends Command
         'seat' => ShippingBand::QuoteOnly,
     ];
 
-    /** Fallback when no keyword matches, by category name. */
+    /**
+     * Fallback when no keyword matches, by category name. Only categories
+     * that are truck freight through and through — every other category
+     * holds parts of too many sizes to guess. DOOR is not one: mirrors and
+     * regulators live there too, and whole doors are caught by keyword.
+     */
     protected array $categoryBands = [
         'NOW DISMANTLING' => ShippingBand::QuoteOnly,
         'ENGINE' => ShippingBand::QuoteOnly,
         'GEARBOX' => ShippingBand::QuoteOnly,
-        'DIFFERENTIAL' => ShippingBand::Large,
-        'BODYPANELS & FRONT PARTS' => ShippingBand::Large,
-        'REAR BODY PARTS & PANELS' => ShippingBand::Large,
-        'DOOR' => ShippingBand::Large,
-        'INTERIOR' => ShippingBand::Large,
-        'EXHAUST SYSTEM' => ShippingBand::Large,
-        'WHEELS' => ShippingBand::Large,
-        'DASH' => ShippingBand::Medium,
-        'STEERING' => ShippingBand::Medium,
-        'FRONT SUSPENSION' => ShippingBand::Medium,
-        'REAR SUSPENSION' => ShippingBand::Medium,
-        'ENGINE COOLING' => ShippingBand::Medium,
-        'FUEL DELIVERY' => ShippingBand::Medium,
-        'BRAKES' => ShippingBand::Medium,
-        'HEAT & A/C' => ShippingBand::Medium,
-        'LIGHTS' => ShippingBand::Medium,
-        'ELECTRICAL' => ShippingBand::Small,
-        // SPECIALS is deliberately absent: too mixed to guess, left unbanded.
     ];
 
     public function handle(): int
@@ -187,23 +181,22 @@ class GuessShippingBands extends Command
         });
 
         if ($total === 0) {
-            $this->info($force ? 'No parts found.' : 'Every part already has a shipping band. Use --force to re-band.');
+            $this->info($force ? 'No parts found.' : 'Every part already has a freight size. Use --force to re-size.');
 
             return self::SUCCESS;
         }
 
         $this->newLine();
         $this->table(
-            ['Band', 'Parts'],
+            ['Freight size', 'Parts'],
             collect(ShippingBand::cases())
-                ->map(fn (ShippingBand $b) => [$b->shortLabel(), $counts[$b->value] ?? 0])
-                ->push(['Left unbanded (no rule matched)', $skipped])
+                ->filter(fn (ShippingBand $b) => isset($counts[$b->value]))
+                ->map(fn (ShippingBand $b) => [$b->shortLabel(), $counts[$b->value]])
+                ->push(['Left to measure', $skipped])
                 ->all(),
         );
 
-        $sellable = ($counts[ShippingBand::Small->value] ?? 0)
-            + ($counts[ShippingBand::Medium->value] ?? 0)
-            + ($counts[ShippingBand::Large->value] ?? 0);
+        $sellable = collect(ShippingBand::shippable())->sum(fn (string $value) => $counts[$value] ?? 0);
 
         $this->line("  {$sellable} of {$total} parts would become sellable online.");
 
@@ -212,7 +205,7 @@ class GuessShippingBands extends Command
             $this->warn('Dry run — nothing was saved. Re-run without --dry-run to apply.');
         } else {
             $this->newLine();
-            $this->info('Done. These are estimates — review them in the admin, especially anything large or awkward.');
+            $this->info('Done. Measure the rest in the Parts Loader app: Manage Stock → Needs freight size.');
         }
 
         return self::SUCCESS;

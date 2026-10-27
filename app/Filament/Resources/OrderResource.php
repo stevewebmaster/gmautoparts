@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
+use App\Enums\ShippingBand;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use Filament\Forms;
@@ -67,9 +68,10 @@ class OrderResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('title')->disabled(),
                         Forms\Components\TextInput::make('price')->prefix('$')->disabled(),
-                        Forms\Components\TextInput::make('shipping_band')->disabled(),
+                        Forms\Components\TextInput::make('shipping')->label('Freight')->prefix('$')->disabled(),
+                        Forms\Components\Select::make('ship_as')->label('Send as')->options(ShippingBand::options())->disabled(),
                     ])
-                    ->columns(3)
+                    ->columns(4)
                     ->disabled()
                     ->columnSpanFull(),
             ])->collapsed(),

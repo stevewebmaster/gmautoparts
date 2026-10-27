@@ -6,12 +6,16 @@
 **Method:** {{ $order->isPickup() ? 'CUSTOMER COLLECTING' : 'DELIVERY' }}
 
 <x-mail::table>
-| Part | Band | Price |
-| :--- | :--- | ----: |
+| Part | Send as | Freight | Price |
+| :--- | :--- | ----: | ----: |
 @foreach($order->items as $item)
-| {{ $item->title }} | {{ $item->shipping_band?->shortLabel() ?? '—' }} | ${{ number_format((float) $item->price, 2) }} |
+| {{ $item->title }} | {{ $item->ship_as?->shortLabel() ?? '—' }} | {{ $item->shipping !== null ? '$' . number_format((float) $item->shipping, 2) : '—' }} | ${{ number_format((float) $item->price, 2) }} |
 @endforeach
 </x-mail::table>
+
+@unless($order->isPickup())
+Ticket each part as the **Send as** size in eDespatchIT — that is what the customer paid for.
+@endunless
 
 Freight charged: **${{ number_format((float) $order->shipping, 2) }}**@if($order->is_rural) (includes rural surcharge)@endif
 
