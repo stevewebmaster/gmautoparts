@@ -17,6 +17,9 @@
  | Rates are deliberately in config, not the database: they change rarely, and a
  | wrong rate is a silent margin leak rather than something anyone would notice.
  | Review them against actual courier invoices.
+ |
+ | The Google product feed sends these same rates per item, so Google Shopping
+ | follows any change here on its next fetch.
  */
 return [
     'regions' => [

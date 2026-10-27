@@ -79,6 +79,13 @@ to see Google's verdict.
   without that, a stray control byte pasted into a description would make the
   whole feed unparseable.
 - Up to 10 `additional_image_link` entries per item.
+- **`shipping`** is sent twice per item, once per island, at the band's rate from
+  `config/shipping.php`: postcodes `0*-6*` (North Island) and `7*-9*` (South
+  Island). This is what stops Merchant Center flagging **"Missing shipping
+  weight"**. Parts are never weighed, and a feed price overrides the account's
+  shipping settings for those postcodes, so Google no longer needs a weight.
+  The rural surcharge is not included, because it depends on the address rather
+  than the postcode.
 
 ---
 

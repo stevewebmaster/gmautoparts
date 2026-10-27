@@ -53,6 +53,15 @@ class GoogleProductFeed
     /** Google accepts up to 10 additional images per item. */
     public const MAX_ADDITIONAL_IMAGES = 10;
 
+    /**
+     * NZ postcodes split cleanly by island — 0–6 North, 7–9 South — so each
+     * checkout region maps to one Google postcode range.
+     */
+    public const REGION_POSTCODES = [
+        'north_island' => '0*-6*',
+        'south_island' => '7*-9*',
+    ];
+
     public function build(): string
     {
         $items = [];
@@ -98,7 +107,7 @@ class GoogleProductFeed
             'link' => PartPresenter::url($part),
             'image_link' => $images[0],
             'availability' => $part->status === PartStatus::Available ? 'in_stock' : 'out_of_stock',
-            'price' => number_format((float) $part->price, 2, '.', '') . ' ' . self::CURRENCY,
+            'price' => $this->money((float) $part->price),
             'condition' => 'used',
             'identifier_exists' => 'no',
             'google_product_category' => self::GOOGLE_CATEGORY,
@@ -118,9 +127,50 @@ class GoogleProductFeed
             $xml[] = '      <g:additional_image_link>' . $this->escape($image) . '</g:additional_image_link>';
         }
 
+        foreach ($this->shipping($part) as $shipping) {
+            $xml[] = '      <g:shipping>';
+
+            foreach ($shipping as $tag => $value) {
+                $xml[] = '        <g:' . $tag . '>' . $this->escape($value) . '</g:' . $tag . '>';
+            }
+
+            $xml[] = '      </g:shipping>';
+        }
+
         $xml[] = '    </item>';
 
         return implode("\n", $xml);
+    }
+
+    /**
+     * Freight to each island, at the rates the checkout charges. Without this
+     * Merchant Center falls back to the account's shipping settings, which want
+     * a weight per product — and parts are banded by size, never weighed. A
+     * price here overrides the account settings for those postcodes, so no
+     * weight is needed.
+     *
+     * The rural surcharge is left out: it depends on the address rather than
+     * the postcode range, so Google shows the urban rate.
+     */
+    protected function shipping(Part $part): array
+    {
+        $rates = [];
+
+        foreach (self::REGION_POSTCODES as $region => $postcodes) {
+            $rates[] = [
+                'country' => 'NZ',
+                'postal_code' => $postcodes,
+                'service' => 'Courier',
+                'price' => $this->money($part->shipping_band->rate($region)),
+            ];
+        }
+
+        return $rates;
+    }
+
+    protected function money(float $amount): string
+    {
+        return number_format($amount, 2, '.', '') . ' ' . self::CURRENCY;
     }
 
     /**
