@@ -10,6 +10,34 @@ This guide explains how to manage your website content using the Admin panel.
 
 ---
 
+## The dashboard
+
+The page you land on after logging in is your dashboard. It shows:
+
+- **Orders to pack** — paid for, not yet sent. Click it to see them.
+- **Parts on hold** — reserved for a customer.
+- **Parts on the site** and **Vehicles dismantling** — what the public can see.
+- **Google Shopping** — how many parts are being sent to Google, and what is
+  keeping the rest out.
+
+Every number is a link to the list behind it.
+
+### The Google Shopping panel
+
+Google will only list a part if it has **a photo**, **a price**, and **a shipping
+band**. The panel counts the parts missing each of those and links straight to
+them, so you can work through the list. Parts marked *Quote only*, *Hidden*, or
+*Sold* are left out on purpose — those are fine.
+
+You can see the same thing per part: the **Google** column on the Parts list says
+whether each part is in the feed, or what it is missing.
+
+**One thing this panel cannot tell you:** whether Google has *approved* each
+part. It shows what your website sends. If Google rejects something, that shows
+up in Google Merchant Center, not here.
+
+---
+
 ## Adding and editing parts
 
 1. Go to **Admin** → **Catalogue** → **Parts**.
@@ -120,6 +148,8 @@ You can **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: m
 
 | Task                 | Where in Admin                          |
 |----------------------|-----------------------------------------|
+| See how you are doing | Dashboard (the page you land on)        |
+| Check Google Shopping | Dashboard → Google Shopping             |
 | Add/edit parts       | Catalogue → Parts                       |
 | Add/edit vehicles    | Catalogue → Now Dismantling             |
 | Categories           | Catalogue → Part categories             |

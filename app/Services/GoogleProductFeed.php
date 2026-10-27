@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\PartStatus;
 use App\Models\Part;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Builds a Google Merchant Center product feed (RSS 2.0 + the g: namespace).
@@ -22,6 +23,26 @@ use App\Models\Part;
 class GoogleProductFeed
 {
     public const CACHE_KEY = 'feeds.google.products';
+
+    /**
+     * When the feed URL was last requested. The feed is not linked from
+     * anywhere public, so in practice a fetch is Merchant Center collecting it
+     * — which makes this the closest thing to proof that Google is pulling the
+     * feed without going and asking the Content API. Kept for 60 days so a
+     * quiet stretch still shows the real last fetch rather than "never".
+     */
+    public const FETCHED_AT_KEY = 'feeds.google.fetched_at';
+
+    public const FETCHED_AT_TTL_DAYS = 60;
+
+    /**
+     * Drop the cached XML so the next fetch rebuilds it. Does not touch the
+     * fetch timestamp — that is a record of Google's behaviour, not ours.
+     */
+    public static function forget(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
 
     /** ISO 4217 code appended to every price. */
     public const CURRENCY = 'NZD';

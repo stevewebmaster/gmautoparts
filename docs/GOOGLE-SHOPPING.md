@@ -21,9 +21,47 @@ A part is included only if **all** of these are true:
 | status is `available` or `on_hold` | `sold` and `withdrawn` parts are dropped entirely — a sold wrecker part is not coming back. |
 | has a price | Google rejects a null or zero price, so unpriced parts cannot be fed. **No price, no Google.** |
 | has at least one image | `image_link` is a required attribute. |
+| shipping band is Small, Medium or Large | Google expects a working checkout. A part with **no band**, or set to **Quote only**, cannot be bought online, so it is not fed. This one catches people out — existing stock imported before shipping bands existed has no band, and is silently absent from the feed until one is set. |
 
 `available` maps to `in_stock`; `on_hold` maps to `out_of_stock` (still listed,
 but not purchasable right now).
+
+## Seeing what is in the feed
+
+The admin dashboard (`/admin`) leads with a **Google Shopping** panel:
+
+- how many parts are in the feed right now,
+- how many are excluded and **why**, broken down by reason,
+- when the feed was last collected (see below),
+- a link to the raw feed.
+
+Each exclusion reason links straight through to the Parts list filtered to
+exactly those parts, so "9 parts have no price" is one click from fixing them.
+The Parts list also has a **Google** column and a **Google feed** filter showing
+the same thing per part.
+
+The counts and the filter both run through
+[`App\Enums\FeedStatus`](../app/Enums/FeedStatus.php), whose cases partition the
+parts table — every part matches exactly one, so the numbers always add up to the
+catalogue total and a dashboard count can never disagree with the rows behind it.
+
+### "Last collected"
+
+The feed URL is not linked from anywhere public, so a request for it is, in
+practice, Merchant Center collecting the feed. Every fetch stamps
+`feeds.google.fetched_at` in the cache and the dashboard reports it. Two caveats:
+
+- **It is a proxy, not proof.** Opening the feed yourself also updates it.
+- **`php artisan cache:clear` and some deploys reset it**, so it can read "not
+  since the site last restarted" when Google is in fact fetching happily.
+
+### What the dashboard cannot tell you
+
+It reports **what we send Google**, not **what Google accepted**. Item
+disapprovals, policy warnings and "why is this not showing" live in Merchant
+Center, and reading them into the site would need the Content API for Shopping
+(OAuth, a service account, token maintenance). Merchant Center remains the place
+to see Google's verdict.
 
 ### Attribute notes
 

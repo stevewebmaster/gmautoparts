@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\FeedStatus;
 use App\Enums\PartStatus;
 use App\Enums\ShippingBand;
 use App\Filament\Resources\PartResource\Pages;
@@ -135,6 +136,14 @@ class PartResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_visible')->boolean(),
                 Tables\Columns\IconColumn::make('is_featured')->boolean(),
+                // Not sortable: it is derived from four columns, not stored.
+                Tables\Columns\TextColumn::make('feed_status')
+                    ->label('Google')
+                    ->badge()
+                    ->getStateUsing(fn (Part $record) => $record->feedStatus())
+                    ->formatStateUsing(fn (FeedStatus $state) => $state->label())
+                    ->color(fn (FeedStatus $state) => $state->color())
+                    ->tooltip(fn (FeedStatus $state) => $state->description()),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -150,6 +159,16 @@ class PartResource extends Resource
                         }
 
                         return $data['value'] ? $query->where('shipping_band', $data['value']) : $query;
+                    }),
+                // Shares FeedStatus::constrain() with the dashboard widget, so
+                // a count there and the rows here can never disagree.
+                Tables\Filters\SelectFilter::make('feed')
+                    ->label('Google feed')
+                    ->options(FeedStatus::options())
+                    ->query(function ($query, array $data) {
+                        $status = FeedStatus::tryFrom($data['value'] ?? '');
+
+                        return $status ? $status->constrain($query) : $query;
                     }),
                 Tables\Filters\TernaryFilter::make('is_visible'),
                 Tables\Filters\TernaryFilter::make('is_featured'),

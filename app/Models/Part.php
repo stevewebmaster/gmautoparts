@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\FeedStatus;
 use App\Enums\PartStatus;
 use App\Enums\ShippingBand;
 use App\Services\GoogleProductFeed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Part extends Model
@@ -31,7 +31,7 @@ class Part extends Model
 
         // Keep the Google feed honest: marking a part sold should drop it from
         // the next fetch rather than waiting out the cache TTL.
-        $flushFeed = fn () => Cache::forget(GoogleProductFeed::CACHE_KEY);
+        $flushFeed = fn () => GoogleProductFeed::forget();
 
         static::saved($flushFeed);
         static::deleted($flushFeed);
@@ -123,6 +123,53 @@ class Part extends Model
             ->whereNotNull('price')
             ->where('price', '>', 0)
             ->whereIn('shipping_band', ShippingBand::shippable());
+    }
+
+    /**
+     * Has at least one photo.
+     *
+     * `images` is a JSON column, and the array cast only ever writes NULL or a
+     * `json_encode`d array — so an empty one is exactly the two-character string
+     * `[]`. Comparing against that literal is the one test that works on both
+     * MySQL (which parses it as JSON) and SQLite (which compares it as text).
+     * Do not add an `!= ''` here: MySQL rejects the empty string as invalid JSON.
+     */
+    public function scopeWithImages(Builder $query): Builder
+    {
+        return $query->whereNotNull('images')->where('images', '!=', '[]');
+    }
+
+    public function scopeWithoutImages(Builder $query): Builder
+    {
+        return $query->where(
+            fn (Builder $inner) => $inner->whereNull('images')->orWhere('images', '[]')
+        );
+    }
+
+    /** Why this part is, or is not, in the Google feed. */
+    public function feedStatus(): FeedStatus
+    {
+        if (! $this->is_visible) {
+            return FeedStatus::Hidden;
+        }
+
+        if (! in_array($this->status?->value, PartStatus::listable(), true)) {
+            return FeedStatus::NotListable;
+        }
+
+        if (! is_array($this->images) || count($this->images) === 0) {
+            return FeedStatus::NoPhoto;
+        }
+
+        if ($this->price === null || (float) $this->price <= 0) {
+            return FeedStatus::NoPrice;
+        }
+
+        if ($this->shipping_band === null) {
+            return FeedStatus::NoBand;
+        }
+
+        return $this->shipping_band->isShippable() ? FeedStatus::InFeed : FeedStatus::QuoteOnly;
     }
 
     /** In the shop: available, priced and banded. */
