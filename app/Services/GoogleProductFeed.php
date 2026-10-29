@@ -108,7 +108,7 @@ class GoogleProductFeed
             'image_link' => $images[0],
             'availability' => $part->status === PartStatus::Available ? 'in_stock' : 'out_of_stock',
             'price' => $this->money((float) $part->price),
-            'condition' => 'used',
+            'condition' => PartPresenter::condition($part),
             'identifier_exists' => 'no',
             'google_product_category' => self::GOOGLE_CATEGORY,
         ];

@@ -29,7 +29,7 @@ class ProductStructuredData
             'description' => PartPresenter::description($part),
             'sku' => PartPresenter::id($part),
             'url' => PartPresenter::url($part),
-            'itemCondition' => 'https://schema.org/UsedCondition',
+            'itemCondition' => self::condition($part),
         ];
 
         if ($images) {
@@ -73,7 +73,7 @@ class ProductStructuredData
                 'price' => number_format((float) $part->price, 2, '.', ''),
                 'priceCurrency' => GoogleProductFeed::CURRENCY,
                 'availability' => self::availability($part),
-                'itemCondition' => 'https://schema.org/UsedCondition',
+                'itemCondition' => self::condition($part),
                 'seller' => [
                     '@type' => 'Organization',
                     'name' => (string) config('app.name'),
@@ -82,6 +82,15 @@ class ProductStructuredData
         }
 
         return $data;
+    }
+
+    protected static function condition(Part $part): string
+    {
+        return match (PartPresenter::condition($part)) {
+            'new' => 'https://schema.org/NewCondition',
+            'refurbished' => 'https://schema.org/RefurbishedCondition',
+            default => 'https://schema.org/UsedCondition',
+        };
     }
 
     protected static function availability(Part $part): string

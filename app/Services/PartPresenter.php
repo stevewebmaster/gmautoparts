@@ -93,6 +93,24 @@ class PartPresenter
     }
 
     /**
+     * Google's condition — new, refurbished or used — read from the free text
+     * the yard types ("NEW", "Used", "Reconditioned"). Anything unclear is a
+     * used part, which is what a wrecker sells; "as new" and "like new" are
+     * still used.
+     */
+    public static function condition(Part $part): string
+    {
+        $condition = Str::lower((string) $part->condition);
+
+        return match (true) {
+            preg_match('/\b(as|like) new\b/', $condition) === 1 => 'used',
+            preg_match('/\bnew\b/', $condition) === 1 => 'new',
+            preg_match('/\b(refurb|recon|rebuilt|remanufactured)/', $condition) === 1 => 'refurbished',
+            default => 'used',
+        };
+    }
+
+    /**
      * Roots a path at APP_URL rather than the incoming request host. The feed is
      * cached, so request-relative URLs would bake in whichever hostname happened
      * to trigger the rebuild.

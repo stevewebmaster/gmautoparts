@@ -50,7 +50,7 @@ up in Google Merchant Center, not here.
    - **Subcategory** – optional (e.g. Brake Caliper). Add subcategories under **Part categories** if needed.
    - **Description** – optional details about the part.
    - **Stock number** – your internal reference.
-   - **Condition** – e.g. Used, Refurbished.
+   - **Condition** – e.g. Used, Reconditioned. Type **New** for new parts and Google lists them as new; anything else shows as used.
    - **Price** – **including GST**: what the customer pays. Optional; leave blank for “Enquire”.
    - **Freight size** – the satchel or box it goes in, same as eDespatchIT. Needed to sell it online.
    - **Make / Model / Year** – vehicle compatibility (optional).

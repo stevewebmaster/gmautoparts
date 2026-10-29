@@ -67,7 +67,10 @@ to see Google's verdict.
 
 - **`id`** is `part-{id}`, not the stock number. Stock numbers are not unique in
   the database, and feed IDs must be unique and stable.
-- **`condition`** is always `used`.
+- **`condition`** is read from the part's free-text Condition field
+  (`PartPresenter::condition()`): "new" → `new`, "reconditioned" / "refurbished"
+  / "rebuilt" → `refurbished`, anything else — including "as new" — `used`. The
+  page's structured data uses the same answer, so the two always agree.
 - **`identifier_exists`** is `no`, and `brand`/`gtin`/`mpn` are omitted. Used
   parts carry no barcode. A stock number is an internal yard code, **not** a
   manufacturer part number, so submitting it as an MPN would be wrong.
