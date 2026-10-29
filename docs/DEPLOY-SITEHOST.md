@@ -100,6 +100,9 @@ nano .env
 In `.env` set at least:
 
 - `APP_URL=https://gmautospares.co.nz` (the live domain; **https**, no trailing slash)
+- `REDIRECT_HOSTS=www.gmautospares.co.nz,gm.websitemaster.co.nz` — other hosts the
+  container answers on, which 301 to `APP_URL`; while it is set, plain http goes to
+  https too. Leave it empty to switch redirects off (see section 4)
 - `APP_DEBUG=false`
 - `DB_HOST=mariadb1011`
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (SiteHost MySQL)
@@ -195,6 +198,7 @@ After saving, **restart the container** in the SiteHost panel so Nginx reloads t
 - Set **`APP_URL=https://yourdomain.co.nz`** in `.env` (no trailing slash).
 - The app’s **AppServiceProvider** forces `URL::forceScheme('https')` when `APP_URL` starts with `https://`, so asset and form URLs are generated over HTTPS behind the proxy. That avoids “Mixed Content” when the site is opened via HTTPS.
 - The app includes **`TrustProxies`** middleware so Laravel respects `X-Forwarded-Proto` / `X-Forwarded-For` from SiteHost’s reverse proxy. Without that, redirects and cookies can behave as if the request were HTTP.
+- **One address for the site:** `RedirectToCanonicalHost` sends any host in `REDIRECT_HOSTS` to `APP_URL` with a 301, and plain http to https — but only when the proxy's `X-Forwarded-Proto` says `http`. SiteHost terminates SSL at its proxy, so the container always sees http; redirecting on that would loop. If `curl -sI http://gmautospares.co.nz/` still answers `200` with it switched on, the proxy is not sending the header, and http → https has to be done in nginx instead. Every page also carries a `<link rel="canonical">` on `APP_URL`'s host, whatever host served it.
 - After changing `.env` or deploying code:  
   `php artisan config:clear` then `php artisan config:cache`.
 

@@ -12,16 +12,16 @@ the client can do).
 
 ---
 
-## State as at 2026-08-07
+## State as at 2026-10-29
 
 | | |
 | --- | --- |
-| ✅ | Deployed to SiteHost and all migrations run |
-| ✅ | Cron installed and verified — all four scheduled jobs firing |
-| ✅ | Cart, checkout, Google feed, structured data, reserve flow all live |
-| ⛔ | **No Stripe keys** — checkout refuses cleanly, nothing can be bought |
-| ⛔ | **Only 4 parts live**, and the shipping bands have not been applied yet |
-| ⛔ | **Still on `gm.websitemaster.co.nz`** — not the live domain |
+| ✅ | Live on **gmautospares.co.nz** with SSL; cron and all four scheduled jobs running |
+| ✅ | Freight priced by NZ Couriers box size — checkout, Google feed and Shipping Policy all agree |
+| ✅ | Merchant Center verified and fetching the feed: 15 parts in |
+| ✅ | All 19 listed parts sized: 15 buyable online, 4 engine conversions by truck (enquiry) |
+| ⛔ | **No Stripe yet** — G&M are verifying the account; checkout asks people to phone |
+| ⚠️ | **www, plain http and `gm.websitemaster.co.nz` all still serve the site** — redirects are built, switched on by `REDIRECT_HOSTS` (Phase 1) |
 
 ---
 
@@ -39,45 +39,60 @@ prove the chain works. Test webhooks take a minute to recreate.
 
 ## Phase 1 — Point the live domain at the site
 
-- [ ] **[G&M]** Confirm the domain, and who controls its DNS
-- [ ] **[Steve]** DNS A record → SiteHost container IP; wait for propagation
-- [ ] **[Steve]** Add the domain to `server_name` in
+- [x] **[G&M]** Confirm the domain, and who controls its DNS
+- [x] **[Steve]** DNS A record → SiteHost container IP; wait for propagation
+- [x] **[Steve]** Add the domain to `server_name` in
       `~/container/config/nginx/sites-available/default`, then restart the container.
       Leave `root` as `/container/application/public`.
-- [ ] **[Steve]** Issue the SSL certificate via the SiteHost panel. Stripe and
+- [x] **[Steve]** Issue the SSL certificate via the SiteHost panel. Stripe and
       Merchant Center both require HTTPS.
-- [ ] **[Steve]** Update `APP_URL` and rebuild config:
+- [x] **[Steve]** Update `APP_URL` and rebuild config:
       ```bash
       cd ~/container/application
       nano .env          # APP_URL=https://yourdomain.co.nz
       php artisan config:cache
       php artisan cache:clear
       ```
-- [ ] **[Steve]** Verify the feed picked it up — every `link` and `image_link` must be
+- [x] **[Steve]** Verify the feed picked it up — every `link` and `image_link` must be
       the live https domain, not `/storage/…` and not the old host:
       ```bash
       curl -s https://yourdomain.co.nz/feeds/google.xml | head -20
       ```
+- [ ] **[Steve]** ⚠️ **Send every other address to one.** www, plain http and the old
+      host all serve the full site — four copies of every page to Google, and a
+      checkout page that loads over plain http. Every page now carries a canonical
+      tag; to redirect as well, add to `.env` and rebuild config:
+      ```bash
+      REDIRECT_HOSTS=www.gmautospares.co.nz,gm.websitemaster.co.nz
+      php artisan config:cache
+      ```
+      Then check: `curl -sI https://www.gmautospares.co.nz/` and
+      `curl -sI http://gmautospares.co.nz/` should both answer `301` with
+      `location: https://gmautospares.co.nz/`. If the http one still answers `200`,
+      SiteHost's proxy is not sending `X-Forwarded-Proto` — the host redirects still
+      work; http → https then needs doing in nginx. To undo, remove the line and
+      `config:cache`. Merchant Center's website is set to the **www** address: if it
+      complains once www redirects, change it there to `https://gmautospares.co.nz/`.
 
 ## Phase 2 — Finish the stock setup
 
 - [ ] **[Steve]** Put cron logging back to `/dev/null` in
       `~/container/crontabs/crontab` and delete `storage/logs/cron.log`
       (it grows ~1 MB/day otherwise)
-- [ ] **[Steve]** Deploy the freight-size change and run `php artisan migrate --force`.
+- [x] **[Steve]** Deploy the freight-size change and run `php artisan migrate --force`.
       Small parts become E20 satchels; **Medium and Large parts lose their band and
       drop out of the shop and Google until measured** — there is no honest way to
       convert them. The same migrate rewrites the Shipping Policy to match checkout,
       unless it was edited in the admin (then it logs a warning — check the page shows
       the freight table).
-- [ ] **[Steve]** Size the obvious ones — satchel parts and truck freight. Safe to
+- [x] **[Steve]** Size the obvious ones — satchel parts and truck freight. Safe to
       re-run, only touches parts with no size, never overwrites a correction:
       ```bash
       cd ~/container/application
       php artisan parts:guess-shipping-bands
       php artisan cache:clear
       ```
-- [ ] **[G&M]** Measure the rest: Parts Loader app → **Manage Stock → Needs freight
+- [x] **[G&M]** Measure the rest: Parts Loader app → **Manage Stock → Needs freight
       size**. Tap **Freight** on a part, type the box's L × W × H and weight, and it
       picks the box. A size that is too small does not error — it quietly loses money
       on every sale.
@@ -87,7 +102,9 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[G&M]** Enter prices **including GST** from now on — the site, receipt and
       Google all treat a price as what the customer pays.
 - [ ] **[Steve]** Once G&M say go, add GST to the prices loaded without it (rounded
-      up to the dollar). `--before` is the day they switched:
+      up to the dollar). `--before` is the day they switched. **Probably not needed:**
+      on 2026-10-29, 11 of the 19 live prices were already a round figure plus GST —
+      check the dry run before applying anything:
       ```bash
       php artisan parts:add-gst --before=YYYY-MM-DD --dry-run
       php artisan parts:add-gst --before=YYYY-MM-DD
@@ -117,15 +134,19 @@ prove the chain works. Test webhooks take a minute to recreate.
 
 - [ ] **[G&M]** ⚠️ **Approve the returns and shipping policy text** — see the decisions
       table below. Blocks Google approval, and customers agree to it at checkout.
-- [ ] **[Steve]** Create Merchant Center, verify and claim the domain
-- [ ] **[Steve]** Add the feed as a scheduled fetch — **Products → Data sources → Add**.
+      The shipping policy was rewritten to match checkout on 2026-10-29; the returns
+      policy decisions are still open.
+- [x] **[Steve]** Create Merchant Center, verify and claim the domain
+- [x] **[Steve]** Add the feed as a scheduled fetch — **Products → Data sources → Add**.
       Currency **NZD**, country **New Zealand**, daily.
       `https://yourdomain.co.nz/feeds/google.xml`
 - [ ] **[Steve]** Work the **Diagnostics** tab. Expect disapprovals on the first fetch;
       item-level errors there are more specific than any documentation.
 - [ ] **[Steve]** Run a live part URL through the
       [Rich Results Test](https://search.google.com/test/rich-results) — works
-      independently of Merchant Center
+      independently of Merchant Center. The markup itself was checked on 2026-10-29:
+      name, price, availability and condition are there; it leaves out the optional
+      shipping and returns details, so expect warnings for those
 - [ ] **[G&M]** Free listings only, or Shopping ads too? Free listings need no ad
       spend. Start free.
 
@@ -139,8 +160,11 @@ prove the chain works. Test webhooks take a minute to recreate.
       consignment and label straight from a paid order, and optionally quote the
       exact address at checkout. Needs every part's box size, which this freight-size
       work provides. Google still needs the fixed table.
-- [ ] **[Steve]** Add a `sitemap.xml` and `robots.txt` — neither exists. Cheapest
-      remaining SEO gap; a sitemap of part pages helps Google find stock as it loads.
+- [x] **[Steve]** Add a `sitemap.xml` and `robots.txt`. Both are generated:
+      robots.txt keeps crawlers out of the Parts Loader, admin, cart and checkout, and
+      the sitemap lists every part still for sale, the vehicles and the main pages.
+- [ ] **[Steve]** Submit `https://gmautospares.co.nz/sitemap.xml` in Google Search
+      Console (**Sitemaps**), so new stock is found as it loads
 - [ ] **[G&M]** Consider Google **free local listings** — G&M has a physical yard, so
       parts can show in Search and Maps as in-store stock. Separate feed, no checkout
       required, no ad spend.

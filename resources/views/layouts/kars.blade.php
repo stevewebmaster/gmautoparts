@@ -5,6 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>@yield('title', 'G&M Auto Parts') - Quality Used Car Parts | NZ</title>
     <meta name="description" content="@yield('meta_description', 'G&M Auto Parts - quality used automotive parts in New Zealand.')">
+    @include('partials.canonical')
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 

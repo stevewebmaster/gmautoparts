@@ -8,6 +8,8 @@ class Kernel extends HttpKernel
 {
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
+        // After TrustProxies, so the host is the one the visitor typed.
+        \App\Http\Middleware\RedirectToCanonicalHost::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,

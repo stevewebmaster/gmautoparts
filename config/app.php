@@ -8,6 +8,15 @@ return [
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
+
+    // Other hostnames the site also answers on (www, the old staging host),
+    // which 301 to APP_URL — and while any are set, plain http goes to https.
+    // Comma separated; empty switches all of it off.
+    'redirect_hosts' => array_values(array_filter(array_map(
+        fn ($host) => strtolower(trim($host)),
+        explode(',', (string) env('REDIRECT_HOSTS', '')),
+    ))),
+
     'asset_url' => env('ASSET_URL'),
     'timezone' => 'Pacific/Auckland',
     'locale' => 'en',
