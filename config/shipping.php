@@ -60,8 +60,9 @@ return [
     'gst' => 15,
 
     /*
-     | Prepaid NZ Couriers satchels: one flat price to anywhere in the country,
-     | GST inclusive, and not subject to the variable adjustment.
+     | NZ Couriers satchels: one flat price to anywhere in the country, BEFORE
+     | GST. The fuel charge is already in it, so the variable adjustment is not
+     | added — only GST.
      */
     'satchels' => [
         'e20' => 12.00,
@@ -69,7 +70,12 @@ return [
     ],
 
     /*
-     | Added on top for rural delivery addresses, once per order.
+     | Added for rural delivery addresses, for EACH part — NZ Couriers need a
+     | rural ticket on every item. What the customer pays, GST inclusive: book
+     | one item to a rural address in eDespatchIT and see how much the total
+     | goes up by.
+     |
+     | PLACEHOLDER until G&M confirm the figure from the booking page.
      */
     'rural_surcharge' => 6.50,
 

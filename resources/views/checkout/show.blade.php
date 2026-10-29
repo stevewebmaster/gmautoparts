@@ -96,7 +96,7 @@
                                     <label style="font-weight:400;">
                                         <input type="checkbox" name="is_rural" value="1" data-rural {{ old('is_rural') ? 'checked' : '' }}>
                                         This is a rural delivery address
-                                        (+${{ number_format((float) config('shipping.rural_surcharge'), 2) }})
+                                        (+${{ number_format((float) config('shipping.rural_surcharge'), 2) }} per part)
                                     </label>
                                 </div>
                             </fieldset>
@@ -134,6 +134,13 @@
                                     <span data-total-out>${{ number_format($subtotal, 2) }}</span>
                                 </div>
                             </div>
+
+                            <p class="gm-muted mt-2 mb-0">
+                                All prices include GST.
+                                @if($items->count() > 1)
+                                    Freight is charged for each part &mdash; if we can pack them together for less, we refund the difference.
+                                @endif
+                            </p>
 
                             <button type="submit" class="th-btn w-100 mt-3">
                                 Pay Securely <i class="fas fa-arrow-up-right"></i>

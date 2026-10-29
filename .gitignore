@@ -3,6 +3,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+# Written on the server by parts:add-gst, which refuses to run twice while it exists
+/storage/app/parts-gst-added.json
 /vendor
 /database/database.sqlite
 /database/database.sqlite-journal

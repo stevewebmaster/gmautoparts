@@ -8,7 +8,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h1 class="h2 mb-4">{{ $page->title }}</h1>
-                <div class="content-body">{!! $page->content !!}</div>
+                <div class="content-body">{!! $content !!}</div>
             </div>
         </div>
     </div>

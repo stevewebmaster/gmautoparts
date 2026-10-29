@@ -93,7 +93,8 @@ class Cart
      * Each part is charged its own freight. NZ Couriers charge per item even
      * within one consignment, so charging only the biggest part — as this
      * once did — lost the full price of every other box. A pair of headlights
-     * to Christchurch is two boxes and two charges.
+     * to Christchurch is two boxes and two charges. When the yard can pack
+     * parts together for less, it refunds the difference.
      */
     public function shipping(string $fulfilment, ?string $region = null, bool $isRural = false): float
     {
@@ -115,8 +116,9 @@ class Cart
 
         $rate = (float) $items->sum(fn (Part $part) => $part->shipping_band?->rate($region) ?? 0.0);
 
+        // NZ Couriers need a rural ticket on every item, so it is per part too.
         if ($isRural) {
-            $rate += (float) config('shipping.rural_surcharge', 0);
+            $rate += $items->count() * (float) config('shipping.rural_surcharge', 0);
         }
 
         return round($rate, 2);

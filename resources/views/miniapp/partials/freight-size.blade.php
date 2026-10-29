@@ -9,6 +9,7 @@
         @foreach(\App\Enums\ShippingBand::cases() as $size)
             <option value="{{ $size->value }}"
                     @if($size->cube()) data-cube="{{ $size->cube() }}" data-kg="{{ $size->maxKg() }}" @endif
+                    @if($size->isSatchel()) data-satchel @endif
                     {{ $selected === $size->value ? 'selected' : '' }}>
                 {{ $labels[$size->value] }}
             </option>
@@ -25,7 +26,7 @@
         <input type="number" inputmode="decimal" min="0" step="any" placeholder="H" data-measure="h" aria-label="Height in cm">
         <input type="number" inputmode="decimal" min="0" step="any" placeholder="kg" data-measure="kg" aria-label="Weight in kg">
     </div>
-    <p class="photo-hint" id="freight-measure-result">Picks the smallest box that fits. Small enough for a satchel? Choose E20 or E60 above instead.</p>
+    <p class="photo-hint" id="freight-measure-result">Picks the smallest satchel or box that fits. Door handles, sensors and other small parts: choose E20 above — it is cheaper.</p>
 </div>
 
 @once
@@ -60,7 +61,8 @@
 
             if (fits) {
                 select.value = fits.value;
-                result.textContent = cube.toFixed(3) + ' m³ → ' + fits.text.trim();
+                result.textContent = cube.toFixed(3) + ' m³ → ' + fits.text.trim()
+                    + (fits.dataset.satchel !== undefined ? '. Long or awkward? Check it fits the bag. Fits an E20? Choose that instead.' : '');
             } else {
                 select.value = @json(\App\Enums\ShippingBand::QuoteOnly->value);
                 result.textContent = cube.toFixed(3) + ' m³' + (kg > 25 ? ', over 25 kg' : '') + ' — too big for courier. Set to truck freight.';

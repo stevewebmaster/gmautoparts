@@ -79,6 +79,7 @@
                             </span>
                         </div>
                     </div>
+                    <p class="gm-muted mt-2 mb-0">All prices include GST.</p>
 
                     @if($items->contains(fn($p) => $p->isPurchasable()))
                         <a href="{{ route('checkout.show') }}" class="th-btn w-100 mt-3">

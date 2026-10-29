@@ -51,7 +51,8 @@ up in Google Merchant Center, not here.
    - **Description** – optional details about the part.
    - **Stock number** – your internal reference.
    - **Condition** – e.g. Used, Refurbished.
-   - **Price** – optional; leave blank for “Enquire”.
+   - **Price** – **including GST**: what the customer pays. Optional; leave blank for “Enquire”.
+   - **Freight size** – the satchel or box it goes in, same as eDespatchIT. Needed to sell it online.
    - **Make / Model / Year** – vehicle compatibility (optional).
    - **Vehicle** – link to a “Now Dismantling” vehicle if the part comes from one.
    - **Images** – upload one or more photos (drag to reorder). First image is the main one.

@@ -32,7 +32,7 @@
             <textarea id="description" name="description" placeholder="Condition, notes...">{{ old('description') }}</textarea>
         </div>
         <div class="form-group">
-            <label for="price">Price ($)</label>
+            <label for="price">Price incl. GST ($)</label>
             <input type="number" id="price" name="price" value="{{ old('price') }}" min="0" step="0.01" placeholder="Leave blank for Enquire">
         </div>
 

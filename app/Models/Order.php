@@ -58,6 +58,14 @@ class Order extends Model
         return in_array($this->status?->value, OrderStatus::settled(), true);
     }
 
+    /** The GST inside the total: part prices and freight are GST inclusive. */
+    public function gstIncluded(): float
+    {
+        $rate = (float) config('shipping.gst', 15);
+
+        return round((float) $this->total * $rate / (100 + $rate), 2);
+    }
+
     /** Unambiguous read aloud: no O/I/0/1. */
     public static function generateReference(): string
     {

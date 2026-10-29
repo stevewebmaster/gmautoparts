@@ -10,17 +10,19 @@ namespace App\Enums;
  * done at the label anyway — just done once, up front.
  *
  * Cases are declared smallest to largest, and that order is relied on: a part
- * can always travel in something bigger than its own size, so it is charged
- * whichever option from its size upward is cheapest to that island. That is
- * what the yard does by hand — the courier rates are not monotonic, and a
- * 0.015 m³ box to the South Island costs more than an E60 satchel.
+ * can always travel in something bigger that takes its weight, so it is
+ * charged whichever of those is cheapest to that island. That is what the yard
+ * does by hand — the courier rates are not monotonic, so a part that fits an
+ * E60 goes North as a 0.015 m³ box but South in the satchel.
  */
 enum ShippingBand: string
 {
     case SatchelE20 = 'e20';
-    case Box015 = 'box_015';
-    // Bigger than a 0.015 m³ box, so it sits after one.
     case SatchelE60 = 'e60';
+    // The same bag, which takes 15 kg. Sized separately because a part over
+    // 10 kg cannot go North as a 0.015 m³ box, which only takes 10 kg.
+    case SatchelE60Heavy = 'e60_heavy';
+    case Box015 = 'box_015';
     case Box025 = 'box_025';
     case Box030 = 'box_030';
     case Box035 = 'box_035';
@@ -43,7 +45,8 @@ enum ShippingBand: string
     {
         return match ($this) {
             self::SatchelE20 => 'E20 satchel (door handles, sensors, small parts)',
-            self::SatchelE60 => 'E60 satchel',
+            self::SatchelE60 => 'E60 satchel, up to 10 kg',
+            self::SatchelE60Heavy => 'E60 satchel, 10–15 kg',
             self::QuoteOnly => 'Truck freight — quote only, not sold online',
             default => $this->shortLabel() . ' box, up to ' . $this->maxKg() . ' kg',
         };
@@ -54,6 +57,7 @@ enum ShippingBand: string
         return match ($this) {
             self::SatchelE20 => 'E20 satchel',
             self::SatchelE60 => 'E60 satchel',
+            self::SatchelE60Heavy => 'E60 satchel 10–15 kg',
             self::QuoteOnly => 'Truck / quote',
             default => rtrim(rtrim(number_format($this->cube(), 3), '0'), '.') . ' m³',
         };
@@ -69,10 +73,15 @@ enum ShippingBand: string
         };
     }
 
-    /** Box volume in cubic metres, as eDespatchIT rates it. Null for satchels. */
+    /**
+     * What it holds, in cubic metres: a box's volume as eDespatchIT rates it,
+     * or roughly what goes in a satchel (G&M tried boxes in an E60). Null for
+     * an E20, which nobody has measured.
+     */
     public function cube(): ?float
     {
         return match ($this) {
+            self::SatchelE60, self::SatchelE60Heavy => 0.009,
             self::Box015 => 0.015,
             self::Box025 => 0.025,
             self::Box030 => 0.03,
@@ -88,10 +97,12 @@ enum ShippingBand: string
         };
     }
 
-    /** Heaviest item eDespatchIT allows in this box. Null for satchels. */
+    /** Heaviest part this size covers. Null for an E20. */
     public function maxKg(): ?int
     {
         return match (true) {
+            $this === self::SatchelE60 => 10,
+            $this === self::SatchelE60Heavy => 15,
             $this === self::Box015 => 10,
             $this === self::Box025 => 15,
             $this === self::Box030 => 20,
@@ -102,7 +113,7 @@ enum ShippingBand: string
 
     public function isSatchel(): bool
     {
-        return $this === self::SatchelE20 || $this === self::SatchelE60;
+        return in_array($this, [self::SatchelE20, self::SatchelE60, self::SatchelE60Heavy], true);
     }
 
     /** Sizes that can actually be bought and shipped online. */
@@ -127,8 +138,8 @@ enum ShippingBand: string
 
     /**
      * What to send a part this size in: the cheapest option from this size
-     * upward. Printed on the yard's order email so the label matches what the
-     * customer was charged.
+     * upward that takes its weight. Printed on the yard's order email so the
+     * label matches what the customer was charged.
      */
     public function shipAs(string $region): ?self
     {
@@ -140,6 +151,12 @@ enum ShippingBand: string
         $cheapest = null;
 
         foreach (array_slice($cases, array_search($this, $cases, true)) as $option) {
+            // Under-ticketing the weight is penalised, so a 12 kg part that
+            // fits an E60 never goes as a 10 kg box.
+            if ($this->maxKg() !== null && $option->maxKg() !== null && $option->maxKg() < $this->maxKg()) {
+                continue;
+            }
+
             $cost = $option->cost($region);
 
             if ($cost !== null && ($cheapest === null || $cost < $cheapest->cost($region))) {
@@ -152,8 +169,9 @@ enum ShippingBand: string
 
     /**
      * What sending in exactly this satchel or box costs, as the customer pays
-     * it: the courier rate plus the variable adjustment plus GST, rounded up to
-     * the dollar. Null if there is no rate for it.
+     * it, rounded up to the dollar: a box's courier rate plus the variable
+     * adjustment plus GST, or a satchel's price plus GST (its fuel charge is
+     * already in it). Null if there is no rate for it.
      */
     protected function cost(string $region): ?float
     {
@@ -161,10 +179,13 @@ enum ShippingBand: string
             return null;
         }
 
-        if ($this->isSatchel()) {
-            $price = config("shipping.satchels.{$this->value}");
+        $gst = 1 + (float) config('shipping.gst', 15) / 100;
 
-            return $price === null ? null : (float) $price;
+        if ($this->isSatchel()) {
+            $bag = $this === self::SatchelE20 ? 'e20' : 'e60';
+            $price = config("shipping.satchels.{$bag}");
+
+            return $price === null ? null : ceil(round((float) $price * $gst, 2));
         }
 
         $base = config("shipping.courier_rates.{$this->value}.{$region}");
@@ -174,7 +195,6 @@ enum ShippingBand: string
         }
 
         $adjustment = 1 + (float) config('shipping.variable_adjustment', 0) / 100;
-        $gst = 1 + (float) config('shipping.gst', 15) / 100;
 
         // Round to cents first so float noise cannot push a whole-dollar
         // amount up a dollar.

@@ -181,7 +181,7 @@
                                     <div class="inventory-owner-top">
                                         <div class="content">
                                             <h6 class="box-title">Buy This Part</h6>
-                                            <p class="saving">${{ number_format((float) $part->price, 2) }}</p>
+                                            <p class="saving">${{ number_format((float) $part->price, 2) }} incl. GST</p>
                                         </div>
                                     </div>
                                     @if($errors->has('cart'))
@@ -215,6 +215,12 @@
                                         <div class="content">
                                             <h6 class="box-title">Reserve This Part</h6>
                                             <p class="saving">Free to reserve &middot; pay when you collect</p>
+                                            @if($part->shipping_band === \App\Enums\ShippingBand::QuoteOnly)
+                                                <p class="gm-reserve-note">
+                                                    Need it delivered? This goes by truck &mdash; send an enquiry below with
+                                                    your town and we will work out the freight before you pay anything.
+                                                </p>
+                                            @endif
                                         </div>
                                     </div>
 

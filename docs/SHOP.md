@@ -30,12 +30,14 @@ customer is not overcharged.
 | Size | Use |
 | --- | --- |
 | E20 satchel | Door handles, sensors, small parts — one price anywhere |
-| E60 satchel | Bigger than a 0.015 m³ box |
+| E60 satchel, up to 10 kg | Small boxed parts up to about 0.009 m³ (G&M tried boxes in one) |
+| E60 satchel, 10–15 kg | The same bag. Separate because a part over 10 kg cannot go North as a 0.015 m³ box |
 | 0.015 – 0.125 m³ box | Boxed parts, by the box's volume. 0.015 takes up to 10 kg, 0.025 up to 15 kg, 0.03 up to 20 kg, the rest up to 25 kg |
 | Truck / quote | Bumpers, doors, gearboxes, engines — **not sold online**, reserve instead |
 
 Set when loading in the Parts Loader app — which has a **measure the box** helper:
-type L × W × H in cm and the weight, and it picks the smallest box that fits — or
+type L × W × H in cm and the weight, and it picks the smallest E60 or box that fits
+(the E20 is picked by eye: nobody has measured one) — or
 for existing stock under **Manage Stock → Needs freight size**. Also in Filament,
 including a bulk **Set freight size** action.
 
@@ -52,20 +54,28 @@ column from eDespatchIT, as the screen shows it, for each box to each island:
 - **South Island** is Christchurch (rated *inter-island*)
 
 The customer pays cost **+ the variable adjustment** (18.4%, the fuel-linked
-figure under the eDespatchIT total) **+ GST**, rounded up to the dollar. Satchels
-are a flat price anywhere.
+figure under the eDespatchIT total) **+ GST**, rounded up to the dollar.
+Satchels are a flat price anywhere, entered before GST: their fuel charge is
+already in the price, so only GST is added (E20 $12 → $14, E60 $28 → $33).
 
 When the adjustment changes, set `NZC_VARIABLE_ADJUSTMENT` in `.env` and run
 `php artisan config:cache` — checkout and Google both follow. No deploy needed.
 When the box rates themselves change, update `courier_rates` and deploy.
 
 **A part is charged the cheapest way to send it, from its own size upward.** A
-part fits in anything bigger, and the courier rates are not in size order: a
-0.015 m³ box to the South Island costs more than an E60 satchel, so a 0.015 m³
-part is charged — and sent — as an E60 to the South Island. That is the yard's
-own rule of thumb, applied automatically. The yard's order email and **Online
-Orders** in the Parts Loader app say what to send each part as, so the label
-matches what the customer paid.
+part fits in anything bigger that takes its weight, and the courier rates are not
+in size order: an E60 part goes North as a 0.015 m³ box ($17) but South in the
+satchel ($33, against $38 for the box). That is the yard's own rule of thumb,
+applied automatically. Weight is respected because under-ticketing is penalised:
+a 10–15 kg E60 part skips the 10 kg box and goes North as a 0.03 m³ box instead.
+The yard's order email and **Online Orders** in the Parts Loader app say what to
+send each part as, so the label matches what the customer paid.
+
+> The eDespatchIT screen has the North Island 0.03 m³ box ($16.77) cheaper than
+> the 0.025 ($19.56). G&M think that is NZ Couriers' mistake, but it is the rate
+> they are charged, so 0.025 m³ parts go North as 0.03. If NZ Couriers correct
+> it, update `courier_rates` — the yard would otherwise be ticketing at a rate
+> that no longer exists.
 
 To print the current table:
 
@@ -78,7 +88,19 @@ php artisan tinker --execute='foreach (App\Enums\ShippingBand::cases() as $s) ec
 NZ Couriers charge per item, even several items on one consignment, so a cart is
 charged the **sum** of each part's freight. (This used to charge only the
 biggest part, which lost the full freight on every other box — a pair of
-headlights to Christchurch is two boxes.) Rural adds a flat surcharge per order.
+headlights to Christchurch is two boxes.) When the yard can pack parts together
+for less, G&M refund the difference by hand in Stripe; checkout and the shipping
+policy say so.
+
+Rural adds `rural_surcharge` **per part**, for the same reason: NZ Couriers need
+a rural ticket on every item.
+
+### The shipping policy quotes the same rates
+
+The shipping policy page is edited in the admin, but its freight table is not
+text: a `[freight-rates]` placeholder in the page is replaced with a table drawn
+from `config/shipping.php`, so the policy always matches checkout and the Google
+feed. Removing the placeholder in the admin removes the table.
 
 ### Sizing stock in bulk
 
@@ -98,6 +120,26 @@ of "nosecut".
 **It only touches parts with no size at all**, so it is safe to re-run and will
 never overwrite a correction made in the admin. `--force` re-sizes everything,
 including corrections.
+
+### Prices include GST
+
+Every price on the site — parts, freight, the checkout total, the receipt — is
+what the customer pays, **GST included**. That is what NZ consumer pricing expects,
+and Google Shopping requires it for New Zealand. The receipt shows the GST inside
+the total (3/23 of it).
+
+G&M's first parts were loaded without GST. Once they confirm, add it in one go:
+
+```bash
+php artisan parts:add-gst --before=YYYY-MM-DD --dry-run   # preview
+php artisan parts:add-gst --before=YYYY-MM-DD             # apply
+```
+
+`--before` is the day G&M started entering GST-inclusive prices; only parts
+created before it are touched. Prices are rounded up to the dollar ($85 → $98).
+It records every old and new price in `storage/app/parts-gst-added.json` and
+refuses to run again while that file exists — running it twice would add GST
+twice.
 
 ---
 

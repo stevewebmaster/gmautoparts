@@ -13,6 +13,7 @@
 | **Subtotal** | **${{ number_format((float) $order->subtotal, 2) }}** |
 | {{ $order->isPickup() ? 'Collection' : 'Freight' }} | ${{ number_format((float) $order->shipping, 2) }} |
 | **Total paid** | **${{ number_format((float) $order->total, 2) }}** |
+| Includes GST | ${{ number_format($order->gstIncluded(), 2) }} |
 </x-mail::table>
 
 @if($order->isPickup())

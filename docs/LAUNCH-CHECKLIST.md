@@ -67,7 +67,9 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[Steve]** Deploy the freight-size change and run `php artisan migrate --force`.
       Small parts become E20 satchels; **Medium and Large parts lose their band and
       drop out of the shop and Google until measured** — there is no honest way to
-      convert them.
+      convert them. The same migrate rewrites the Shipping Policy to match checkout,
+      unless it was edited in the admin (then it logs a warning — check the page shows
+      the freight table).
 - [ ] **[Steve]** Size the obvious ones — satchel parts and truck freight. Safe to
       re-run, only touches parts with no size, never overwrites a correction:
       ```bash
@@ -82,6 +84,14 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[G&M]** Load and price the rest of the stock. Only 4 parts are live, and a part
       with no price cannot be sold online *or* listed on Google. Parts loaded from
       here get a freight size in the Parts Loader app, so this backlog is a one-off.
+- [ ] **[G&M]** Enter prices **including GST** from now on — the site, receipt and
+      Google all treat a price as what the customer pays.
+- [ ] **[Steve]** Once G&M say go, add GST to the prices loaded without it (rounded
+      up to the dollar). `--before` is the day they switched:
+      ```bash
+      php artisan parts:add-gst --before=YYYY-MM-DD --dry-run
+      php artisan parts:add-gst --before=YYYY-MM-DD
+      ```
 
 ## Phase 3 — Turn on card payments
 
@@ -153,13 +163,17 @@ trader cannot contract out of the guarantees on used goods sold to consumers.
 | Return freight — change of mind | Customer pays | Confirm |
 | Return freight — faulty part | G&M pays | Confirm |
 | Refund turnaround | 10 working days | Confirm |
-| E20 / E60 satchel price | $12 / $28 anywhere, incl. GST | Confirm, and that satchels carry no fuel adjustment |
-| Where an E60 sits | Bigger than a 0.015 m³ box, smaller than 0.025 | Confirm — it decides which parts get sent South as an E60 |
-| E60 weight limit | Assumed to take anything a 0.015 m³ box does (10 kg) | Confirm |
-| 0.025 m³ box to North Island | Charged as a 0.03 m³ box — the screen shows 0.03 **cheaper** ($16.77 vs $19.56) | Check that screenshot figure |
-| Multi-part orders | Each part charged its own freight | Confirm. Option: refund the difference when parts are packed together |
-| Rural delivery surcharge | +$6.50 per order | Check vs invoices — per order or per item? |
+| Rural delivery surcharge | +$6.50 per part — per part confirmed, **amount is a placeholder** | The figure from the booking page |
+| Freight to the far ends | Paraparaumu and Christchurch rates used everywhere | Check one box to e.g. Kaitaia, Gisborne and Invercargill isn't dearer |
+| Existing part prices | Loaded without GST | Go-ahead to add GST to all of them |
 | Free-freight threshold | Off | Decide if wanted |
+
+Settled with G&M, 2026-10-29: satchels are $12 / $28 **plus GST** with fuel included
+($14 / $33 to the customer); an E60 takes about 0.009 m³ and 15 kg, so it sits below
+the 0.015 m³ box; parts packed together for less get the difference refunded; rural
+is per item; truck freight is always quoted before the customer pays. The 0.025 vs
+0.03 m³ North Island rate looks like NZ Couriers' mistake — G&M will follow it up
+gently, and it is used as charged until then.
 
 ### How freight is charged
 
@@ -170,17 +184,19 @@ Island is priced to Paraparaumu (long haul), South Island to Christchurch.
 
 | Example | North Island | South Island |
 | --- | ---: | ---: |
-| Door handle, sensor (E20 satchel) | $12 | $12 |
-| Vacuum pump (0.015 m³ box — South goes as an E60) | $17 | $28 |
+| Door handle, sensor (E20 satchel) | $14 | $14 |
+| Vacuum pump (E60 — North goes as a 0.015 m³ box) | $17 | $33 |
 | 0.05 m³ box | $38 | $112 |
 | Big headlight (0.125 m³ box) | $94 | $280 |
 
 A basket pays **each part's freight**, because NZ Couriers charge per item even on
-one consignment.
+one consignment. If the yard can pack parts together for less, it refunds the
+difference.
 
 Bumpers, doors, gearboxes, engines, nosecuts and panels go by **truck** and are
 sized *Truck / quote*. They are not sold online and not sent to Google; their pages
-offer *Reserve for collection* instead, so nothing is lost.
+offer *Reserve for collection*, and point anyone wanting delivery to the enquiry
+form, so G&M can quote the freight before they pay.
 
 ---
 

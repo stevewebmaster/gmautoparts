@@ -42,6 +42,7 @@
                     <div class="gm-total-row"><span>Subtotal</span><strong>${{ number_format((float) $order->subtotal, 2) }}</strong></div>
                     <div class="gm-total-row"><span>{{ $order->isPickup() ? 'Collection' : 'Freight' }}</span><strong>${{ number_format((float) $order->shipping, 2) }}</strong></div>
                     <div class="gm-total-row gm-total-row--grand"><span>Total</span><span>${{ number_format((float) $order->total, 2) }}</span></div>
+                    <div class="gm-total-row gm-muted"><span>Includes GST</span><span>${{ number_format($order->gstIncluded(), 2) }}</span></div>
                 </div>
 
                 <h3 style="font-size:1.15rem;margin:1.5rem 0 .5rem;">

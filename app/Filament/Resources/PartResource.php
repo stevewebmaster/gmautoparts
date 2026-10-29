@@ -58,6 +58,7 @@ class PartResource extends Resource
                     Forms\Components\TextInput::make('stock_number'),
                     Forms\Components\TextInput::make('condition'),
                     Forms\Components\TextInput::make('price')
+                        ->label('Price incl. GST')
                         ->numeric()
                         ->prefix('$'),
                 ])->columns(2),
