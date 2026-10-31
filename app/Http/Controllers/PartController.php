@@ -45,8 +45,9 @@ class PartController extends Controller
     {
         $validated = $request->validate([
             'part_id' => 'required|exists:parts,id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            // No line breaks in name or email: both go into email headers.
+            'name' => 'required|string|max:255|not_regex:/[\r\n]/',
+            'email' => 'required|email|not_regex:/[\r\n]/',
             'phone' => 'nullable|string|max:50',
             'message' => 'nullable|string|max:2000',
         ]);

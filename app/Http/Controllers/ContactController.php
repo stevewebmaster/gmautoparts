@@ -11,8 +11,9 @@ class ContactController extends Controller
     public function submit(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            // No line breaks in name or email: both go into email headers.
+            'name' => 'required|string|max:255|not_regex:/[\r\n]/',
+            'email' => 'required|email|not_regex:/[\r\n]/',
             'phone' => 'nullable|string|max:50',
             'message' => 'required|string|max:2000',
         ]);

@@ -18,8 +18,9 @@ class ReservationController extends Controller
     public function store(Request $request, Part $part): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            // No line breaks in name or email: both go into email headers.
+            'name' => 'required|string|max:255|not_regex:/[\r\n]/',
+            'email' => 'required|email|max:255|not_regex:/[\r\n]/',
             'phone' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:2000',
         ]);

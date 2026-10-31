@@ -283,6 +283,7 @@
                                             <textarea name="message" cols="30" rows="3" class="form-control" placeholder="Write Message..." required></textarea>
                                         </div>
                                         <div class="form-btn">
+                                            @include('partials.recaptcha', ['action' => 'contact'])
                                             <button type="submit" class="th-btn w-100">Send Enquiry</button>
                                         </div>
                                     </form>

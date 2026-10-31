@@ -44,5 +44,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'miniapp.auth' => \App\Http\Middleware\MiniappAuth::class,
+        'recaptcha' => \App\Http\Middleware\VerifyRecaptcha::class,
     ];
 }

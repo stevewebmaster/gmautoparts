@@ -142,6 +142,7 @@
                                 @endif
                             </p>
 
+                            @include('partials.recaptcha', ['action' => 'checkout'])
                             <button type="submit" class="th-btn w-100 mt-3">
                                 Pay Securely <i class="fas fa-arrow-up-right"></i>
                             </button>

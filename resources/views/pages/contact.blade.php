@@ -95,6 +95,7 @@
                                                 @error('message')<span class="text-danger small d-block mt-1">{{ $message }}</span>@enderror
                                             </div>
                                             <div class="form-btn col-12">
+                                                @include('partials.recaptcha', ['action' => 'contact'])
                                                 <button class="th-btn star-btn" type="submit">Submit Message</button>
                                             </div>
                                         </div>

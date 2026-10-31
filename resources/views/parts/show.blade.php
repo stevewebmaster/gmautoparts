@@ -253,6 +253,7 @@
                                                               rows="2" placeholder="e.g. when you plan to collect">{{ old('notes') }}</textarea>
                                                 </div>
                                                 <div class="form-btn col-12">
+                                                    @include('partials.recaptcha', ['action' => 'reserve'])
                                                     <button type="submit" class="th-btn w-100">
                                                         Reserve for Collection <i class="fas fa-arrow-up-right"></i>
                                                     </button>
@@ -281,7 +282,7 @@
                                 </div>
                                 @if($part->isEnquirable())
                                 <div class="contact-form style-3 mt-30">
-                                    <form action="{{ route('parts.enquire') }}" method="post" class="ajax-contact">
+                                    <form action="{{ route('parts.enquire') }}" method="post">
                                         @csrf
                                         <input type="hidden" name="part_id" value="{{ $part->id }}">
                                         <div class="row">
@@ -306,6 +307,7 @@
                                                           rows="3" placeholder="Your message">{{ old('message') }}</textarea>
                                             </div>
                                             <div class="form-btn col-12">
+                                                @include('partials.recaptcha', ['action' => 'enquire'])
                                                 <button type="submit" class="th-btn w-100">
                                                     Send Enquiry <i class="fas fa-arrow-up-right"></i>
                                                 </button>

@@ -27,9 +27,9 @@ Route::get('/sitemap.xml', [\App\Http\Controllers\SeoController::class, 'sitemap
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit')->middleware('throttle:5,1');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit')->middleware(['throttle:5,1', 'recaptcha:contact']);
 
-Route::post('/enquire', [PartController::class, 'enquire'])->name('parts.enquire')->middleware('throttle:10,1');
+Route::post('/enquire', [PartController::class, 'enquire'])->name('parts.enquire')->middleware(['throttle:10,1', 'recaptcha:enquire']);
 
 /*
 | Reserve for collection — the purchase path Google requires before it will
@@ -37,7 +37,7 @@ Route::post('/enquire', [PartController::class, 'enquire'])->name('parts.enquire
 */
 Route::post('/parts/{part:slug}/reserve', [\App\Http\Controllers\ReservationController::class, 'store'])
     ->name('reservations.store')
-    ->middleware('throttle:10,1');
+    ->middleware(['throttle:10,1', 'recaptcha:reserve']);
 Route::get('/reservations/{reference}', [\App\Http\Controllers\ReservationController::class, 'show'])
     ->name('reservations.show');
 
@@ -50,7 +50,7 @@ Route::post('/cart/remove/{part}', [\App\Http\Controllers\CartController::class,
 Route::post('/cart/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
-Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store')->middleware('throttle:10,1');
+Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store')->middleware(['throttle:10,1', 'recaptcha:checkout']);
 Route::get('/checkout/success/{reference}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/cancel/{reference}', [\App\Http\Controllers\CheckoutController::class, 'cancel'])->name('checkout.cancel');
 

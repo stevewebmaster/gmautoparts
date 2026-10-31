@@ -179,6 +179,23 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[G&M]** Consider Google **free local listings** — G&M has a physical yard, so
       parts can show in Search and Maps as in-store stock. Separate feed, no checkout
       required, no ad spend.
+- [ ] **[Steve]** Turn on reCAPTCHA: create a v3 key (see DEPLOY-SITEHOST.md for
+      the domains), set `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, then
+      `config:cache`. Send the contact form once and check it arrives; check
+      `laravel.log` for `reCAPTCHA` lines over the first week
+- [ ] **[Steve]** ⚠️ Change the database password. A real-looking one was committed in
+      `.env.sitehost.example` (and the deploy zip) and is still in git history.
+      Set a new one in the SiteHost panel, then straight away update `DB_PASSWORD` in
+      `.env` and `php artisan config:cache` — the site cannot reach the database in
+      between, so do it at a quiet time. Then load a part page and `/admin` to check
+- [ ] **[Steve]** Check `MINIAPP_PIN` on the server is at least 6 digits
+- [ ] **[Steve]** Upgrade Laravel 10 → 13. Filament 3.3 already supports 13, so the
+      admin needs no rewrite; Laravel 13 needs PHP 8.3+, so check `php -v` on the
+      server first. (12 would stop getting security fixes in early 2027.) Laravel 10
+      no longer gets security fixes and
+      `composer audit` lists ~50 advisories across Laravel, Filament, Livewire, Guzzle
+      and Symfony; a few apply here (email header injection through the forms — now
+      blocked at validation — and an unauthenticated file upload on the admin login)
 - [ ] **[Steve]** Delete the two unused header images —
       `public/images/page-headers/secondhand-parts.jpg` (1.1 MB) and
       `vehicle-wrecking-yard.webp`, both untracked and referenced nowhere

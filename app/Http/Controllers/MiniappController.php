@@ -16,6 +16,7 @@ use App\Services\ImageOptimizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -43,10 +44,26 @@ class MiniappController extends Controller
             ])->withInput();
         }
 
-        if ($pin !== $expected) {
+        // A short PIN is only safe if guesses are slow: 10 wrong per hour from
+        // one address, which puts every 4-digit PIN about 40 days away. Only
+        // wrong guesses count, so staff logging in often are never locked out.
+        $throttleKey = 'miniapp-login:' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $minutes = (int) ceil(RateLimiter::availableIn($throttleKey) / 60);
+            Log::warning('Mini-app login locked after repeated wrong PINs', ['ip' => $request->ip()]);
+
+            return back()->withErrors(['pin' => "Too many wrong PINs. Try again in {$minutes} minutes."]);
+        }
+
+        if (! hash_equals($expected, $pin)) {
+            RateLimiter::hit($throttleKey, 3600);
+
             return back()->withErrors(['pin' => 'Invalid PIN.'])->withInput();
         }
 
+        RateLimiter::clear($throttleKey);
+        $request->session()->regenerate();
         session(['miniapp_authenticated' => true]);
 
         return redirect()->route('app.dashboard');

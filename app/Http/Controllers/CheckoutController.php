@@ -43,8 +43,9 @@ class CheckoutController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            // No line breaks in name or email: both go into email headers.
+            'name' => 'required|string|max:255|not_regex:/[\r\n]/',
+            'email' => 'required|email|max:255|not_regex:/[\r\n]/',
             'phone' => 'nullable|string|max:50',
             'fulfilment' => ['required', Rule::in(['pickup', 'delivery'])],
             'address_line1' => 'required_if:fulfilment,delivery|nullable|string|max:255',

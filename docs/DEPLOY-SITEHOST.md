@@ -125,7 +125,15 @@ In `.env` set at least:
   contact form. Comma-separated for several inboxes, no spaces. Blank the
   username: if one is set, Laravel tries to log in to a relay that does not
   expect it.
-- `MINIAPP_PIN=1234` (or your chosen PIN) if you use the mini-app at `/app`
+- `MINIAPP_PIN` if you use the mini-app at `/app` — at least 6 digits, not `1234`.
+  Wrong guesses are limited to 10 an hour from one address
+- `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` — Google reCAPTCHA v3 on the contact,
+  enquiry, reserve and checkout forms; leave both empty to switch it off. Create the
+  key at <https://www.google.com/recaptcha/admin> (type **score based (v3)**) with
+  `gmautospares.co.nz`, `www.gmautospares.co.nz` and `gm.websitemaster.co.nz` as its
+  domains: a domain missing from the key means every form on it gets turned away.
+  Rejections are logged with Google's score; if real customers are being stopped,
+  lower `RECAPTCHA_MIN_SCORE` (default `0.5`)
 
 Then:
 
