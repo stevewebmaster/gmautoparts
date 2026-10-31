@@ -190,13 +190,37 @@ prove the chain works. Test webhooks take a minute to recreate.
       between, so do it at a quiet time. Then load a part page and `/admin` to check
       *Changed 2026-10-31.*
 - [ ] **[Steve]** Check `MINIAPP_PIN` on the server is at least 6 digits
-- [ ] **[Steve]** Upgrade Laravel 10 → 13. Filament 3.3 already supports 13, so the
-      admin needs no rewrite; Laravel 13 needs PHP 8.3+, so check `php -v` on the
-      server first. (12 would stop getting security fixes in early 2027.) Laravel 10
-      no longer gets security fixes and
-      `composer audit` lists ~50 advisories across Laravel, Filament, Livewire, Guzzle
-      and Symfony; a few apply here (email header injection through the forms — now
-      blocked at validation — and an unauthenticated file upload on the admin login)
+- [ ] **[Steve]** Deploy the Laravel 13 upgrade. The code is done and tested: Laravel
+      13.39, Filament 3.3.57, Livewire 3.8.11, and `composer audit` is clean — on
+      Laravel 10, which no longer gets security fixes, it listed ~50 advisories.
+      Laravel 13 needs PHP 8.3+. Every package changes, so put the site in maintenance
+      mode for the minute it takes:
+      ```bash
+      cd ~/container/application
+      php -v                          # must say 8.3 or higher: stop here if not
+      php artisan down
+      git pull origin main
+      composer install --no-dev -o
+      php artisan optimize:clear
+      php artisan config:cache
+      php artisan view:cache
+      php artisan up
+      ```
+      If `composer install` fails, go back to Laravel 10: `git reset --hard 1ab9d95`,
+      then the same `composer install`, cache and `up` lines. Afterwards log in to
+      `/admin` once (Laravel re-hashes the password to its stronger setting by
+      itself) and send a test contact form
+- [ ] **[Steve]** Check no admin password is stored as plain text. From 10 June until
+      `1ab9d95`, `gm:create-admin` saved passwords as typed, because Laravel 10 never
+      applied the model's hashing. On the server:
+      ```bash
+      php artisan tinker --execute='foreach (App\Models\User::all() as $u) echo $u->email, " ", str_starts_with($u->password, "$2y$") ? "ok" : "PLAIN TEXT", PHP_EOL;'
+      ```
+      A `PLAIN TEXT` account cannot log in, and its password was readable in the
+      database: delete it and re-create it with `php artisan gm:create-admin`
+- [ ] **[Steve]** Once Laravel 13 is live, rename the CSRF middleware the app extends
+      from `VerifyCsrfToken` to `PreventRequestForgery`, Laravel 13's name (the old one
+      is a deprecated alias). Left until then so the upgrade deploy works on both versions
 - [ ] **[Steve]** Delete the two unused header images —
       `public/images/page-headers/secondhand-parts.jpg` (1.1 MB) and
       `vehicle-wrecking-yard.webp`, both untracked and referenced nowhere

@@ -57,6 +57,10 @@ When you create a **new** SiteHost container, put the Laravel app in **one place
 
 **Stack used:** Nginx + PHP 8.4 (e.g. 1.0.4-noble). Database host: **mariadb1011** (not localhost) – set in `.env` as `DB_HOST=mariadb1011`.
 
+The app runs on Laravel 13, which needs **PHP 8.3 or newer** — check with `php -v`
+before changing the container image. `composer.json` pins dependency resolution to
+PHP 8.3, so the lock file never asks for more than that.
+
 ---
 
 ## 1. On your Mac – push latest to GitHub
