@@ -69,6 +69,9 @@ git commit -m "Your message"
 git push origin main
 ```
 
+Claude commits and pushes straight to `main` too: Steve has given standing
+permission, recorded in [CLAUDE.md](../CLAUDE.md).
+
 ---
 
 ## 2. On SiteHost – first-time setup (app in container)
