@@ -21,7 +21,8 @@ the client can do).
 | ✅ | Merchant Center verified and fetching the feed: 15 parts in |
 | ✅ | All 19 listed parts sized: 15 buyable online, 4 engine conversions by truck (enquiry) |
 | ⛔ | **No Stripe yet** — G&M are verifying the account; checkout asks people to phone |
-| ⚠️ | **www, plain http and `gm.websitemaster.co.nz` all still serve the site** — redirects are built, switched on by `REDIRECT_HOSTS` (Phase 1) |
+| ✅ | One address: www, plain http and `gm.websitemaster.co.nz` all 301 to `https://gmautospares.co.nz/` |
+| ✅ | `robots.txt` and `sitemap.xml` live; Google gets each part's real condition (all 15 listed are new stock) |
 
 ---
 
@@ -58,7 +59,7 @@ prove the chain works. Test webhooks take a minute to recreate.
       ```bash
       curl -s https://yourdomain.co.nz/feeds/google.xml | head -20
       ```
-- [ ] **[Steve]** ⚠️ **Send every other address to one.** www, plain http and the old
+- [x] **[Steve]** ⚠️ **Send every other address to one.** www, plain http and the old
       host all serve the full site — four copies of every page to Google, and a
       checkout page that loads over plain http. Every page now carries a canonical
       tag; to redirect as well, add to `.env` and rebuild config:
@@ -73,6 +74,16 @@ prove the chain works. Test webhooks take a minute to recreate.
       work; http → https then needs doing in nginx. To undo, remove the line and
       `config:cache`. Merchant Center's website is set to the **www** address: if it
       complains once www redirects, change it there to `https://gmautospares.co.nz/`.
+      *Live 2026-10-29: SiteHost's proxy does send `X-Forwarded-Proto`, so http → https
+      works from the app.*
+- [x] **[Steve]** Before deploying the `sales@` change: in SiteHost, forward
+      `sales@gmautospares.co.nz` to G&M's inbox, then send a test from a Gmail address
+      and check it arrives (and not in spam). The site shows `sales@` and customer
+      emails reply to it, so it must work first. Leave `ADMIN_EMAIL` pointing straight
+      at the inbox they read — orders should not depend on a forward
+      *Forwarder set up 2026-10-31.*
+- [x] **[Steve]** Now that http redirects, make the session cookie https-only: add
+      `SESSION_SECURE_COOKIE=true` to `.env`, then `php artisan config:cache`
 
 ## Phase 2 — Finish the stock setup
 

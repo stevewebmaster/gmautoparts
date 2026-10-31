@@ -24,8 +24,10 @@ class ReservationConfirmation extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
+        // "Reply to this email" has to reach someone: mail goes out as noreply@.
         return new Envelope(
             subject: 'Your part is reserved — ' . $this->reservation->reference,
+            replyTo: [config('mail.contact_address')],
         );
     }
 

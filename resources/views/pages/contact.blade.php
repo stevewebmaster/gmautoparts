@@ -56,7 +56,7 @@
                         </div>
                         <div class="media-body">
                             <p class="contact-feature_label">Email</p>
-                            <a href="mailto:gmautospares@xtra.co.nz" class="contact-feature_link">gmautospares@xtra.co.nz</a>
+                            <a href="mailto:{{ config('mail.contact_address') }}" class="contact-feature_link">{{ config('mail.contact_address') }}</a>
                         </div>
                     </div>
                 </div>

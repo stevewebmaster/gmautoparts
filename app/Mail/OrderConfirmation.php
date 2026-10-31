@@ -21,7 +21,11 @@ class OrderConfirmation extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Order confirmed — ' . $this->order->reference);
+        // "Reply to this email" has to reach someone: mail goes out as noreply@.
+        return new Envelope(
+            subject: 'Order confirmed — ' . $this->order->reference,
+            replyTo: [config('mail.contact_address')],
+        );
     }
 
     public function content(): Content

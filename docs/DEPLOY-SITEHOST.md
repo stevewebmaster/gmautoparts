@@ -103,6 +103,9 @@ In `.env` set at least:
 - `REDIRECT_HOSTS=www.gmautospares.co.nz,gm.websitemaster.co.nz` — other hosts the
   container answers on, which 301 to `APP_URL`; while it is set, plain http goes to
   https too. Leave it empty to switch redirects off (see section 4)
+- `CONTACT_EMAIL` — optional; the address shown on the site and used as the
+  reply-to on customer emails. Defaults to `sales@gmautospares.co.nz`, a SiteHost
+  forwarder to G&M's inbox (the domain's mail is hosted by SiteHost)
 - `APP_DEBUG=false`
 - `DB_HOST=mariadb1011`
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (SiteHost MySQL)

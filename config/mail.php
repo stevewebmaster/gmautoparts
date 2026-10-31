@@ -31,6 +31,10 @@ return [
         'name' => env('MAIL_FROM_NAME', 'G&M Autospares'),
     ],
 
+    // The address customers see on the site and reach when they reply to a
+    // confirmation email. Sending stays as noreply@; this is the reply-to.
+    'contact_address' => env('CONTACT_EMAIL', 'sales@gmautospares.co.nz'),
+
     // Where the yard's own notifications go: paid orders, reservations, part
     // enquiries and the contact form. Kept separate from the from address so
     // mail can be sent as noreply@ while still reaching an inbox someone reads.
