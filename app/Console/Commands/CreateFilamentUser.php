@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
 
 class CreateFilamentUser extends Command
 {
@@ -27,10 +28,14 @@ class CreateFilamentUser extends Command
             return 1;
         }
 
+        // Hashed here rather than left to User's `hashed` cast: Laravel 10 never
+        // applies a model's casts() method, so the password was stored as typed
+        // and could not log in. On newer Laravel the cast sees the value is
+        // already hashed and leaves it alone, so this never double-hashes.
         User::create([
             'name' => $name,
             'email' => $email,
-            'password' => $password,
+            'password' => Hash::make($password),
         ]);
 
         $this->info('Admin user created. Log in at /admin with: ' . $email);
