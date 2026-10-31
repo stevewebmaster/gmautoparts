@@ -45,7 +45,7 @@
                         </div>
                         <div class="media-body">
                             <p class="contact-feature_label">Phone</p>
-                            <a href="tel:+6478718575" class="contact-feature_link">Phone: (07) 871-8575</a>
+                            <a href="tel:{{ config('contact.phone_tel') }}" class="contact-feature_link">Phone: {{ config('contact.phone') }}</a>
                         </div>
                     </div>
                 </div>

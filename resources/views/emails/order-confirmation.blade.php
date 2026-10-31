@@ -37,7 +37,7 @@ We will pack and dispatch your order, and email you when it is on its way.
 View your order
 </x-mail::button>
 
-Questions? Reply to this email or call **07 849 8814**.
+Questions? Reply to this email or call **{{ config('contact.phone') }}**.
 See our [Returns Policy]({{ url('/returns-policy') }}) and [Shipping Policy]({{ url('/shipping-policy') }}).
 
 Thanks,<br>

@@ -20,7 +20,7 @@
                     <div class="gm-warn">
                         <strong>We haven't confirmed your payment yet.</strong>
                         If you have just paid, this usually settles within a minute — refresh the page.
-                        Nothing further is needed from you. If it stays like this, call us on 07 849 8814
+                        Nothing further is needed from you. If it stays like this, call us on {{ config('contact.phone') }}
                         quoting {{ $order->reference }}.
                     </div>
                 @endif
@@ -61,7 +61,7 @@
                 @endif
 
                 <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.5rem;">
-                    <a href="tel:+6478498814" class="th-btn style-2"><i class="fa-solid fa-phone"></i> 07 849 8814</a>
+                    <a href="tel:{{ config('contact.phone_tel') }}" class="th-btn style-2"><i class="fa-solid fa-phone"></i> {{ config('contact.phone') }}</a>
                     <a href="{{ route('parts.index') }}" class="th-btn style3 dealer">Browse More Parts <i class="fas fa-arrow-up-right"></i></a>
                 </div>
 

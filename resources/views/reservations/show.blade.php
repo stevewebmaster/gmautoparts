@@ -90,7 +90,7 @@
                 @endif
 
                 <div class="gm-res-actions">
-                    <a href="tel:+6478498814" class="th-btn style-2"><i class="fa-solid fa-phone"></i> 07 849 8814</a>
+                    <a href="tel:{{ config('contact.phone_tel') }}" class="th-btn style-2"><i class="fa-solid fa-phone"></i> {{ config('contact.phone') }}</a>
                     <a href="{{ route('parts.index') }}" class="th-btn style3 dealer">Browse More Parts <i class="fas fa-arrow-up-right"></i></a>
                 </div>
 

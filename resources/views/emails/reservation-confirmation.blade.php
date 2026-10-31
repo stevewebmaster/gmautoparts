@@ -26,7 +26,7 @@ we will do our best to hold it longer. Otherwise the part goes back on sale.
 View your reservation
 </x-mail::button>
 
-If anything looks wrong, reply to this email or call us on 07 849 8814.
+If anything looks wrong, reply to this email or call us on {{ config('contact.phone') }}.
 
 Thanks,<br>
 {{ config('app.name') }}

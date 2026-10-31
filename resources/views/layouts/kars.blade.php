@@ -105,7 +105,7 @@
                         <div class="header-links">
                             <ul>
                                 <li><i class="fal fa-location-dot"></i> <a href="https://www.google.com/maps/search/?api=1&query=2+Bruce+Berquist+Drive,+Te+Awamutu">2 Bruce Berquist Drive, Te Awamutu</a></li>
-                                <li><i class="fa-regular fa-phone"></i> <a href="tel:+6478718575">(07) 871-8575</a></li>
+                                <li><i class="fa-regular fa-phone"></i> <a href="tel:{{ config('contact.phone_tel') }}">{{ config('contact.phone') }}</a></li>
                                 <li><i class="fa-sharp fa-regular fa-envelope"></i> <a href="mailto:{{ config('mail.contact_address') }}">{{ config('mail.contact_address') }}</a></li>
                             </ul>
                         </div>
@@ -240,7 +240,7 @@
                                     <div class="info-contnt">
                                         <h4 class="footer-info-title">Phone:</h4>
                                         <p class="info-box_text">
-                                            <a href="tel:+6478718575" class="info-box_link">(07) 871-8575</a>
+                                            <a href="tel:{{ config('contact.phone_tel') }}" class="info-box_link">{{ config('contact.phone') }}</a>
                                         </p>
                                     </div>
                                 </div>

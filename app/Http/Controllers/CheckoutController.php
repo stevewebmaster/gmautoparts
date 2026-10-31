@@ -62,7 +62,7 @@ class CheckoutController extends Controller
             Log::error('Checkout attempted with no Stripe secret configured');
 
             return back()->withErrors([
-                'checkout' => 'Online payment is not available right now. Please call us on 07 849 8814 and we will take your order.',
+                'checkout' => 'Online payment is not available right now. Please call us on ' . config('contact.phone') . ' and we will take your order.',
             ])->withInput();
         }
 
@@ -131,7 +131,7 @@ class CheckoutController extends Controller
             Log::error('Order creation failed', ['exception' => $e]);
 
             return back()->withErrors([
-                'checkout' => 'Sorry, something went wrong creating your order. Please try again or call us on 07 849 8814.',
+                'checkout' => 'Sorry, something went wrong creating your order. Please try again or call us on ' . config('contact.phone') . '.',
             ])->withInput();
         }
 
@@ -159,7 +159,7 @@ class CheckoutController extends Controller
             $order->release();
 
             return redirect()->route('cart.index')->withErrors([
-                'cart' => 'We could not reach the payment provider. Nothing has been charged. Please try again shortly, or call us on 07 849 8814.',
+                'cart' => 'We could not reach the payment provider. Nothing has been charged. Please try again shortly, or call us on ' . config('contact.phone') . '.',
             ]);
         }
     }

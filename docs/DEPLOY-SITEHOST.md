@@ -113,6 +113,9 @@ In `.env` set at least:
 - `CONTACT_EMAIL` — optional; the address shown on the site and used as the
   reply-to on customer emails. Defaults to `sales@gmautospares.co.nz`, a SiteHost
   forwarder to G&M's inbox (the domain's mail is hosted by SiteHost)
+- `CONTACT_PHONE` — optional; the phone number shown everywhere on the site and in
+  customer emails. Defaults to `(07) 871-8575`. The policy pages are stored text,
+  so a new number needs changing there in the admin too
 - `APP_DEBUG=false`
 - `DB_HOST=mariadb1011`
 - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (SiteHost MySQL)

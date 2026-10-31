@@ -41,7 +41,7 @@ class ReservationController extends Controller
             Log::error('Reservation failed', ['part_id' => $part->id, 'exception' => $e]);
 
             return back()->withErrors([
-                'reserve' => 'Sorry, something went wrong reserving that part. Please call us on 07 849 8814.',
+                'reserve' => 'Sorry, something went wrong reserving that part. Please call us on ' . config('contact.phone') . '.',
             ])->withInput();
         }
 

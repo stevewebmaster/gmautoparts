@@ -193,7 +193,7 @@
                                         <div class="info-box_icon"><i class="fa-solid fa-phone"></i></div>
                                         <div class="info-contnt">
                                             <p class="info-box_text">
-                                                <a href="tel:+6478498814" class="info-box_link">07 849 8814</a>
+                                                <a href="tel:{{ config('contact.phone_tel') }}" class="info-box_link">{{ config('contact.phone') }}</a>
                                             </p>
                                         </div>
                                     </div>

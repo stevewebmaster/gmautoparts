@@ -30,7 +30,7 @@ class VerifyRecaptcha
         }
 
         return back()->withErrors([
-            'recaptcha_' . $action => 'Sorry, our spam check stopped that from sending. Please try again, or call us on 07 849 8814.',
+            'recaptcha_' . $action => 'Sorry, our spam check stopped that from sending. Please try again, or call us on ' . config('contact.phone') . '.',
         ])->withInput($request->except('g-recaptcha-response'));
     }
 }

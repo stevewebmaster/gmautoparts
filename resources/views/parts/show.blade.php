@@ -83,7 +83,7 @@
                                 <div>
                                     <h5 class="gm-stock-notice-title">This part has sold</h5>
                                     <p>We often get the same part in again — give us a call on
-                                        <a href="tel:+6478498814" class="text-inherit"><strong>07 849 8814</strong></a>
+                                        <a href="tel:{{ config('contact.phone_tel') }}" class="text-inherit"><strong>{{ config('contact.phone') }}</strong></a>
                                         and we will keep an eye out for you.</p>
                                 </div>
                             </div>
@@ -329,8 +329,8 @@
                                     </p>
                                 @endif
                                 <div class="inventory-owner-bottom mt-3">
-                                    <a href="tel:+6478498814" class="th-btn style-2 w-100">
-                                        <i class="fa-solid fa-phone"></i> 07 849 8814
+                                    <a href="tel:{{ config('contact.phone_tel') }}" class="th-btn style-2 w-100">
+                                        <i class="fa-solid fa-phone"></i> {{ config('contact.phone') }}
                                     </a>
                                     @if($part->vehicle)
                                         <a href="{{ route('vehicles.show', $part->vehicle) }}" class="th-btn style3 dealer w-100">

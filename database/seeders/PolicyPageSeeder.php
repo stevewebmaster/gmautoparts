@@ -50,7 +50,7 @@ class PolicyPageSeeder extends Seeder
 
 <h3>How to return a part</h3>
 <ol>
-<li>Call us on <strong>07 849 8814</strong> or email us, quoting your reservation reference.</li>
+<li>Call us on <strong>(07) 871-8575</strong> or email us, quoting your reservation reference.</li>
 <li>We will confirm the return address and whether we are covering freight.</li>
 <li>Send the part back, or drop it in to us in Te Awamutu.</li>
 </ol>
@@ -62,7 +62,7 @@ class PolicyPageSeeder extends Seeder
 <p>Reserving a part on this website costs nothing and does not charge you. If you do not collect a reserved part within the holding period, the reservation simply lapses and the part goes back on sale. There is nothing to refund.</p>
 
 <h3>Contact</h3>
-<p>G&amp;M Auto Spares Ltd, Te Awamutu &middot; Phone <strong>07 849 8814</strong></p>',
+<p>G&amp;M Auto Spares Ltd, Te Awamutu &middot; Phone <strong>(07) 871-8575</strong></p>',
             ],
             [
                 'key' => 'shipping-policy',
@@ -87,19 +87,19 @@ class PolicyPageSeeder extends Seeder
 <p>Orders are usually dispatched within 1&ndash;2 working days of payment clearing.</p>
 
 <h3>Large items by truck</h3>
-<p>Bumpers, doors, panels, gearboxes, engines and other large items are too big for a courier and go by truck. The cost depends on where they are going, so they are not sold online. Send us an enquiry from the part&rsquo;s page or call us on <strong>07 849 8814</strong>, and we will work out the freight to you first, so you know the full cost before you pay.</p>
+<p>Bumpers, doors, panels, gearboxes, engines and other large items are too big for a courier and go by truck. The cost depends on where they are going, so they are not sold online. Send us an enquiry from the part&rsquo;s page or call us on <strong>(07) 871-8575</strong>, and we will work out the freight to you first, so you know the full cost before you pay.</p>
 
 <h3>Overseas delivery</h3>
 <p>We do ship internationally. Freight is quoted case by case &mdash; contact us with the part and the destination and we will come back to you with a price. Any import duties or taxes in the destination country are the buyer&rsquo;s responsibility.</p>
 
 <h3>Getting a freight quote</h3>
-<p>Reserve the part on this website or call us on <strong>07 849 8814</strong>, and we will confirm the freight cost before anything is sent.</p>
+<p>Reserve the part on this website or call us on <strong>(07) 871-8575</strong>, and we will confirm the freight cost before anything is sent.</p>
 
 <h3>Damage in transit</h3>
 <p>If a part arrives damaged, contact us within <strong>7 days</strong> with photos and we will arrange a replacement or refund. See our <a href="/returns-policy">Returns Policy</a>.</p>
 
 <h3>Contact</h3>
-<p>G&amp;M Auto Spares Ltd, Te Awamutu &middot; Phone <strong>07 849 8814</strong></p>',
+<p>G&amp;M Auto Spares Ltd, Te Awamutu &middot; Phone <strong>(07) 871-8575</strong></p>',
             ],
         ];
 
