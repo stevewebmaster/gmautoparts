@@ -55,7 +55,7 @@ When you create a **new** SiteHost container, put the Laravel app in **one place
 
 - Put the Laravel app so it lives at **`~/container/application`** (clone or copy there). The container then exposes it as `/container/application`.
 
-**Stack used:** Nginx + PHP 8.4 (e.g. 1.0.4-noble). Database host: **mariadb1011** (not localhost) – set in `.env` as `DB_HOST=mariadb1011`.
+**Stack used:** Nginx + PHP 8.5 (`php -v` gave 8.5.12 on 2026-10-31). Database host: **mariadb1011** (not localhost) – set in `.env` as `DB_HOST=mariadb1011`.
 
 The app runs on Laravel 13, which needs **PHP 8.3 or newer** — check with `php -v`
 before changing the container image. `composer.json` pins dependency resolution to
