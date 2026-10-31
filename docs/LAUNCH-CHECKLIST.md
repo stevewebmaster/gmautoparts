@@ -210,7 +210,7 @@ prove the chain works. Test webhooks take a minute to recreate.
       then the same `composer install`, cache and `up` lines. Afterwards log in to
       `/admin` once (Laravel re-hashes the password to its stronger setting by
       itself) and send a test contact form
-- [ ] **[Steve]** Check no admin password is stored as plain text. From 10 June until
+- [x] **[Steve]** Check no admin password is stored as plain text. From 10 June until
       `1ab9d95`, `gm:create-admin` saved passwords as typed, because Laravel 10 never
       applied the model's hashing. On the server:
       ```bash
@@ -218,6 +218,7 @@ prove the chain works. Test webhooks take a minute to recreate.
       ```
       A `PLAIN TEXT` account cannot log in, and its password was readable in the
       database: delete it and re-create it with `php artisan gm:create-admin`
+      *Checked 2026-10-31: both admin accounts are hashed.*
 - [ ] **[Steve]** Once Laravel 13 is live, rename the CSRF middleware the app extends
       from `VerifyCsrfToken` to `PreventRequestForgery`, Laravel 13's name (the old one
       is a deprecated alias). Left until then so the upgrade deploy works on both versions
