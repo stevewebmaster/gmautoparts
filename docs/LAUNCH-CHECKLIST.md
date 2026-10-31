@@ -179,10 +179,11 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[G&M]** Consider Google **free local listings** — G&M has a physical yard, so
       parts can show in Search and Maps as in-store stock. Separate feed, no checkout
       required, no ad spend.
-- [ ] **[Steve]** Turn on reCAPTCHA: create a v3 key (see DEPLOY-SITEHOST.md for
+- [x] **[Steve]** Turn on reCAPTCHA: create a v3 key (see DEPLOY-SITEHOST.md for
       the domains), set `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, then
       `config:cache`. Send the contact form once and check it arrives; check
       `laravel.log` for `reCAPTCHA` lines over the first week
+      *Live 2026-10-31: on all five forms, and a post without a token is turned away.*
 - [x] **[Steve]** ⚠️ Change the database password. A real-looking one was committed in
       `.env.sitehost.example` (and the deploy zip) and is still in git history.
       Set a new one in the SiteHost panel, then straight away update `DB_PASSWORD` in
