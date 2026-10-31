@@ -15,6 +15,7 @@ class ContactController extends Controller
             'name' => 'required|string|max:255|not_regex:/[\r\n]/',
             'email' => 'required|email|not_regex:/[\r\n]/',
             'phone' => 'nullable|string|max:50',
+            'subject' => 'nullable|string|max:255',
             'message' => 'required|string|max:2000',
         ]);
 
@@ -23,7 +24,8 @@ class ContactController extends Controller
         Mail::raw(
             "Contact form submission\n\n" .
             "From: {$validated['name']} <{$validated['email']}>\n" .
-            "Phone: " . ($validated['phone'] ?? 'N/A') . "\n\n" .
+            "Phone: " . ($validated['phone'] ?? 'N/A') . "\n" .
+            "Subject: " . ($validated['subject'] ?? 'N/A') . "\n\n" .
             "Message:\n" . $validated['message'],
             function ($message) use ($adminEmails, $validated) {
                 $message->to($adminEmails)
@@ -32,6 +34,7 @@ class ContactController extends Controller
             }
         );
 
-        return redirect()->route('contact')->with('success', 'Thank you for your message. We will get back to you soon.');
+        // Back to whichever form sent it: the Contact page, or Quick Contact on About.
+        return back()->with('success', 'Thank you for your message. We will get back to you soon.');
     }
 }

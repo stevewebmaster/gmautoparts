@@ -75,6 +75,9 @@
                                     <form action="{{ route('contact.submit') }}" method="POST" class="contact-form">
                                         @csrf
                                         <h3 class="form-title">Get In Touch</h3>
+                                        @if(session('success'))
+                                            <p class="text-success">{{ session('success') }}</p>
+                                        @endif
                                         <div class="row">
                                             <div class="form-group col-md-6">
                                                 <input type="text" class="form-control" name="name" id="name" placeholder="Your Name *" required value="{{ old('name') }}">

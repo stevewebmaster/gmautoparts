@@ -277,15 +277,24 @@
                                     <form action="{{ route('contact.submit') }}" method="post" class="newsletter-form">
                                         @csrf
                                         <div class="form-group">
-                                            <input class="form-control" type="text" name="name" placeholder="Your Name" required>
+                                            <input class="form-control" type="text" name="name" placeholder="Your Name" required value="{{ old('name') }}">
+                                            @error('name')<span class="text-danger small d-block mt-1">{{ $message }}</span>@enderror
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="form-control" type="email" name="email" placeholder="Your Email" required value="{{ old('email') }}">
+                                            @error('email')<span class="text-danger small d-block mt-1">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-group mb-3">
-                                            <textarea name="message" cols="30" rows="3" class="form-control" placeholder="Write Message..." required></textarea>
+                                            <textarea name="message" cols="30" rows="3" class="form-control" placeholder="Write Message..." required>{{ old('message') }}</textarea>
+                                            @error('message')<span class="text-danger small d-block mt-1">{{ $message }}</span>@enderror
                                         </div>
                                         <div class="form-btn">
                                             @include('partials.recaptcha', ['action' => 'contact'])
                                             <button type="submit" class="th-btn w-100">Send Enquiry</button>
                                         </div>
+                                        @if(session('success'))
+                                            <p class="text-success mt-3 mb-0">{{ session('success') }}</p>
+                                        @endif
                                     </form>
                                 </div>
                             </div>
