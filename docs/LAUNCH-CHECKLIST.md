@@ -190,7 +190,7 @@ prove the chain works. Test webhooks take a minute to recreate.
       between, so do it at a quiet time. Then load a part page and `/admin` to check
       *Changed 2026-10-31.*
 - [ ] **[Steve]** Check `MINIAPP_PIN` on the server is at least 6 digits
-- [ ] **[Steve]** Deploy the Laravel 13 upgrade. The code is done and tested: Laravel
+- [x] **[Steve]** Deploy the Laravel 13 upgrade. The code is done and tested: Laravel
       13.39, Filament 3.3.57, Livewire 3.8.11, and `composer audit` is clean — on
       Laravel 10, which no longer gets security fixes, it listed ~50 advisories.
       Laravel 13 needs PHP 8.3+. Every package changes, so put the site in maintenance
@@ -210,6 +210,7 @@ prove the chain works. Test webhooks take a minute to recreate.
       then the same `composer install`, cache and `up` lines. Afterwards log in to
       `/admin` once (Laravel re-hashes the password to its stronger setting by
       itself) and send a test contact form
+      *Live 2026-10-31.*
 - [x] **[Steve]** Check no admin password is stored as plain text. From 10 June until
       `1ab9d95`, `gm:create-admin` saved passwords as typed, because Laravel 10 never
       applied the model's hashing. On the server:
@@ -219,9 +220,10 @@ prove the chain works. Test webhooks take a minute to recreate.
       A `PLAIN TEXT` account cannot log in, and its password was readable in the
       database: delete it and re-create it with `php artisan gm:create-admin`
       *Checked 2026-10-31: both admin accounts are hashed.*
-- [ ] **[Steve]** Once Laravel 13 is live, rename the CSRF middleware the app extends
+- [x] **[Steve]** Once Laravel 13 is live, rename the CSRF middleware the app extends
       from `VerifyCsrfToken` to `PreventRequestForgery`, Laravel 13's name (the old one
       is a deprecated alias). Left until then so the upgrade deploy works on both versions
+      *Done 2026-10-31; goes live with the next deploy, nothing to do on the server.*
 - [ ] **[Steve]** Delete the two unused header images —
       `public/images/page-headers/secondhand-parts.jpg` (1.1 MB) and
       `vehicle-wrecking-yard.webp`, both untracked and referenced nowhere
