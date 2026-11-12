@@ -28,6 +28,12 @@ class PartsFilter extends Component
         'keyword' => ['except' => ''],
     ];
 
+    /** The site's pagination look: Livewire's own Tailwind view is unstyled in this theme. */
+    public function paginationView(): string
+    {
+        return 'vendor.pagination.livewire';
+    }
+
     public function updated($propertyName): void
     {
         if (in_array($propertyName, ['make', 'model', 'year', 'category', 'subcategory', 'keyword'])) {
