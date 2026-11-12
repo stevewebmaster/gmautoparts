@@ -20,9 +20,11 @@ If anything fails, see **Troubleshooting** below and [DEPLOY-SITEHOST.md](DEPLOY
 
 1. **Set a PIN** in `.env`:
    ```env
-   MINIAPP_PIN=1234
+   MINIAPP_PIN=yourpin
    ```
-   Use a PIN only the client knows. If `MINIAPP_PIN` is empty, the mini-app is disabled (404).
+   Use **8 random digits**, not a date, a phone number or `1234`. Generate one with
+   `php -r 'echo random_int(10000000, 99999999), PHP_EOL;'`. Only the client should
+   know it. If `MINIAPP_PIN` is empty, the mini-app is disabled (404).
 
 2. **Storage link** (for uploads):
    ```bash
@@ -140,4 +142,18 @@ This keeps file sizes down and avoids filling the server. If optimization fails 
 
 - Access is protected by the PIN only (no user accounts).
 - PIN is stored in `.env`; do not commit it. Change it if it is ever shared.
+- Wrong PINs are limited two ways (right ones never count):
+  - **10 an hour from one address.** That address is locked out for the rest of the hour.
+  - **20 an hour across the whole site, from phones that have not logged in before.**
+    This stops a bot spread over many addresses. Once the limit is reached, new phones
+    are turned away for the rest of the hour, even with the right PIN.
+- A phone that has logged in carries a cookie (`miniapp_device`) that skips the
+  site-wide limit, so a bot that hits it cannot lock the yard out. The cookie is
+  tied to the PIN: after a PIN change, each phone counts as new until it logs in
+  once.
+- Each limit writes one warning to `storage/logs/laravel.log` when it is reached
+  (`Mini-app login locked…` / `Mini-app login paused…`). Several of those means
+  someone is guessing.
+- If staff get locked out by their own typos, wait the hour, or run
+  `php artisan cache:clear` on the server.
 - New parts and vehicles are created with `is_visible = true` so they appear on the site immediately. To hold for approval, change the controller to set `is_visible => false` and approve in Admin.

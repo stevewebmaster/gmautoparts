@@ -190,7 +190,12 @@ prove the chain works. Test webhooks take a minute to recreate.
       `.env` and `php artisan config:cache` — the site cannot reach the database in
       between, so do it at a quiet time. Then load a part page and `/admin` to check
       *Changed 2026-10-31.*
-- [ ] **[Steve]** Check `MINIAPP_PIN` on the server is at least 6 digits
+- [ ] **[Steve]** Deploy the security headers and the mini-app's site-wide PIN limit.
+      At the same time, set `MINIAPP_PIN` in `.env` to a new 8-digit PIN (Steve has
+      it; it is not in git) and `config:cache`. Tell G&M the new PIN *before* you
+      change it. Phones already logged in stay in, but need it next time. Then check
+      `curl -sI https://gmautospares.co.nz/ | grep -i -E '^(strict-transport|x-frame|x-content-type)'`
+      shows three lines, and log in to `/app` once
 - [x] **[Steve]** Deploy the Laravel 13 upgrade. The code is done and tested: Laravel
       13.39, Filament 3.3.57, Livewire 3.8.11, and `composer audit` is clean — on
       Laravel 10, which no longer gets security fixes, it listed ~50 advisories.

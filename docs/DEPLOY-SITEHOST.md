@@ -135,8 +135,10 @@ In `.env` set at least:
   contact form. Comma-separated for several inboxes, no spaces. Blank the
   username: if one is set, Laravel tries to log in to a relay that does not
   expect it.
-- `MINIAPP_PIN` if you use the mini-app at `/app` — at least 6 digits, not `1234`.
-  Wrong guesses are limited to 10 an hour from one address
+- `MINIAPP_PIN` if you use the mini-app at `/app`: 8 random digits, not `1234`.
+  Wrong guesses are limited to 10 an hour from one address, and 20 an hour
+  site-wide from phones that have not logged in before (see
+  [MINIAPP.md](MINIAPP.md#security))
 - `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` — Google reCAPTCHA v3 on the contact,
   enquiry, reserve and checkout forms; leave both empty to switch it off. Create the
   key at <https://www.google.com/recaptcha/admin> (type **score based (v3)**) with
@@ -220,6 +222,12 @@ After saving, **restart the container** in the SiteHost panel so Nginx reloads t
 - The app’s **AppServiceProvider** forces `URL::forceScheme('https')` when `APP_URL` starts with `https://`, so asset and form URLs are generated over HTTPS behind the proxy. That avoids “Mixed Content” when the site is opened via HTTPS.
 - The app includes **`TrustProxies`** middleware so Laravel respects `X-Forwarded-Proto` / `X-Forwarded-For` from SiteHost’s reverse proxy. Without that, redirects and cookies can behave as if the request were HTTP.
 - **One address for the site:** `RedirectToCanonicalHost` sends any host in `REDIRECT_HOSTS` to `APP_URL` with a 301, and plain http to https — but only when the proxy's `X-Forwarded-Proto` says `http`. SiteHost terminates SSL at its proxy, so the container always sees http; redirecting on that would loop. If `curl -sI http://gmautospares.co.nz/` still answers `200` with it switched on, the proxy is not sending the header, and http → https has to be done in nginx instead. Every page also carries a `<link rel="canonical">` on `APP_URL`'s host, whatever host served it.
+- **Security headers:** the `SecurityHeaders` middleware adds the following to every page Laravel serves, including redirects and error pages:
+  - `X-Frame-Options` and CSP `frame-ancestors`, so no other site can frame the pages
+  - `X-Content-Type-Options: nosniff`, `Referrer-Policy` and `Permissions-Policy`
+  - HSTS (`max-age` one year, no subdomains), only while `APP_URL` is https
+
+  Files nginx serves directly (images, CSS, JS) do not get them, and do not need them. There is no full Content-Security-Policy: the templates, reCAPTCHA, the map and the admin all use inline scripts. Don't add CSP `form-action` either, because checkout posts here and then redirects to Stripe. To check: `curl -sI https://gmautospares.co.nz/ | grep -i -E '^(strict-transport|x-frame|x-content-type)'` should show three lines.
 - After changing `.env` or deploying code:  
   `php artisan config:clear` then `php artisan config:cache`.
 

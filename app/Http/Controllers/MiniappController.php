@@ -23,6 +23,14 @@ use Illuminate\View\View;
 
 class MiniappController extends Controller
 {
+    private const WRONG_PINS_PER_ADDRESS = 10;
+
+    private const WRONG_PINS_SITE_WIDE = 20;
+
+    private const SITE_WIDE_KEY = 'miniapp-login:site-wide';
+
+    private const DEVICE_COOKIE = 'miniapp_device';
+
     public function login(): View|RedirectResponse
     {
         if (session('miniapp_authenticated')) {
@@ -44,29 +52,75 @@ class MiniappController extends Controller
             ])->withInput();
         }
 
-        // A short PIN is only safe if guesses are slow: 10 wrong per hour from
-        // one address, which puts every 4-digit PIN about 40 days away. Only
-        // wrong guesses count, so staff logging in often are never locked out.
-        $throttleKey = 'miniapp-login:' . $request->ip();
+        // A PIN is only safe if guesses are slow, so wrong ones are limited two
+        // ways. Only wrong guesses count: staff logging in often are never held up.
+        //
+        // - Per address: 10 an hour.
+        // - Site-wide: 20 an hour from devices that have never logged in. Without
+        //   it, a bot spread over 1,000 addresses gets 10,000 guesses an hour.
+        //   A phone that has logged in before carries a cookie that skips this
+        //   limit, so a bot that trips it cannot lock the yard out.
+        $addressKey = 'miniapp-login:' . $request->ip();
+        $knownDevice = $this->isKnownDevice($request, $expected);
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
-            $minutes = (int) ceil(RateLimiter::availableIn($throttleKey) / 60);
-            Log::warning('Mini-app login locked after repeated wrong PINs', ['ip' => $request->ip()]);
+        if (RateLimiter::tooManyAttempts($addressKey, self::WRONG_PINS_PER_ADDRESS)) {
+            $minutes = (int) ceil(RateLimiter::availableIn($addressKey) / 60);
 
             return back()->withErrors(['pin' => "Too many wrong PINs. Try again in {$minutes} minutes."]);
         }
 
-        if (! hash_equals($expected, $pin)) {
-            RateLimiter::hit($throttleKey, 3600);
+        if (! $knownDevice && RateLimiter::tooManyAttempts(self::SITE_WIDE_KEY, self::WRONG_PINS_SITE_WIDE)) {
+            $minutes = (int) ceil(RateLimiter::availableIn(self::SITE_WIDE_KEY) / 60);
 
-            return back()->withErrors(['pin' => 'Invalid PIN.'])->withInput();
+            return back()->withErrors(['pin' => "Too many wrong PINs have been tried. A phone that has not logged in before can try again in {$minutes} minutes."]);
         }
 
-        RateLimiter::clear($throttleKey);
+        if (! hash_equals($expected, $pin)) {
+            RateLimiter::hit($addressKey, 3600);
+
+            if (RateLimiter::attempts($addressKey) === self::WRONG_PINS_PER_ADDRESS) {
+                Log::warning('Mini-app login locked for one address after repeated wrong PINs', ['ip' => $request->ip()]);
+            }
+
+            if (! $knownDevice) {
+                RateLimiter::hit(self::SITE_WIDE_KEY, 3600);
+
+                if (RateLimiter::attempts(self::SITE_WIDE_KEY) === self::WRONG_PINS_SITE_WIDE) {
+                    Log::warning('Mini-app login paused for new devices: too many wrong PINs site-wide', ['last_ip' => $request->ip()]);
+                }
+            }
+
+            // No withInput(): it would keep the wrong PIN in the session.
+            return back()->withErrors(['pin' => 'Invalid PIN.']);
+        }
+
+        // Only this address's count is cleared. The site-wide one stays, so a
+        // correct login does not hand a bot a fresh allowance.
+        RateLimiter::clear($addressKey);
         $request->session()->regenerate();
         session(['miniapp_authenticated' => true]);
 
-        return redirect()->route('app.dashboard');
+        return redirect()->route('app.dashboard')->withCookie(cookie(
+            self::DEVICE_COOKIE,
+            $this->deviceToken($expected),
+            60 * 24 * 365,
+            '/app',
+        ));
+    }
+
+    /**
+     * The value a phone's cookie holds once it has logged in. It is tied to the
+     * PIN, so changing the PIN makes every phone a new device again. Laravel
+     * encrypts cookies with the app key, so it cannot be forged.
+     */
+    private function deviceToken(string $pin): string
+    {
+        return hash_hmac('sha256', 'miniapp-device|' . $pin, (string) config('app.key'));
+    }
+
+    private function isKnownDevice(Request $request, string $pin): bool
+    {
+        return hash_equals($this->deviceToken($pin), (string) $request->cookie(self::DEVICE_COOKIE));
     }
 
     public function logout(Request $request)
