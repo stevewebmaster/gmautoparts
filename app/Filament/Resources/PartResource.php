@@ -6,6 +6,7 @@ use App\Enums\FeedStatus;
 use App\Enums\PartStatus;
 use App\Enums\ShippingBand;
 use App\Filament\Resources\PartResource\Pages;
+use App\Filament\Resources\VehicleResource\RelationManagers\PartsRelationManager;
 use App\Models\Part;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,7 +14,6 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class PartResource extends Resource
 {
@@ -34,11 +34,19 @@ class PartResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state))),
+                        // New parts only: renaming a listed part must not move
+                        // its page, or links to it (Google's too) stop working.
+                        ->afterStateUpdated(function (?string $state, Set $set, string $operation) {
+                            if ($operation === 'create' && filled($state)) {
+                                $set('slug', Part::uniqueSlug($state));
+                            }
+                        }),
                     Forms\Components\TextInput::make('slug')
+                        ->label('Web address')
                         ->required()
                         ->maxLength(255)
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true)
+                        ->helperText('Filled in from the title. Changing it later breaks existing links to the part, including Google\'s.'),
                     Forms\Components\Select::make('part_category_id')
                         ->relationship('category', 'name')
                         ->required()
@@ -81,16 +89,22 @@ class PartResource extends Resource
                         ->helperText('The NZ Couriers satchel or box it goes in — pick it the same way as in eDespatchIT. Sets the freight price online. Leave empty and the part is NOT sold online — it falls back to reserve/enquire and is left out of the Google feed.')
                         ->columnSpanFull(),
                 ])->columns(2),
+                // Open, not collapsed: the parts page filters by these, so a part
+                // without them never comes up when a customer picks their car.
                 Forms\Components\Section::make('Vehicle compatibility')->schema([
                     Forms\Components\TextInput::make('make'),
                     Forms\Components\TextInput::make('model'),
                     Forms\Components\TextInput::make('year'),
                     Forms\Components\Select::make('vehicle_id')
+                        ->label('From vehicle (Now Dismantling)')
                         ->relationship('vehicle', 'id')
                         ->getOptionLabelFromRecordUsing(fn ($record) => $record->display_name)
-                        ->searchable()
-                        ->preload(),
-                ])->columns(2)->collapsed(),
+                        // Without these it searches the vehicle's ID number only.
+                        ->searchable(['make', 'model', 'year', 'stock_number'])
+                        ->preload()
+                        // Added from a vehicle's own page, it is that vehicle.
+                        ->hiddenOn(PartsRelationManager::class),
+                ])->columns(2),
                 Forms\Components\Section::make('Media & visibility')->schema([
                     Forms\Components\FileUpload::make('images')
                         ->image()

@@ -45,7 +45,8 @@ up in Google Merchant Center, not here.
 2. Click **New part**.
 3. Fill in:
    - **Title** – e.g. “Front brake caliper”
-   - **Slug** – usually auto-filled from the title (used in the part’s URL).
+   - **Web address** – filled in from the title. Leave it alone on a part that is already
+     listed: changing it breaks links to the part, including Google’s.
    - **Category** – choose from the main list (e.g. BRAKES, ENGINE).
    - **Subcategory** – optional (e.g. Brake Caliper). Add subcategories under **Part categories** if needed.
    - **Description** – optional details about the part.
@@ -53,8 +54,10 @@ up in Google Merchant Center, not here.
    - **Condition** – e.g. Used, Reconditioned. Type **New** for new parts and Google lists them as new; anything else shows as used.
    - **Price** – **including GST**: what the customer pays. Optional; leave blank for “Enquire”.
    - **Freight size** – the satchel or box it goes in, same as eDespatchIT. Needed to sell it online.
-   - **Make / Model / Year** – vehicle compatibility (optional).
-   - **Vehicle** – link to a “Now Dismantling” vehicle if the part comes from one.
+   - **Make / Model / Year** – what it fits. The parts page searches by these, so a part
+     without them doesn’t come up when a customer picks their car.
+   - **From vehicle (Now Dismantling)** – if the part comes from one; type the make or
+     model to find it.
    - **Images** – upload one or more photos (drag to reorder). First image is the main one.
    - **Visible** – turn off to hide the part from the site without deleting it.
    - **Featured** – turn on to show it in “Featured parts” on the homepage.
@@ -67,7 +70,7 @@ To **edit** a part, open **Parts**, click the part, change the fields and save.
 ## Adding and editing “Now Dismantling” vehicles
 
 1. Go to **Admin** → **Catalogue** → **Now Dismantling**.
-2. Click **New**.
+2. Click **New vehicle**.
 3. Fill in:
    - **Make** – e.g. Toyota, Holden.
    - **Model** – e.g. Hilux, Commodore.
@@ -80,7 +83,7 @@ To **edit** a part, open **Parts**, click the part, change the fields and save.
    - **Visible** – turn off to hide from the “Now Dismantling” page.
 4. Click **Save**.
 
-To add **parts** to this vehicle: open the vehicle in Admin, go to the **Parts** tab, then **New** and create a part (the vehicle will be linked automatically). You can also link existing parts to the vehicle by editing the part and choosing this vehicle.
+To add **parts** to this vehicle: open the vehicle in Admin, go to the **Parts** tab, then **New part** and create a part. The vehicle is linked automatically, and its make, model and year fill in any you leave blank. You can also link existing parts to the vehicle by editing the part and choosing this vehicle.
 
 ---
 

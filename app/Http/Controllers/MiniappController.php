@@ -17,7 +17,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -177,14 +176,7 @@ class MiniappController extends Controller
             'images.*' => 'image|max:20480',
         ]);
 
-        $slug = Str::slug($validated['title']);
-        $base = $slug;
-        $i = 0;
-        while (Part::where('slug', $slug)->exists()) {
-            $i++;
-            $slug = $base . '-' . $i;
-        }
-        $validated['slug'] = $slug;
+        $validated['slug'] = Part::uniqueSlug($validated['title']);
 
         $paths = [];
         foreach ($request->file('images') ?? [] as $file) {

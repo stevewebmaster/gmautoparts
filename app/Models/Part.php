@@ -17,7 +17,7 @@ class Part extends Model
     {
         static::saving(function (Part $part) {
             if (empty($part->slug) && !empty($part->title)) {
-                $part->slug = Str::slug($part->title);
+                $part->slug = static::uniqueSlug($part->title);
             }
 
             // Keep sold_at in step with status, so channel feeds and reporting
@@ -36,6 +36,24 @@ class Part extends Model
         static::saved($flushFeed);
         static::deleted($flushFeed);
     }
+
+    /**
+     * A web address for this title that no other part has yet: a yard sells
+     * many parts with the same title, so the second "Headlight" becomes
+     * "headlight-1", and so on.
+     */
+    public static function uniqueSlug(string $title): string
+    {
+        $base = Str::slug($title);
+        $slug = $base;
+
+        for ($i = 1; static::where('slug', $slug)->exists(); $i++) {
+            $slug = "{$base}-{$i}";
+        }
+
+        return $slug;
+    }
+
     protected $fillable = [
         'title',
         'slug',
