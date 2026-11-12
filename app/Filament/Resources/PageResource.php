@@ -50,9 +50,10 @@ class PageResource extends Resource
             ->bulkActions([]);
     }
 
+    /** The site only shows a fixed set of pages, so a new one would appear nowhere. */
     public static function canCreate(): bool
     {
-        return true;
+        return false;
     }
 
     public static function getPages(): array
