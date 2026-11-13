@@ -123,20 +123,31 @@ prove the chain works. Test webhooks take a minute to recreate.
 
 ## Phase 3 — Turn on card payments
 
-- [ ] **[G&M]** Open the Stripe account — business details, GST number, bank account
+- [x] **[G&M]** Open the Stripe account — business details, GST number, bank account
       for payouts. Roughly 2.7% + 30c on domestic cards.
-- [ ] **[Steve]** Add test keys (`STRIPE_KEY`, `STRIPE_SECRET`), then `config:cache`
-- [ ] **[Steve]** ⚠️ **Create the webhook** — `https://yourdomain.co.nz/stripe/webhook`,
+- [x] **[Steve]** Add test keys (`STRIPE_KEY`, `STRIPE_SECRET`), then `config:cache`
+- [x] **[Steve]** ⚠️ **Create the webhook** — `https://yourdomain.co.nz/stripe/webhook`,
       events `checkout.session.completed` and `checkout.session.expired`. Signing
       secret into `STRIPE_WEBHOOK_SECRET`, then `config:cache`.
       Without it, a customer who closes the tab after paying leaves an order stuck on
       "awaiting payment" and the sweep hands their parts back to the shop.
-- [ ] **[Steve]** Test purchase with `4242 4242 4242 4242`, any future expiry/CVC.
+- [x] **[Steve]** Test purchase with `4242 4242 4242 4242`, any future expiry/CVC.
       Check all four: order shows **Paid**; part flips to **Sold**; customer receipt
       arrives; pick-and-pack email arrives.
       *Receipt missing but order paid → the queue. Order stuck unpaid → the webhook.*
-- [ ] **[Steve]** Switch to live keys — and recreate the webhook in live mode, it has
+      *Done 2026-11-12 (GM26-AZVP6): paid, sold, both emails.*
+- [x] **[Steve]** Switch to live keys — and recreate the webhook in live mode, it has
       its own signing secret
+      *Live 2026-11-13: a $5 test part sold for real (GM26-XQWXW) and the live webhook
+      answered 200. If the secret key is a restricted one and Stripe ever refuses a
+      request, its error (in `laravel.log`) names the permission to add: API keys →
+      ⋯ → Edit key.*
+- [ ] **[Steve]** ⚠️ Order emails arrive with `***SPAM***` in the subject: SiteHost's
+      spam filter adds it (both gmautospares.co.nz and websitemaster.co.nz mail is at
+      SiteHost), not the site. Check G&M's own copies (info@ and the xtra address) —
+      a paid order missed in a spam folder is a customer waiting. The email's
+      `X-Spam` headers (Gmail: ⋮ → Show original) say which rules it tripped. The
+      domain has SPF and DMARC but no DKIM; ask SiteHost about signing.
 - [ ] **[G&M]** Decide who checks orders daily. Paid orders arrive by email and show
       under **Orders to Pack** in the Parts Loader app; a customer has already paid
       and is waiting.
@@ -190,12 +201,13 @@ prove the chain works. Test webhooks take a minute to recreate.
       `.env` and `php artisan config:cache` — the site cannot reach the database in
       between, so do it at a quiet time. Then load a part page and `/admin` to check
       *Changed 2026-10-31.*
-- [ ] **[Steve]** Deploy the security headers and the mini-app's site-wide PIN limit.
+- [x] **[Steve]** Deploy the security headers and the mini-app's site-wide PIN limit.
       At the same time, set `MINIAPP_PIN` in `.env` to a new 8-digit PIN (Steve has
       it; it is not in git) and `config:cache`. Tell G&M the new PIN *before* you
       change it. Phones already logged in stay in, but need it next time. Then check
       `curl -sI https://gmautospares.co.nz/ | grep -i -E '^(strict-transport|x-frame|x-content-type)'`
       shows three lines, and log in to `/app` once
+      *Live 2026-11-12; the headers checked again 2026-11-13.*
 - [x] **[Steve]** Deploy the Laravel 13 upgrade. The code is done and tested: Laravel
       13.39, Filament 3.3.57, Livewire 3.8.11, and `composer audit` is clean — on
       Laravel 10, which no longer gets security fixes, it listed ~50 advisories.
