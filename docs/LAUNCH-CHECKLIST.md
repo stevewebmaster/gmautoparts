@@ -145,9 +145,12 @@ prove the chain works. Test webhooks take a minute to recreate.
 - [ ] **[Steve]** ⚠️ Order emails arrive with `***SPAM***` in the subject: SiteHost's
       spam filter adds it (both gmautospares.co.nz and websitemaster.co.nz mail is at
       SiteHost), not the site. Check G&M's own copies (info@ and the xtra address) —
-      a paid order missed in a spam folder is a customer waiting. The email's
-      `X-Spam` headers (Gmail: ⋮ → Show original) say which rules it tripped. The
-      domain has SPF and DMARC but no DKIM; ask SiteHost about signing.
+      a paid order missed in a spam folder is a customer waiting.
+      *Likely cause, fixed 2026-11-13: the site introduced itself to the mail server
+      as `[127.0.0.1]`; it now says `gmautospares.co.nz`. After deploying, send a test
+      (contact form) and check the subject. Still tagged → whitelist
+      `noreply@gmautospares.co.nz` with SiteHost, and ask them about DKIM signing (the
+      domain has SPF and DMARC but no DKIM).*
 - [ ] **[G&M]** Decide who checks orders daily. Paid orders arrive by email and show
       under **Orders to Pack** in the Parts Loader app; a customer has already paid
       and is waiting.

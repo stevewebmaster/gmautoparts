@@ -11,6 +11,11 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
+            // The name the site gives when it connects to send. Without it, it
+            // says "[127.0.0.1]", which spam filters score heavily: SiteHost's
+            // tagged order emails ***SPAM*** for it. The site's domain points
+            // at the server it sends from, so the name checks out.
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
         // Writes the rendered message to the log instead of sending it. Useful

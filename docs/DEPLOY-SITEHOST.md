@@ -131,6 +131,9 @@ In `.env` set at least:
   MAIL_FROM_ADDRESS=noreply@gmautospares.co.nz
   ADMIN_EMAIL=gmautospares@xtra.co.nz,info@gmautospares.co.nz
   ```
+  The site introduces itself to the mail server as `APP_URL`'s domain
+  (`MAIL_EHLO_DOMAIN` overrides it). Left as `[127.0.0.1]`, SiteHost's spam filter
+  tagged order emails `***SPAM***`.
   `ADMIN_EMAIL` receives paid orders, reservations, part enquiries and the
   contact form. Comma-separated for several inboxes, no spaces. Blank the
   username: if one is set, Laravel tries to log in to a relay that does not
