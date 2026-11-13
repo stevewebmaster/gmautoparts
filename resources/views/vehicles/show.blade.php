@@ -1,7 +1,9 @@
 @extends('layouts.kars')
 
-@section('title', $vehicle->display_name . ' - Now Dismantling')
-@section('meta_description', 'Parts available from ' . $vehicle->display_name . '.')
+{{-- Worded the way people search: "<make> <model> wreckers", "<model> parts". --}}
+@section('full_title', 'Wrecking ' . $vehicle->display_name . ' – Used Parts | G&M Autospares, Te Awamutu')
+@section('meta_description', 'Now wrecking: ' . collect([$vehicle->display_name, $vehicle->engine, $vehicle->transmission])->filter()->implode(', ')
+    . '. Used parts available, courier NZ-wide or pick up in Te Awamutu. Phone ' . config('contact.phone') . '.')
 
 @section('content')
     <div class="breadcumb-wrapper style-2 compact-header" data-bg-src="/images/page-headers/Dismantling-Header.jpg" data-overlay="black" data-opacity="3">

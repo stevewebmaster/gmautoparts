@@ -18,7 +18,9 @@ Route::get('/parts', [PartController::class, 'index'])->name('parts.index');
 Route::get('/parts/{part:slug}', [PartController::class, 'show'])->name('parts.show');
 
 Route::get('/now-dismantling', [VehicleController::class, 'index'])->name('vehicles.index');
-Route::get('/now-dismantling/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
+// {vehicle:url_key}: route('vehicles.show', $vehicle) gives the address with the
+// vehicle's name in it. Old number-only addresses still work and redirect.
+Route::get('/now-dismantling/{vehicle:url_key}', [VehicleController::class, 'show'])->name('vehicles.show');
 
 Route::get('/feeds/google.xml', [\App\Http\Controllers\FeedController::class, 'google'])->name('feeds.google');
 

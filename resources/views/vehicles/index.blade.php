@@ -1,7 +1,7 @@
 @extends('layouts.kars')
 
-@section('title', 'Now Dismantling')
-@section('meta_description', 'Vehicles we are currently dismantling. Browse parts available from each vehicle.')
+@section('full_title', 'Cars We Are Wrecking Now – Used Parts | G&M Autospares, Te Awamutu')
+@section('meta_description', 'The cars G&M Autospares is wrecking now in Te Awamutu, Waikato. Browse each one for used parts, courier NZ-wide or pick up. Phone ' . config('contact.phone') . '.')
 
 @section('content')
     <div class="breadcumb-wrapper style-2" data-bg-src="/images/page-headers/Dismantling-Header.jpg" data-overlay="black" data-opacity="3">

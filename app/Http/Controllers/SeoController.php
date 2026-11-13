@@ -63,7 +63,7 @@ class SeoController extends Controller
             }
         });
 
-        foreach (Vehicle::where('is_visible', true)->get(['id', 'updated_at']) as $vehicle) {
+        foreach (Vehicle::where('is_visible', true)->get(['id', 'year', 'make', 'model', 'updated_at']) as $vehicle) {
             $urls[] = ['loc' => route('vehicles.show', $vehicle, absolute: false), 'lastmod' => $vehicle->updated_at];
         }
 

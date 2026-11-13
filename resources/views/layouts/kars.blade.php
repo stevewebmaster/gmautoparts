@@ -3,7 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>@yield('title', 'G&M Auto Parts') - Quality Used Car Parts | NZ</title>
+    {{-- A page can set its whole title with full_title; otherwise the usual ending is added. --}}
+    @hasSection('full_title')
+        <title>@yield('full_title')</title>
+    @else
+        <title>@yield('title', 'G&M Auto Parts') - Quality Used Car Parts | NZ</title>
+    @endif
     <meta name="description" content="@yield('meta_description', 'G&M Auto Parts - quality used automotive parts in New Zealand.')">
     @include('partials.canonical')
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
